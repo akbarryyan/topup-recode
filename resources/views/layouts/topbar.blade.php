@@ -1,4 +1,4 @@
-<div class="w-full bg-[#0E0E10] shadow-2xl text-gray-300 relative z-50">
+<div class="w-full bg-[#0E0E10] backdrop-blur-md shadow-2xl text-gray-300 fixed top-0 left-0 right-0 z-50">
     <!-- Topbar content goes here -->
     <div class="flex items-center justify-between px-4 py-2">
         <!-- Logo Section -->

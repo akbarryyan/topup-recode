@@ -26,7 +26,7 @@
         }
     </style>
 </head>
-<body>
+<body class="pt-12">
     @include('layouts.topbar')
 
     @yield('content')
