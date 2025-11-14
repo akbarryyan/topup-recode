@@ -18,10 +18,10 @@
 </div>
 
 <!-- Overlay -->
-<div id="menuOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden transition-opacity duration-300 opacity-0"></div>
+<div id="menuOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-68 hidden transition-opacity duration-300 opacity-0"></div>
 
 <!-- Sidebar Menu -->
-<div id="sidebarMenu" class="fixed top-0 right-0 h-full w-72 bg-[#18181B] shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out">
+<div id="sidebarMenu" class="fixed top-0 right-0 h-full w-72 bg-[#18181B] shadow-2xl z-68 transform translate-x-full transition-transform duration-300 ease-in-out">
     <div class="p-6">
         <!-- Close Button & Logo -->
         <div class="flex items-center justify-between mb-8">
