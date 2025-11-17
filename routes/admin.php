@@ -18,9 +18,11 @@ Route::prefix('admin')->middleware('web')->group(function () {
 
         Route::post('/logout', [AuthController::class, 'logout'])->name('admin.logout');
 
-        Route::get('/users', function () {
-            return view('admin.users.index');
-        })->name('admin.users');
+        // Users Management
+        Route::get('/users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.users');
+        Route::get('/users/{id}/edit', [\App\Http\Controllers\Admin\UserController::class, 'edit'])->name('admin.users.edit');
+        Route::put('/users/{id}', [\App\Http\Controllers\Admin\UserController::class, 'update'])->name('admin.users.update');
+        Route::delete('/users/{id}', [\App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('admin.users.destroy');
 
         Route::get('/settings', function () {
             return view('admin.settings.index');

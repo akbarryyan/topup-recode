@@ -7,15 +7,16 @@
             <a href="index.html">St</a>
           </div>
           <ul class="sidebar-menu">
-            <li class="menu-header">Dashboard</li>
-            <li class="dropdown active">
-              <a href="#" class="nav-link has-dropdown"><i class="fas fa-fire"></i><span>Dashboard</span></a>
-              <ul class="dropdown-menu">
-                <li class=active><a class="nav-link" href="index-0.html">General Dashboard</a></li>
-                <li><a class="nav-link" href="index.html">Ecommerce Dashboard</a></li>
-              </ul>
+            <li class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"><a class="nav-link" href="{{ route('admin.dashboard') }}"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+            
+            <li class="menu-header">Management</li>
+            <li class="{{ request()->routeIs('admin.users*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.users') }}">
+                    <i class="fas fa-users"></i> <span>Kelola Users</span>
+                </a>
             </li>
-            <li class="menu-header">Starter</li>
+            
+            <li class="menu-header">Example Menu</li>
             <li class="dropdown">
               <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-columns"></i> <span>Layout</span></a>
               <ul class="dropdown-menu">
