@@ -11,3 +11,9 @@ Route::get('/register', function () {
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
+Route::get('/invoices', function () {
+    return view('check-invoice');
+})->name('invoices');
+Route::get('/leaderboard', function () {
+    return view('leaderboard');
+})->name('leaderboard');
