@@ -123,6 +123,7 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
+                                            <th>Gambar</th>
                                             <th>Code</th>
                                             <th>Game</th>
                                             <th>Nama Layanan</th>
@@ -139,6 +140,9 @@
                                         @forelse($services as $index => $service)
                                         <tr>
                                             <td>{{ ($services->currentPage() - 1) * $services->perPage() + $index + 1 }}</td>
+                                            <td>
+                                                <img src="{{ $service->image_url }}" alt="{{ $service->game }}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover; cursor: pointer;" onclick="openImageModal('{{ $service->game }}', '{{ $service->image_url }}', {{ $service->has_image ? 'true' : 'false' }})">
+                                            </td>
                                             <td><code>{{ $service->code }}</code></td>
                                             <td><strong>{{ $service->game }}</strong></td>
                                             <td>{{ $service->name }}</td>
@@ -180,6 +184,10 @@
                                             </td>
                                             <td>
                                                 <div class="d-flex gap-2">
+                                                    <button type="button" class="btn btn-sm btn-info" onclick="openImageModal('{{ $service->game }}', '{{ $service->image_url }}', {{ $service->has_image ? 'true' : 'false' }})" title="Upload Gambar Game">
+                                                        <i class="fas fa-image"></i>
+                                                    </button>
+
                                                     <form action="{{ route('admin.game-services.toggle', $service->id) }}" method="POST">
                                                         @csrf
                                                         @method('PATCH')
@@ -196,7 +204,7 @@
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="11" class="text-center">Tidak ada data. Silakan sync dari API terlebih dahulu.</td>
+                                            <td colspan="12" class="text-center">Tidak ada data. Silakan sync dari API terlebih dahulu.</td>
                                         </tr>
                                         @endforelse
                                     </tbody>
@@ -314,7 +322,15 @@
                     </div>
 
                     <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> Proses sync akan mengambil data layanan terbaru dari VIP Reseller API, menambahkan margin, dan memperbarui database.
+                        <i class="fas fa-info-circle"></i> Proses sync akan mengambil data layanan terbaru dari VIP Reseller API, menambahkan margin, dan memperbarui database.<br>
+                        <strong>Behavior:</strong><br>
+                        • Status <span class="badge badge-success">Available</span> → Disimpan/diupdate<br>
+                        • Status <span class="badge badge-danger">Empty</span> (baru) → Dilewati<br>
+                        • Status <span class="badge badge-danger">Empty</span> (sudah ada di database) → <strong>Dihapus otomatis</strong>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> <strong>Gambar game aman!</strong> Gambar yang sudah diupload tidak akan hilang saat sync ulang.
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -397,10 +413,125 @@
     </div>
 </div>
 
+<!-- Image Upload Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Upload Gambar Game</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="imageUploadForm" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <img id="previewImage" src="" alt="" class="img-thumbnail" style="max-width: 200px; max-height: 200px; object-fit: cover;">
+                        <p class="mt-2"><strong id="gameName"></strong></p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Pilih Gambar Baru</label>
+                        <input type="file" name="image" id="imageInput" class="form-control" accept="image/*">
+                        <small class="form-text text-muted">Format: JPG, PNG, GIF, WEBP. Maksimal 2MB</small>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> <strong>Upload 1x untuk semua layanan game ini!</strong><br>
+                        Gambar ini akan otomatis digunakan oleh semua layanan dari game <strong id="gameNameInfo"></strong>.<br>
+                        Ukuran disarankan: 500x500px atau rasio 1:1
+                    </div>
+
+                    <div id="deleteImageSection" style="display: none;">
+                        <hr>
+                        <button type="button" class="btn btn-danger btn-block" id="deleteImageBtn">
+                            <i class="fas fa-trash"></i> Hapus Gambar
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Upload Gambar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
 <script>
+// Open image modal
+var currentGameName = null;
+
+function openImageModal(gameName, imageUrl, hasImage) {
+    currentGameName = gameName;
+    $('#previewImage').attr('src', imageUrl);
+    $('#gameName').text(gameName);
+    $('#gameNameInfo').text(gameName);
+    $('#imageUploadForm').attr('action', '/admin/game-services/upload-image/' + encodeURIComponent(gameName));
+    $('#imageInput').val('');
+    
+    if (hasImage) {
+        $('#deleteImageSection').show();
+    } else {
+        $('#deleteImageSection').hide();
+    }
+    
+    $('#imageModal').modal('show');
+}
+
+// Preview image before upload
+$('#imageInput').on('change', function(e) {
+    if (e.target.files && e.target.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            $('#previewImage').attr('src', e.target.result);
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    }
+});
+
+// Delete image
+$('#deleteImageBtn').on('click', function() {
+    swal({
+        title: "Hapus Gambar Game?",
+        text: "Gambar game " + currentGameName + " akan dihapus dan semua layanannya akan menggunakan placeholder default.",
+        icon: "warning",
+        buttons: {
+            cancel: "Batal",
+            confirm: "Ya, Hapus!"
+        },
+        dangerMode: true,
+    }).then((willDelete) => {
+        if (willDelete) {
+            var form = $('<form>', {
+                'method': 'POST',
+                'action': '/admin/game-services/delete-image/' + encodeURIComponent(currentGameName)
+            });
+            
+            form.append($('<input>', {
+                'type': 'hidden',
+                'name': '_token',
+                'value': '{{ csrf_token() }}'
+            }));
+            
+            form.append($('<input>', {
+                'type': 'hidden',
+                'name': '_method',
+                'value': 'DELETE'
+            }));
+            
+            $('body').append(form);
+            form.submit();
+        }
+    });
+});
+
 $(document).ready(function() {
     // Margin calculator
     $('#marginType, #marginValue').on('change keyup', function() {

@@ -77,4 +77,32 @@ class GameService extends Model
         }
         return $originalPrice + $marginValue;
     }
+
+    /**
+     * Get game image relationship
+     */
+    public function gameImage()
+    {
+        return $this->belongsTo(GameImage::class, 'game', 'game_name');
+    }
+
+    /**
+     * Get image URL with fallback
+     */
+    public function getImageUrlAttribute()
+    {
+        if ($this->gameImage && $this->gameImage->image) {
+            return $this->gameImage->image_url;
+        }
+        // Fallback to placeholder
+        return asset('assets/img/game-placeholder.svg');
+    }
+
+    /**
+     * Check if game has image
+     */
+    public function getHasImageAttribute()
+    {
+        return $this->gameImage && $this->gameImage->image;
+    }
 }

@@ -47,25 +47,42 @@
             </div>
         </div>
 
-        <div class="mt-4 grid grid-cols-3 gap-2">
-            <button>
-                <img src="{{ asset('image/MLBB1.webp') }}" alt="MLBB Example" class="w-full rounded">
-            </button>
-            <button>
-                <img src="{{ asset('image/MLBB1.webp') }}" alt="MLBB Example" class="w-full rounded">
-            </button>
-            <button>
-                <img src="{{ asset('image/MLBB1.webp') }}" alt="MLBB Example" class="w-full rounded">
-            </button>
-            <button>
-                <img src="{{ asset('image/MLBB1.webp') }}" alt="MLBB Example" class="w-full rounded">
-            </button>
-            <button>
-                <img src="{{ asset('image/MLBB1.webp') }}" alt="MLBB Example" class="w-full rounded">
-            </button>
-            <button>
-                <img src="{{ asset('image/MLBB1.webp') }}" alt="MLBB Example" class="w-full rounded">
-            </button>
+        <!-- Products Grid -->
+        <div id="products-container" class="mt-4">
+            <div id="products-grid" class="grid grid-cols-3 gap-2">
+                @foreach($gameServices as $index => $gameData)
+                    @php
+                        $gameName = $index;
+                        $services = $gameData;
+                    @endphp
+                    <button class="game-product relative overflow-hidden rounded-lg {{ $loop->index >= 6 ? 'hidden' : '' }}" data-game="{{ $gameName }}">
+                        @if(isset($gameImages[$gameName]))
+                            <img src="{{ asset('storage/game-images/' . $gameImages[$gameName]->image) }}" 
+                                 alt="{{ $gameName }}" 
+                                 class="w-full h-full object-cover rounded-lg hover:scale-105 transition-transform duration-300">
+                        @else
+                            <img src="{{ asset('storage/game-images/game-placeholder.svg') }}" 
+                                 alt="{{ $gameName }}" 
+                                 class="w-full h-full object-cover rounded-lg hover:scale-105 transition-transform duration-300">
+                        @endif
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                            <p class="text-white text-xs font-semibold truncate">{{ $gameName }}</p>
+                        </div>
+                    </button>
+                @endforeach
+            </div>
+
+            <!-- Show More Button -->
+            @if($gameServices->count() > 6)
+                <div class="mt-4 text-center">
+                    <button id="show-more-btn" class="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-2 rounded-lg transition-colors duration-300">
+                        Show More
+                    </button>
+                    <button id="show-less-btn" class="hidden bg-gray-700 hover:bg-gray-600 text-white font-semibold px-6 py-2 rounded-lg transition-colors duration-300">
+                        Show Less
+                    </button>
+                </div>
+            @endif
         </div>
     </div>
 
@@ -85,7 +102,11 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const tabs = document.querySelectorAll('.category-tab');
+            const showMoreBtn = document.getElementById('show-more-btn');
+            const showLessBtn = document.getElementById('show-less-btn');
+            const productsGrid = document.getElementById('products-grid');
             
+            // Tab switching
             tabs.forEach(tab => {
                 tab.addEventListener('click', function() {
                     // Remove active class from all tabs
@@ -99,6 +120,38 @@
                     this.classList.remove('text-gray-400', 'border-transparent');
                 });
             });
+
+            // Show More functionality
+            if (showMoreBtn) {
+                showMoreBtn.addEventListener('click', function() {
+                    const hiddenProducts = productsGrid.querySelectorAll('.game-product.hidden');
+                    hiddenProducts.forEach(product => {
+                        product.classList.remove('hidden');
+                    });
+                    showMoreBtn.classList.add('hidden');
+                    if (showLessBtn) {
+                        showLessBtn.classList.remove('hidden');
+                    }
+                });
+            }
+
+            // Show Less functionality
+            if (showLessBtn) {
+                showLessBtn.addEventListener('click', function() {
+                    const allProducts = productsGrid.querySelectorAll('.game-product');
+                    allProducts.forEach((product, index) => {
+                        if (index >= 6) {
+                            product.classList.add('hidden');
+                        }
+                    });
+                    showLessBtn.classList.add('hidden');
+                    if (showMoreBtn) {
+                        showMoreBtn.classList.remove('hidden');
+                    }
+                    // Scroll to products section
+                    productsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            }
         });
     </script>
 

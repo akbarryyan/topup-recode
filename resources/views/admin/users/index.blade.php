@@ -179,27 +179,6 @@
 
 @push('scripts')
 <script>
-    // DataTables Initialization
-    $("#table-1").dataTable({
-        "columnDefs": [
-            { "sortable": false, "targets": [6] } // Disable sorting on action column
-        ],
-        "language": {
-            "search": "Cari:",
-            "lengthMenu": "Tampilkan _MENU_ data per halaman",
-            "zeroRecords": "Data tidak ditemukan",
-            "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
-            "infoEmpty": "Tidak ada data tersedia",
-            "infoFiltered": "(difilter dari _MAX_ total data)",
-            "paginate": {
-                "first": "Pertama",
-                "last": "Terakhir",
-                "next": "Selanjutnya",
-                "previous": "Sebelumnya"
-            }
-        }
-    });
-
     function confirmDelete(userId) {
         swal({
             title: 'Apakah Anda yakin?',

@@ -27,6 +27,12 @@
                     <i class="fas fa-mobile-alt"></i> <span>Layanan Pulsa & PPOB</span>
                 </a>
             </li>
+
+            <li class="{{ request()->routeIs('admin.news*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.news.index') }}">
+                    <i class="fas fa-newspaper"></i> <span>Kelola Berita</span>
+                </a>
+            </li>
             
             <li class="menu-header">Example Menu</li>
             <li class="dropdown">

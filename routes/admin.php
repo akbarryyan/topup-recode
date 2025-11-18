@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\GameServiceController;
 use App\Http\Controllers\Admin\PrepaidServiceController;
+use App\Http\Controllers\Admin\NewsController;
 
 Route::prefix('admin')->middleware('web')->group(function () {
     // Login routes (guest only)
@@ -36,6 +37,8 @@ Route::prefix('admin')->middleware('web')->group(function () {
             Route::get('/', [GameServiceController::class, 'index'])->name('index');
             Route::post('/sync', [GameServiceController::class, 'sync'])->name('sync');
             Route::post('/bulk-check-stock', [GameServiceController::class, 'bulkCheckStock'])->name('bulk-check-stock');
+            Route::post('/upload-image/{gameName}', [GameServiceController::class, 'uploadImage'])->name('upload-image');
+            Route::delete('/delete-image/{gameName}', [GameServiceController::class, 'deleteImage'])->name('delete-image');
             Route::patch('/{id}/toggle', [GameServiceController::class, 'toggleStatus'])->name('toggle');
             Route::patch('/{id}/check-stock', [GameServiceController::class, 'checkStock'])->name('check-stock');
             Route::delete('/{id}', [GameServiceController::class, 'destroy'])->name('destroy');
@@ -47,6 +50,16 @@ Route::prefix('admin')->middleware('web')->group(function () {
             Route::post('/sync', [PrepaidServiceController::class, 'sync'])->name('sync');
             Route::patch('/{id}/toggle', [PrepaidServiceController::class, 'toggleStatus'])->name('toggle');
             Route::delete('/{id}', [PrepaidServiceController::class, 'destroy'])->name('destroy');
+        });
+
+        // News Routes
+        Route::prefix('news')->name('admin.news.')->group(function () {
+            Route::get('/', [NewsController::class, 'index'])->name('index');
+            Route::get('/create', [NewsController::class, 'create'])->name('create');
+            Route::post('/', [NewsController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [NewsController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [NewsController::class, 'update'])->name('update');
+            Route::delete('/{id}', [NewsController::class, 'destroy'])->name('destroy');
         });
     });
 });

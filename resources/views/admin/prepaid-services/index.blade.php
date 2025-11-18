@@ -330,7 +330,11 @@
                     </div>
 
                     <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> Proses sync akan mengambil data layanan terbaru dari VIP Reseller API Prepaid Endpoint, menambahkan margin, dan memperbarui database.
+                        <i class="fas fa-info-circle"></i> Proses sync akan mengambil data layanan terbaru dari VIP Reseller API Prepaid Endpoint, menambahkan margin, dan memperbarui database.<br>
+                        <strong>Behavior:</strong><br>
+                        • Status <span class="badge badge-success">Available</span> → Disimpan/diupdate<br>
+                        • Status <span class="badge badge-danger">Empty</span> (baru) → Dilewati<br>
+                        • Status <span class="badge badge-danger">Empty</span> (sudah ada di database) → <strong>Dihapus otomatis</strong>
                     </div>
                 </div>
                 <div class="modal-footer">

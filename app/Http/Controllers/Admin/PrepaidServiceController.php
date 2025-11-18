@@ -100,8 +100,26 @@ class PrepaidServiceController extends Controller
         $synced = 0;
         $updated = 0;
         $skipped = 0;
+        $skippedEmpty = 0;
+        $deleted = 0;
 
         foreach ($response['data'] as $service) {
+            // Check if service already exists in database
+            $existingService = PrepaidService::where('code', $service['code'])->first();
+
+            // If service is empty/unavailable
+            if ($service['status'] !== 'available') {
+                // Delete if already exists in database
+                if ($existingService) {
+                    $existingService->delete();
+                    $deleted++;
+                } else {
+                    // Skip if doesn't exist (don't add empty services)
+                    $skippedEmpty++;
+                }
+                continue;
+            }
+
             // Check limit
             if (($synced + $updated) >= $limit) {
                 $skipped++;
@@ -155,11 +173,21 @@ class PrepaidServiceController extends Controller
         }
 
         $marginText = $marginType === 'percent' ? "{$marginValue}%" : "Rp " . number_format($marginValue, 0, ',', '.');
-        $message = "Sync berhasil dengan margin {$marginText}! {$synced} layanan baru ditambahkan, {$updated} layanan diperbarui.";
+        $message = "Sync berhasil dengan margin {$marginText}! {$synced} layanan baru ditambahkan, {$updated} layanan diperbarui";
+        
+        if ($deleted > 0) {
+            $message .= ", {$deleted} layanan empty dihapus";
+        }
+        
+        if ($skippedEmpty > 0) {
+            $message .= " ({$skippedEmpty} layanan empty baru dilewati)";
+        }
         
         if ($skipped > 0) {
             $message .= " ({$skipped} layanan dilewati karena limit)";
         }
+        
+        $message .= ".";
 
         return redirect()->back()->with('success', $message);
     }

@@ -1,9 +1,21 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Models\GameService;
+use App\Models\GameImage;
 
 Route::get('/', function () {
-    return view('welcome');
+    // Get active game services grouped by game
+    $gameServices = GameService::where('is_active', true)
+        ->where('status', 'available')
+        ->orderBy('game')
+        ->get()
+        ->groupBy('game');
+    
+    // Get game images
+    $gameImages = GameImage::all()->keyBy('game_name');
+    
+    return view('welcome', compact('gameServices', 'gameImages'));
 });
 Route::get('/register', function () {
     return view('auth.register');

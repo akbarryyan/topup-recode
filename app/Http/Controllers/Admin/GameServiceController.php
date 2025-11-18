@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\GameService;
+use App\Models\GameImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use App\Services\VipResellerService;
 
@@ -84,8 +86,26 @@ class GameServiceController extends Controller
         $synced = 0;
         $updated = 0;
         $skipped = 0;
+        $skippedEmpty = 0;
+        $deleted = 0;
 
         foreach ($response['data'] as $service) {
+            // Check if service already exists in database
+            $existingService = GameService::where('code', $service['code'])->first();
+
+            // If service is empty/unavailable
+            if ($service['status'] !== 'available') {
+                // Delete if already exists in database
+                if ($existingService) {
+                    $existingService->delete();
+                    $deleted++;
+                } else {
+                    // Skip if doesn't exist (don't add empty services)
+                    $skippedEmpty++;
+                }
+                continue;
+            }
+
             // Check limit
             if (($synced + $updated) >= $limit) {
                 $skipped++;
@@ -134,11 +154,21 @@ class GameServiceController extends Controller
         }
 
         $marginText = $marginType === 'percent' ? "{$marginValue}%" : "Rp " . number_format($marginValue, 0, ',', '.');
-        $message = "Sync berhasil dengan margin {$marginText}! {$synced} layanan baru ditambahkan, {$updated} layanan diperbarui.";
+        $message = "Sync berhasil dengan margin {$marginText}! {$synced} layanan baru ditambahkan, {$updated} layanan diperbarui";
+        
+        if ($deleted > 0) {
+            $message .= ", {$deleted} layanan empty dihapus";
+        }
+        
+        if ($skippedEmpty > 0) {
+            $message .= " ({$skippedEmpty} layanan empty baru dilewati)";
+        }
         
         if ($skipped > 0) {
             $message .= " ({$skipped} layanan dilewati karena limit)";
         }
+        
+        $message .= ".";
 
         return redirect()->back()->with('success', $message);
     }
@@ -326,5 +356,70 @@ class GameServiceController extends Controller
         }
         
         return redirect()->back()->with($updated > 0 ? 'success' : 'warning', $message);
+    }
+
+    /**
+     * Upload image for game (will apply to all services of this game)
+     */
+    public function uploadImage(Request $request, $gameName)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ]);
+
+        // Get or create GameImage record
+        $gameImage = GameImage::firstOrNew(['game_name' => $gameName]);
+        
+        // Delete old image if exists
+        if ($gameImage->image) {
+            $oldImagePath = public_path('storage/game-images/' . $gameImage->image);
+            if (file_exists($oldImagePath)) {
+                unlink($oldImagePath);
+            }
+        }
+
+        // Create directory if not exists
+        $uploadPath = public_path('storage/game-images');
+        if (!file_exists($uploadPath)) {
+            mkdir($uploadPath, 0755, true);
+        }
+
+        // Generate unique filename
+        $filename = time() . '_' . str_replace(' ', '_', $gameName) . '_' . uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
+        
+        // Move uploaded file
+        $request->file('image')->move($uploadPath, $filename);
+        
+        // Save or update game image
+        $gameImage->image = $filename;
+        $gameImage->save();
+
+        // Count affected services
+        $serviceCount = GameService::where('game', $gameName)->count();
+
+        return redirect()->back()->with('success', "Gambar berhasil diupload untuk game {$gameName}! ({$serviceCount} layanan menggunakan gambar ini)");
+    }
+
+    /**
+     * Delete image for game (will affect all services of this game)
+     */
+    public function deleteImage($gameName)
+    {
+        $gameImage = GameImage::where('game_name', $gameName)->first();
+        
+        if ($gameImage && $gameImage->image) {
+            $imagePath = public_path('storage/game-images/' . $gameImage->image);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+            
+            $gameImage->delete();
+            
+            $serviceCount = GameService::where('game', $gameName)->count();
+            
+            return redirect()->back()->with('success', "Gambar berhasil dihapus untuk game {$gameName}! ({$serviceCount} layanan terpengaruh)");
+        }
+        
+        return redirect()->back()->with('error', 'Tidak ada gambar untuk dihapus.');
     }
 }
