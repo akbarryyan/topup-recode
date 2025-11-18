@@ -1,7 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\GameServiceController;
+use App\Http\Controllers\Admin\PrepaidServiceController;
 
 Route::prefix('admin')->middleware('web')->group(function () {
     // Login routes (guest only)
@@ -19,13 +22,31 @@ Route::prefix('admin')->middleware('web')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout'])->name('admin.logout');
 
         // Users Management
-        Route::get('/users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.users');
-        Route::get('/users/{id}/edit', [\App\Http\Controllers\Admin\UserController::class, 'edit'])->name('admin.users.edit');
-        Route::put('/users/{id}', [\App\Http\Controllers\Admin\UserController::class, 'update'])->name('admin.users.update');
-        Route::delete('/users/{id}', [\App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('admin.users.destroy');
+        Route::get('/users', [UserController::class, 'index'])->name('admin.users');
+        Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
+        Route::put('/users/{id}', [UserController::class, 'update'])->name('admin.users.update');
+        Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
 
         Route::get('/settings', function () {
             return view('admin.settings.index');
         })->name('admin.settings');
+
+        // Game Services Routes
+        Route::prefix('game-services')->name('admin.game-services.')->group(function () {
+            Route::get('/', [GameServiceController::class, 'index'])->name('index');
+            Route::post('/sync', [GameServiceController::class, 'sync'])->name('sync');
+            Route::post('/bulk-check-stock', [GameServiceController::class, 'bulkCheckStock'])->name('bulk-check-stock');
+            Route::patch('/{id}/toggle', [GameServiceController::class, 'toggleStatus'])->name('toggle');
+            Route::patch('/{id}/check-stock', [GameServiceController::class, 'checkStock'])->name('check-stock');
+            Route::delete('/{id}', [GameServiceController::class, 'destroy'])->name('destroy');
+        });
+
+        // Prepaid Services Routes (Pulsa & PPOB)
+        Route::prefix('prepaid-services')->name('admin.prepaid-services.')->group(function () {
+            Route::get('/', [PrepaidServiceController::class, 'index'])->name('index');
+            Route::post('/sync', [PrepaidServiceController::class, 'sync'])->name('sync');
+            Route::patch('/{id}/toggle', [PrepaidServiceController::class, 'toggleStatus'])->name('toggle');
+            Route::delete('/{id}', [PrepaidServiceController::class, 'destroy'])->name('destroy');
+        });
     });
 });

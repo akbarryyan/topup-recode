@@ -15,6 +15,18 @@
                     <i class="fas fa-users"></i> <span>Kelola Users</span>
                 </a>
             </li>
+
+            <li class="{{ request()->routeIs('admin.game-services*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.game-services.index') }}">
+                    <i class="fas fa-gamepad"></i> <span>Layanan Game</span>
+                </a>
+            </li>
+
+            <li class="{{ request()->routeIs('admin.prepaid-services*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.prepaid-services.index') }}">
+                    <i class="fas fa-mobile-alt"></i> <span>Layanan Pulsa & PPOB</span>
+                </a>
+            </li>
             
             <li class="menu-header">Example Menu</li>
             <li class="dropdown">

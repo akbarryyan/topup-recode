@@ -17,3 +17,6 @@ Route::get('/invoices', function () {
 Route::get('/leaderboard', function () {
     return view('leaderboard');
 })->name('leaderboard');
+Route::get('/article', function () {
+    return view('article');
+})->name('article');
