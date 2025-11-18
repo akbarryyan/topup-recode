@@ -39,6 +39,88 @@
         @endif
 
         <div class="section-body">
+            <!-- Brand Images Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-images"></i> Kelola Gambar Brand</h4>
+                            <div class="card-header-action">
+                                <button type="button" class="btn btn-info btn-sm" data-toggle="collapse" data-target="#brandImagesSection">
+                                    <i class="fas fa-eye"></i> Toggle
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body collapse" id="brandImagesSection">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> <strong>Info:</strong> Setiap brand dapat memiliki 1 gambar yang akan ditampilkan untuk semua layanan dari brand tersebut.
+                            </div>
+                            
+                            <div class="row">
+                                @foreach($brands as $brand)
+                                    @php
+                                        $brandImage = $brandImages[$brand] ?? null;
+                                        $serviceCount = \App\Models\PrepaidService::where('brand', $brand)->count();
+                                    @endphp
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card border">
+                                            <div class="card-body text-center">
+                                                <h6 class="mb-3"><strong>{{ $brand }}</strong></h6>
+                                                
+                                                @if($brandImage)
+                                                    <img src="{{ asset('storage/brand-images/' . $brandImage->image) }}" 
+                                                         alt="{{ $brand }}" 
+                                                         class="img-thumbnail mb-2" 
+                                                         style="max-width: 150px; max-height: 150px; object-fit: contain;">
+                                                @else
+                                                    <img src="{{ asset('storage/brand-images/brand-placeholder.svg') }}" 
+                                                         alt="No Image" 
+                                                         class="img-thumbnail mb-2" 
+                                                         style="max-width: 150px; max-height: 150px; object-fit: contain; opacity: 0.5;">
+                                                @endif
+                                                
+                                                <p class="text-muted small mb-3">{{ $serviceCount }} layanan</p>
+                                                
+                                                <form action="{{ route('admin.prepaid-services.upload-image', $brand) }}" 
+                                                      method="POST" 
+                                                      enctype="multipart/form-data" 
+                                                      class="mb-2">
+                                                    @csrf
+                                                    <div class="custom-file mb-2">
+                                                        <input type="file" 
+                                                               class="custom-file-input" 
+                                                               name="image" 
+                                                               id="brandImage{{ $loop->index }}" 
+                                                               accept="image/*" 
+                                                               onchange="this.form.submit()" 
+                                                               required>
+                                                        <label class="custom-file-label" for="brandImage{{ $loop->index }}">
+                                                            Pilih gambar...
+                                                        </label>
+                                                    </div>
+                                                </form>
+                                                
+                                                @if($brandImage)
+                                                    <form action="{{ route('admin.prepaid-services.delete-image', $brand) }}" 
+                                                          method="POST" 
+                                                          onsubmit="return confirm('Hapus gambar brand ini?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger btn-sm btn-block">
+                                                            <i class="fas fa-trash"></i> Hapus
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-12">
                     <div class="card">

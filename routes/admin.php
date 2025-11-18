@@ -17,7 +17,13 @@ Route::prefix('admin')->middleware('web')->group(function () {
     // Protected admin routes (auth + admin role required)
     Route::middleware('admin')->group(function () {
         Route::get('/', function () {
-            return view('admin.dashboard');
+            $stats = [
+                'total_users' => \App\Models\User::count(),
+                'total_news' => \App\Models\News::count(),
+                'total_prepaid_services' => \App\Models\PrepaidService::count(),
+                'total_game_services' => \App\Models\GameService::count(),
+            ];
+            return view('admin.dashboard', compact('stats'));
         })->name('admin.dashboard');
 
         Route::post('/logout', [AuthController::class, 'logout'])->name('admin.logout');
@@ -48,6 +54,8 @@ Route::prefix('admin')->middleware('web')->group(function () {
         Route::prefix('prepaid-services')->name('admin.prepaid-services.')->group(function () {
             Route::get('/', [PrepaidServiceController::class, 'index'])->name('index');
             Route::post('/sync', [PrepaidServiceController::class, 'sync'])->name('sync');
+            Route::post('/upload-image/{brandName}', [PrepaidServiceController::class, 'uploadImage'])->name('upload-image');
+            Route::delete('/delete-image/{brandName}', [PrepaidServiceController::class, 'deleteImage'])->name('delete-image');
             Route::patch('/{id}/toggle', [PrepaidServiceController::class, 'toggleStatus'])->name('toggle');
             Route::delete('/{id}', [PrepaidServiceController::class, 'destroy'])->name('destroy');
         });

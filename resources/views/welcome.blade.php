@@ -49,40 +49,79 @@
 
         <!-- Products Grid -->
         <div id="products-container" class="mt-4">
-            <div id="products-grid" class="grid grid-cols-3 gap-2">
-                @foreach($gameServices as $index => $gameData)
-                    @php
-                        $gameName = $index;
-                        $services = $gameData;
-                    @endphp
-                    <button class="game-product relative overflow-hidden rounded-lg {{ $loop->index >= 6 ? 'hidden' : '' }}" data-game="{{ $gameName }}">
-                        @if(isset($gameImages[$gameName]))
-                            <img src="{{ asset('storage/game-images/' . $gameImages[$gameName]->image) }}" 
-                                 alt="{{ $gameName }}" 
-                                 class="w-full h-full object-cover rounded-lg hover:scale-105 transition-transform duration-300">
-                        @else
-                            <img src="{{ asset('storage/game-images/game-placeholder.svg') }}" 
-                                 alt="{{ $gameName }}" 
-                                 class="w-full h-full object-cover rounded-lg hover:scale-105 transition-transform duration-300">
-                        @endif
-                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
-                            <p class="text-white text-xs font-semibold truncate">{{ $gameName }}</p>
-                        </div>
-                    </button>
-                @endforeach
+            <!-- Topup Game Products -->
+            <div id="topup-game-products" class="products-content">
+                <div class="products-grid grid grid-cols-3 gap-2">
+                    @foreach($gameServices as $index => $gameData)
+                        @php
+                            $gameName = $index;
+                            $services = $gameData;
+                        @endphp
+                        <button class="product-item relative overflow-hidden rounded-lg {{ $loop->index >= 6 ? 'hidden' : '' }}" data-name="{{ $gameName }}">
+                            @if(isset($gameImages[$gameName]))
+                                <img src="{{ asset('storage/game-images/' . $gameImages[$gameName]->image) }}" 
+                                     alt="{{ $gameName }}" 
+                                     class="w-full h-full object-cover rounded-lg hover:scale-105 transition-transform duration-300">
+                            @else
+                                <img src="{{ asset('storage/game-images/game-placeholder.svg') }}" 
+                                     alt="{{ $gameName }}" 
+                                     class="w-full h-full object-cover rounded-lg hover:scale-105 transition-transform duration-300">
+                            @endif
+                            <div class="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2">
+                                <p class="text-white text-xs font-semibold truncate">{{ $gameName }}</p>
+                            </div>
+                        </button>
+                    @endforeach
+                </div>
+
+                @if($gameServices->count() > 6)
+                    <div class="mt-4 text-center">
+                        <button class="show-more-btn bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-2 rounded-lg transition-colors duration-300">
+                            Show More
+                        </button>
+                        <button class="show-less-btn hidden bg-gray-700 hover:bg-gray-600 text-white font-semibold px-6 py-2 rounded-lg transition-colors duration-300">
+                            Show Less
+                        </button>
+                    </div>
+                @endif
             </div>
 
-            <!-- Show More Button -->
-            @if($gameServices->count() > 6)
-                <div class="mt-4 text-center">
-                    <button id="show-more-btn" class="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-2 rounded-lg transition-colors duration-300">
-                        Show More
-                    </button>
-                    <button id="show-less-btn" class="hidden bg-gray-700 hover:bg-gray-600 text-white font-semibold px-6 py-2 rounded-lg transition-colors duration-300">
-                        Show Less
-                    </button>
+            <!-- Pulsa & Data Products -->
+            <div id="pulsa-data-products" class="products-content hidden">
+                <div class="products-grid grid grid-cols-3 gap-2">
+                    @foreach($prepaidServices as $index => $brandData)
+                        @php
+                            $brandName = $index;
+                            $services = $brandData;
+                        @endphp
+                        <button class="product-item relative overflow-hidden rounded-lg {{ $loop->index >= 6 ? 'hidden' : '' }}" data-name="{{ $brandName }}">
+                            @if(isset($brandImages[$brandName]))
+                                <img src="{{ asset('storage/brand-images/' . $brandImages[$brandName]->image) }}" 
+                                     alt="{{ $brandName }}" 
+                                     class="w-full h-full object-cover rounded-lg hover:scale-105 transition-transform duration-300">
+                            @else
+                                <img src="{{ asset('storage/brand-images/brand-placeholder.svg') }}" 
+                                     alt="{{ $brandName }}" 
+                                     class="w-full h-full object-cover rounded-lg hover:scale-105 transition-transform duration-300">
+                            @endif
+                            <div class="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2">
+                                <p class="text-white text-xs font-semibold truncate">{{ $brandName }}</p>
+                            </div>
+                        </button>
+                    @endforeach
                 </div>
-            @endif
+
+                @if($prepaidServices->count() > 6)
+                    <div class="mt-4 text-center">
+                        <button class="show-more-btn bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-2 rounded-lg transition-colors duration-300">
+                            Show More
+                        </button>
+                        <button class="show-less-btn hidden bg-gray-700 hover:bg-gray-600 text-white font-semibold px-6 py-2 rounded-lg transition-colors duration-300">
+                            Show Less
+                        </button>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 
@@ -102,13 +141,19 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const tabs = document.querySelectorAll('.category-tab');
-            const showMoreBtn = document.getElementById('show-more-btn');
-            const showLessBtn = document.getElementById('show-less-btn');
-            const productsGrid = document.getElementById('products-grid');
+            const productsContainer = document.getElementById('products-container');
+            
+            // Tab to content mapping
+            const tabContentMap = {
+                'Topup Game': 'topup-game-products',
+                'Pulsa & Data': 'pulsa-data-products'
+            };
             
             // Tab switching
             tabs.forEach(tab => {
                 tab.addEventListener('click', function() {
+                    const tabText = this.textContent.trim();
+                    
                     // Remove active class from all tabs
                     tabs.forEach(t => {
                         t.classList.remove('active', 'text-white', 'border-yellow-500');
@@ -118,40 +163,64 @@
                     // Add active class to clicked tab
                     this.classList.add('active', 'text-white', 'border-yellow-500');
                     this.classList.remove('text-gray-400', 'border-transparent');
+                    
+                    // Hide all product contents
+                    document.querySelectorAll('.products-content').forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    
+                    // Show selected content
+                    const contentId = tabContentMap[tabText];
+                    if (contentId) {
+                        const selectedContent = document.getElementById(contentId);
+                        if (selectedContent) {
+                            selectedContent.classList.remove('hidden');
+                        }
+                    }
                 });
             });
 
-            // Show More functionality
-            if (showMoreBtn) {
-                showMoreBtn.addEventListener('click', function() {
-                    const hiddenProducts = productsGrid.querySelectorAll('.game-product.hidden');
+            // Show More/Less functionality for all product sections
+            document.querySelectorAll('.show-more-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const parentContent = this.closest('.products-content');
+                    const productsGrid = parentContent.querySelector('.products-grid');
+                    const showLessBtn = parentContent.querySelector('.show-less-btn');
+                    
+                    const hiddenProducts = productsGrid.querySelectorAll('.product-item.hidden');
                     hiddenProducts.forEach(product => {
                         product.classList.remove('hidden');
                     });
-                    showMoreBtn.classList.add('hidden');
+                    
+                    this.classList.add('hidden');
                     if (showLessBtn) {
                         showLessBtn.classList.remove('hidden');
                     }
                 });
-            }
+            });
 
-            // Show Less functionality
-            if (showLessBtn) {
-                showLessBtn.addEventListener('click', function() {
-                    const allProducts = productsGrid.querySelectorAll('.game-product');
+            document.querySelectorAll('.show-less-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const parentContent = this.closest('.products-content');
+                    const productsGrid = parentContent.querySelector('.products-grid');
+                    const showMoreBtn = parentContent.querySelector('.show-more-btn');
+                    
+                    const allProducts = productsGrid.querySelectorAll('.product-item');
                     allProducts.forEach((product, index) => {
                         if (index >= 6) {
                             product.classList.add('hidden');
                         }
                     });
-                    showLessBtn.classList.add('hidden');
+                    
+                    this.classList.add('hidden');
                     if (showMoreBtn) {
                         showMoreBtn.classList.remove('hidden');
                     }
+                    
                     // Scroll to products section
                     productsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 });
-            }
+            });
         });
     </script>
 

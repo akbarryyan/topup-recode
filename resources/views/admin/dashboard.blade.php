@@ -36,7 +36,7 @@
                     <h4>Total Users</h4>
                   </div>
                   <div class="card-body">
-                    10
+                    {{ number_format($stats['total_users']) }}
                   </div>
                 </div>
               </div>
@@ -48,10 +48,10 @@
                 </div>
                 <div class="card-wrap">
                   <div class="card-header">
-                    <h4>News</h4>
+                    <h4>Total Berita</h4>
                   </div>
                   <div class="card-body">
-                    42
+                    {{ number_format($stats['total_news']) }}
                   </div>
                 </div>
               </div>
@@ -59,14 +59,14 @@
             <div class="col-lg-3 col-md-6 col-sm-6 col-12">
               <div class="card card-statistic-1">
                 <div class="card-icon bg-warning">
-                  <i class="far fa-file"></i>
+                  <i class="fas fa-mobile-alt"></i>
                 </div>
                 <div class="card-wrap">
                   <div class="card-header">
-                    <h4>Reports</h4>
+                    <h4>Layanan Pulsa & PPOB</h4>
                   </div>
                   <div class="card-body">
-                    1,201
+                    {{ number_format($stats['total_prepaid_services']) }}
                   </div>
                 </div>
               </div>
@@ -74,14 +74,14 @@
             <div class="col-lg-3 col-md-6 col-sm-6 col-12">
               <div class="card card-statistic-1">
                 <div class="card-icon bg-success">
-                  <i class="fas fa-circle"></i>
+                  <i class="fas fa-gamepad"></i>
                 </div>
                 <div class="card-wrap">
                   <div class="card-header">
-                    <h4>Online Users</h4>
+                    <h4>Layanan Game</h4>
                   </div>
                   <div class="card-body">
-                    47
+                    {{ number_format($stats['total_game_services']) }}
                   </div>
                 </div>
               </div>

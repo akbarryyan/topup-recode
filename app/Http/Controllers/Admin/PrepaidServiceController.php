@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PrepaidService;
+use App\Models\BrandImage;
 use App\Services\VipResellerService;
 use Illuminate\Http\Request;
 
@@ -60,8 +61,9 @@ class PrepaidServiceController extends Controller
         $brands = PrepaidService::select('brand')->distinct()->whereNotNull('brand')->orderBy('brand')->pluck('brand');
         $categories = PrepaidService::select('category')->distinct()->whereNotNull('category')->orderBy('category')->pluck('category');
         $types = PrepaidService::select('type')->distinct()->whereNotNull('type')->orderBy('type')->pluck('type');
+        $brandImages = BrandImage::all()->keyBy('brand_name');
 
-        return view('admin.prepaid-services.index', compact('services', 'brands', 'categories', 'types'));
+        return view('admin.prepaid-services.index', compact('services', 'brands', 'categories', 'types', 'brandImages'));
     }
 
     /**
@@ -213,5 +215,68 @@ class PrepaidServiceController extends Controller
         $service->delete();
 
         return redirect()->back()->with('success', 'Layanan berhasil dihapus!');
+    }
+
+    /**
+     * Upload brand image
+     */
+    public function uploadImage(Request $request, $brandName)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+        ]);
+
+        $uploadPath = public_path('storage/brand-images');
+        if (!file_exists($uploadPath)) {
+            mkdir($uploadPath, 0755, true);
+        }
+
+        $brandImage = BrandImage::where('brand_name', $brandName)->first();
+
+        // Delete old image if exists
+        if ($brandImage && $brandImage->image) {
+            $oldImagePath = $uploadPath . '/' . $brandImage->image;
+            if (file_exists($oldImagePath)) {
+                unlink($oldImagePath);
+            }
+        }
+
+        // Upload new image
+        $filename = time() . '_' . str_replace(' ', '_', $brandName) . '.' . $request->file('image')->getClientOriginalExtension();
+        $request->file('image')->move($uploadPath, $filename);
+
+        // Create or update brand image record
+        BrandImage::updateOrCreate(
+            ['brand_name' => $brandName],
+            ['image' => $filename]
+        );
+
+        // Count affected services
+        $servicesCount = PrepaidService::where('brand', $brandName)->count();
+
+        return redirect()->back()->with('success', "Gambar brand '{$brandName}' berhasil diupload! ({$servicesCount} layanan terpengaruh)");
+    }
+
+    /**
+     * Delete brand image
+     */
+    public function deleteImage($brandName)
+    {
+        $brandImage = BrandImage::where('brand_name', $brandName)->first();
+
+        if (!$brandImage) {
+            return redirect()->back()->with('error', 'Gambar brand tidak ditemukan!');
+        }
+
+        // Delete image file
+        $imagePath = public_path('storage/brand-images/' . $brandImage->image);
+        if (file_exists($imagePath)) {
+            unlink($imagePath);
+        }
+
+        // Delete record
+        $brandImage->delete();
+
+        return redirect()->back()->with('success', "Gambar brand '{$brandName}' berhasil dihapus!");
     }
 }
