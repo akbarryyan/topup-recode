@@ -87,9 +87,13 @@ Route::prefix('admin')->middleware('web')->group(function () {
         // Payment Gateway Routes
         Route::prefix('payment-gateways')->name('admin.payment-gateways.')->group(function () {
             Route::get('/', [PaymentGatewayController::class, 'index'])->name('index');
+            Route::post('/', [PaymentGatewayController::class, 'store'])->name('store');
+            Route::get('/config', [PaymentGatewayController::class, 'config'])->name('config');
+            Route::put('/config', [PaymentGatewayController::class, 'updateConfig'])->name('config.update');
             Route::post('/sync', [PaymentGatewayController::class, 'sync'])->name('sync');
             Route::patch('/{id}/toggle', [PaymentGatewayController::class, 'toggleStatus'])->name('toggle');
             Route::put('/{id}', [PaymentGatewayController::class, 'update'])->name('update');
+            Route::delete('/{id}', [PaymentGatewayController::class, 'destroy'])->name('destroy');
         });
     });
 });
