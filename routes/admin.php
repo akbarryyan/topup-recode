@@ -32,6 +32,7 @@ Route::prefix('admin')->middleware('web')->group(function () {
 
         // Users Management
         Route::get('/users', [UserController::class, 'index'])->name('admin.users');
+        Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');
         Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
         Route::put('/users/{id}', [UserController::class, 'update'])->name('admin.users.update');
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');

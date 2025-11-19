@@ -16,6 +16,25 @@ class UserController extends Controller
         return view('admin.users.index', compact('users'));
     }
 
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|in:user,admin',
+        ]);
+
+        User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password']),
+            'role' => $validated['role'],
+        ]);
+
+        return redirect()->route('admin.users')->with('success', 'User berhasil ditambahkan!');
+    }
+
     public function edit($id)
     {
         $user = User::findOrFail($id);

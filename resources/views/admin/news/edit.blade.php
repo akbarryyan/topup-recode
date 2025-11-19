@@ -4,6 +4,7 @@
 <div class="main-content">
     <section class="section">
         <div class="section-header">
+            <a href="{{ route('admin.news.index') }}" class="btn btn-icon btn-primary mr-3"><i class="fas fa-arrow-left"></i></a>
             <h1>Edit Berita</h1>
             <div class="section-header-breadcrumb">
                 <div class="breadcrumb-item active"><a href="{{ route('admin.dashboard') }}">Dashboard</a></div>
