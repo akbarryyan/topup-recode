@@ -33,6 +33,20 @@
                     <i class="fas fa-newspaper"></i> <span>Kelola Berita</span>
                 </a>
             </li>
+
+            <li class="dropdown {{ request()->routeIs('admin.game-transactions*') || request()->routeIs('admin.prepaid-transactions*') ? 'active' : '' }}">
+                <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
+                    <i class="fas fa-receipt"></i> <span>Kelola Transaksi</span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li class="{{ request()->routeIs('admin.game-transactions*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.game-transactions.index') }}">Transaksi Game</a>
+                    </li>
+                    <li class="{{ request()->routeIs('admin.prepaid-transactions*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.prepaid-transactions.index') }}">Transaksi Pulsa & PPOB</a>
+                    </li>
+                </ul>
+            </li>
             
             <li class="menu-header">Example Menu</li>
             <li class="dropdown">

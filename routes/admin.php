@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\GameServiceController;
 use App\Http\Controllers\Admin\PrepaidServiceController;
 use App\Http\Controllers\Admin\NewsController;
+use App\Http\Controllers\Admin\GameTransactionController;
+use App\Http\Controllers\Admin\PrepaidTransactionController;
 
 Route::prefix('admin')->middleware('web')->group(function () {
     // Login routes (guest only)
@@ -68,6 +70,16 @@ Route::prefix('admin')->middleware('web')->group(function () {
             Route::get('/{id}/edit', [NewsController::class, 'edit'])->name('edit');
             Route::put('/{id}', [NewsController::class, 'update'])->name('update');
             Route::delete('/{id}', [NewsController::class, 'destroy'])->name('destroy');
+        });
+
+        // Game Transaction Routes
+        Route::prefix('game-transactions')->name('admin.game-transactions.')->group(function () {
+            Route::get('/', [GameTransactionController::class, 'index'])->name('index');
+        });
+
+        // Prepaid Transaction Routes
+        Route::prefix('prepaid-transactions')->name('admin.prepaid-transactions.')->group(function () {
+            Route::get('/', [PrepaidTransactionController::class, 'index'])->name('index');
         });
     });
 });
