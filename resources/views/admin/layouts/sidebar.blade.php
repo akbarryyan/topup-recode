@@ -28,6 +28,12 @@
                 </a>
             </li>
 
+            <li class="{{ request()->routeIs('admin.payment-gateways*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.payment-gateways.index') }}">
+                    <i class="fas fa-credit-card"></i> <span>Kelola Payment Gateway</span>
+                </a>
+            </li>
+
             <li class="{{ request()->routeIs('admin.news*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin.news.index') }}">
                     <i class="fas fa-newspaper"></i> <span>Kelola Berita</span>

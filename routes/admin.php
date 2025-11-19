@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\PrepaidServiceController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\GameTransactionController;
 use App\Http\Controllers\Admin\PrepaidTransactionController;
+use App\Http\Controllers\Admin\PaymentGatewayController;
 
 Route::prefix('admin')->middleware('web')->group(function () {
     // Login routes (guest only)
@@ -81,6 +82,14 @@ Route::prefix('admin')->middleware('web')->group(function () {
         // Prepaid Transaction Routes
         Route::prefix('prepaid-transactions')->name('admin.prepaid-transactions.')->group(function () {
             Route::get('/', [PrepaidTransactionController::class, 'index'])->name('index');
+        });
+
+        // Payment Gateway Routes
+        Route::prefix('payment-gateways')->name('admin.payment-gateways.')->group(function () {
+            Route::get('/', [PaymentGatewayController::class, 'index'])->name('index');
+            Route::post('/sync', [PaymentGatewayController::class, 'sync'])->name('sync');
+            Route::patch('/{id}/toggle', [PaymentGatewayController::class, 'toggleStatus'])->name('toggle');
+            Route::put('/{id}', [PaymentGatewayController::class, 'update'])->name('update');
         });
     });
 });
