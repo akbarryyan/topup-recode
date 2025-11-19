@@ -21,7 +21,11 @@ class AdminMiddleware
                 ->with('error', 'Silakan login terlebih dahulu');
         }
 
-        if (Auth::user()->role !== 'admin') {
+        /** @var \App\Models\User|\Illuminate\Contracts\Auth\Authenticatable|null $user */
+        $user = Auth::user();
+
+        // Pastikan user ada dan memiliki properti 'role'
+        if (!$user || $user->role !== 'admin') {
             Auth::logout();
             return redirect()->route('admin.login')
                 ->with('error', 'Anda tidak memiliki akses ke halaman admin');
