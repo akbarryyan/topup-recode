@@ -91,9 +91,18 @@ Route::prefix('admin')->middleware('web')->group(function () {
             Route::get('/config', [PaymentGatewayController::class, 'config'])->name('config');
             Route::put('/config', [PaymentGatewayController::class, 'updateConfig'])->name('config.update');
             Route::post('/sync', [PaymentGatewayController::class, 'sync'])->name('sync');
+            Route::post('/fetch-methods', [PaymentGatewayController::class, 'fetchPaymentMethods'])->name('fetch-methods');
+            Route::post('/save-methods', [PaymentGatewayController::class, 'savePaymentMethods'])->name('save-methods');
             Route::patch('/{id}/toggle', [PaymentGatewayController::class, 'toggleStatus'])->name('toggle');
             Route::put('/{id}', [PaymentGatewayController::class, 'update'])->name('update');
             Route::delete('/{id}', [PaymentGatewayController::class, 'destroy'])->name('destroy');
+        });
+
+        // Payment Methods Routes
+        Route::prefix('payment-methods')->name('admin.payment-methods.')->group(function () {
+            Route::patch('/{id}/toggle', [PaymentGatewayController::class, 'toggleMethodStatus'])->name('toggle');
+            Route::put('/{id}', [PaymentGatewayController::class, 'updateMethod'])->name('update');
+            Route::delete('/{id}', [PaymentGatewayController::class, 'destroyMethod'])->name('destroy');
         });
     });
 });

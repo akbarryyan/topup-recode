@@ -18,16 +18,35 @@
         </div>
 
         <div class="section-body">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Daftar Payment Gateway</h4>
-                    <div class="card-header-action">
+            <ul class="nav nav-tabs" id="paymentTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="gateway-config-tab" data-toggle="tab" href="#gateway-config" role="tab">
+                        <i class="fas fa-cog"></i> Konfigurasi Gateway
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="payment-methods-tab" data-toggle="tab" href="#payment-methods" role="tab">
+                        <i class="fas fa-credit-card"></i> Payment Methods ({{ $paymentMethods->count() }})
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="paymentTabsContent">
+                <!-- Tab Konfigurasi Gateway -->
+                <div class="tab-pane fade show active" id="gateway-config" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Daftar Payment Gateway</h4>
+                            <div class="card-header-action">
                         <button type="button" class="btn btn-success mr-2" data-toggle="modal" data-target="#addPaymentGatewayModal">
                             <i class="fas fa-plus"></i> Tambah Payment Gateway
                         </button>
                         <a href="{{ route('admin.payment-gateways.config') }}" class="btn btn-warning mr-2">
                             <i class="fas fa-cog"></i> Konfigurasi
                         </a>
+                        <button type="button" id="fetch-methods-button" class="btn btn-info mr-2" data-toggle="modal" data-target="#paymentMethodsModal">
+                            <i class="fas fa-download"></i> Lihat Payment Method
+                        </button>
                         <form id="sync-form" action="{{ route('admin.payment-gateways.sync') }}" method="POST" class="d-inline">
                             @csrf
                             <button type="button" id="sync-button" class="btn btn-primary">
@@ -116,6 +135,92 @@
                 </div>
             </div>
         </div>
+
+        <!-- Tab Payment Methods -->
+        <div class="tab-pane fade" id="payment-methods" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Daftar Payment Methods (Duitku)</h4>
+                    <div class="card-header-action">
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#paymentMethodsModal">
+                            <i class="fas fa-download"></i> Tambah dari Duitku
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if($paymentMethods->isEmpty())
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Belum ada payment method. Klik tombol "Tambah dari Duitku" untuk mengambil payment methods dari Duitku API.
+                        </div>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">#</th>
+                                        <th>Logo</th>
+                                        <th>Payment Name</th>
+                                        <th>Code</th>
+                                        <th>Fee dari API</th>
+                                        <th>Fee Customer</th>
+                                        <th class="text-center">Status</th>
+                                        <th class="text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($paymentMethods as $pm)
+                                        <tr>
+                                            <td class="text-center">{{ $loop->iteration }}</td>
+                                            <td>
+                                                @if($pm->image_url)
+                                                    <img src="{{ $pm->image_url }}" alt="{{ $pm->name }}" width="60" class="rounded">
+                                                @else
+                                                    <span class="badge badge-secondary">No Icon</span>
+                                                @endif
+                                            </td>
+                                            <td><strong>{{ $pm->name }}</strong></td>
+                                            <td><code>{{ $pm->code }}</code></td>
+                                            <td>Rp {{ number_format($pm->total_fee, 0, ',', '.') }}</td>
+                                            <td>
+                                                @if($pm->fee_customer_flat > 0 || $pm->fee_customer_percent > 0)
+                                                    {{ $pm->formatted_customer_fee }}
+                                                @else
+                                                    <span class="badge badge-success">Gratis</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-center">
+                                                <form class="toggle-method-form" action="{{ route('admin.payment-methods.toggle', $pm->id) }}" method="POST">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <label class="custom-switch mt-2">
+                                                        <input type="checkbox" name="is_active" class="custom-switch-input" {{ $pm->is_active ? 'checked' : '' }}>
+                                                        <span class="custom-switch-indicator"></span>
+                                                    </label>
+                                                </form>
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#editMethodModal{{ $pm->id }}">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <form action="{{ route('admin.payment-methods.destroy', $pm->id) }}" method="POST" class="d-inline delete-method-form">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
     </section>
 </div>
 
@@ -280,6 +385,77 @@
     </div>
 </div>
 @endforeach
+
+<!-- Modal Payment Methods -->
+<div class="modal fade" id="paymentMethodsModal" tabindex="-1" role="dialog" aria-labelledby="paymentMethodsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentMethodsModalLabel">
+                    <i class="fas fa-list"></i> Payment Methods dari Duitku
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="payment-methods-loading" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <p class="mt-3">Mengambil data dari Duitku...</p>
+                </div>
+                <div id="payment-methods-error" class="alert alert-danger" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i> <span id="error-message"></span>
+                </div>
+                <div id="payment-methods-content" style="display: none;">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Pilih payment method yang ingin Anda simpan ke database.
+                        <span class="badge badge-warning">Sudah Ada</span> menandakan payment method sudah tersimpan di database.
+                    </div>
+                    <div class="mb-3">
+                        <button type="button" id="select-all" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-check-square"></i> Pilih Semua
+                        </button>
+                        <button type="button" id="deselect-all" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-square"></i> Hapus Semua Pilihan
+                        </button>
+                        <button type="button" id="select-new" class="btn btn-sm btn-success">
+                            <i class="fas fa-check"></i> Pilih Yang Baru Saja
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th width="50">
+                                        <input type="checkbox" id="select-all-checkbox">
+                                    </th>
+                                    <th>Logo</th>
+                                    <th>Payment Name</th>
+                                    <th>Payment Method</th>
+                                    <th>Total Fee</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payment-methods-list">
+                                <!-- Data akan diisi via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Tutup
+                </button>
+                <button type="button" id="save-selected-methods" class="btn btn-success" style="display: none;">
+                    <i class="fas fa-save"></i> Simpan Terpilih
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -344,6 +520,24 @@
                 });
             });
 
+            // Handle Delete Payment Method Button
+            $('.delete-method-form').on('submit', function(e) {
+                e.preventDefault();
+                const form = this;
+                
+                swal({
+                    title: 'Hapus Payment Method?',
+                    text: 'Data yang dihapus tidak dapat dikembalikan!',
+                    icon: 'warning',
+                    buttons: ['Batal', 'Ya, Hapus!'],
+                    dangerMode: true,
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        form.submit();
+                    }
+                });
+            });
+
             // Handle toggle form submission with confirmation
             $('.toggle-form').on('submit', function(e) {
                 e.preventDefault();
@@ -371,6 +565,169 @@
             // Prevent toggle form submission on initial load change
             $('.custom-switch-input').on('change', function(e) {
                 $(this).closest('form').submit();
+            });
+
+            // Handle Fetch Payment Methods
+            let paymentMethodsData = [];
+
+            $('#paymentMethodsModal').on('shown.bs.modal', function() {
+                // Reset modal content
+                $('#payment-methods-loading').show();
+                $('#payment-methods-error').hide();
+                $('#payment-methods-content').hide();
+                $('#save-selected-methods').hide();
+                $('#payment-methods-list').empty();
+
+                // Fetch payment methods from API
+                $.ajax({
+                    url: '{{ route('admin.payment-gateways.fetch-methods') }}',
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            paymentMethodsData = response.data;
+                            displayPaymentMethods(paymentMethodsData);
+                            $('#payment-methods-loading').hide();
+                            $('#payment-methods-content').show();
+                            $('#save-selected-methods').show();
+                        } else {
+                            showError(response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        let message = 'Terjadi kesalahan saat mengambil data.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            message = xhr.responseJSON.message;
+                        }
+                        showError(message);
+                    }
+                });
+            });
+
+            function showError(message) {
+                $('#payment-methods-loading').hide();
+                $('#error-message').text(message);
+                $('#payment-methods-error').show();
+            }
+
+            function displayPaymentMethods(methods) {
+                let html = '';
+                methods.forEach(function(method) {
+                    let statusBadge = method.exists 
+                        ? '<span class="badge badge-warning">Sudah Ada</span>' 
+                        : '<span class="badge badge-success">Baru</span>';
+                    
+                    html += `
+                        <tr>
+                            <td class="text-center">
+                                <input type="checkbox" class="payment-method-checkbox" 
+                                    data-method='${JSON.stringify(method)}' 
+                                    ${method.exists ? '' : 'checked'}>
+                            </td>
+                            <td>
+                                <img src="${method.paymentImage}" alt="${method.paymentName}" width="60" class="rounded">
+                            </td>
+                            <td><strong>${method.paymentName}</strong></td>
+                            <td><code>${method.paymentMethod}</code></td>
+                            <td>Rp ${parseInt(method.totalFee).toLocaleString('id-ID')}</td>
+                            <td>${statusBadge}</td>
+                        </tr>
+                    `;
+                });
+                $('#payment-methods-list').html(html);
+            }
+
+            // Select All Checkbox
+            $('#select-all-checkbox').on('change', function() {
+                $('.payment-method-checkbox').prop('checked', $(this).is(':checked'));
+            });
+
+            // Select All Button
+            $('#select-all').on('click', function() {
+                $('.payment-method-checkbox').prop('checked', true);
+                $('#select-all-checkbox').prop('checked', true);
+            });
+
+            // Deselect All Button
+            $('#deselect-all').on('click', function() {
+                $('.payment-method-checkbox').prop('checked', false);
+                $('#select-all-checkbox').prop('checked', false);
+            });
+
+            // Select New Only Button
+            $('#select-new').on('click', function() {
+                $('.payment-method-checkbox').each(function() {
+                    let method = JSON.parse($(this).attr('data-method'));
+                    $(this).prop('checked', !method.exists);
+                });
+                $('#select-all-checkbox').prop('checked', false);
+            });
+
+            // Save Selected Methods
+            $('#save-selected-methods').on('click', function() {
+                let selectedMethods = [];
+                $('.payment-method-checkbox:checked').each(function() {
+                    selectedMethods.push(JSON.parse($(this).attr('data-method')));
+                });
+
+                if (selectedMethods.length === 0) {
+                    iziToast.warning({
+                        title: 'Peringatan!',
+                        message: 'Pilih minimal 1 payment method untuk disimpan.',
+                        position: 'topRight'
+                    });
+                    return;
+                }
+
+                // Show loading
+                $(this).addClass('btn-progress').prop('disabled', true);
+
+                $.ajax({
+                    url: '{{ route('admin.payment-gateways.save-methods') }}',
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: {
+                        payment_methods: selectedMethods
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            iziToast.success({
+                                title: 'Berhasil!',
+                                message: response.message,
+                                position: 'topRight'
+                            });
+                            $('#paymentMethodsModal').modal('hide');
+                            // Reload page after 1 second
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1000);
+                        } else {
+                            iziToast.error({
+                                title: 'Gagal!',
+                                message: response.message,
+                                position: 'topRight'
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        let message = 'Terjadi kesalahan saat menyimpan data.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            message = xhr.responseJSON.message;
+                        }
+                        iziToast.error({
+                            title: 'Gagal!',
+                            message: message,
+                            position: 'topRight'
+                        });
+                    },
+                    complete: function() {
+                        $('#save-selected-methods').removeClass('btn-progress').prop('disabled', false);
+                    }
+                });
             });
         });
     </script>

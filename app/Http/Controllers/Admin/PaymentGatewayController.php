@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PaymentGateway;
+use App\Models\PaymentMethod;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
@@ -13,7 +14,14 @@ class PaymentGatewayController extends Controller
     public function index()
     {
         $paymentGateways = PaymentGateway::orderBy('name')->get();
-        return view('admin.payment-gateway.index', compact('paymentGateways'));
+        
+        // Get Duitku payment methods
+        $duitkuGateway = PaymentGateway::where('code', 'duitku_config')->first();
+        $paymentMethods = $duitkuGateway 
+            ? PaymentMethod::where('payment_gateway_id', $duitkuGateway->id)->orderBy('name')->get()
+            : collect();
+        
+        return view('admin.payment-gateway.index', compact('paymentGateways', 'paymentMethods'));
     }
 
     public function store(Request $request)
@@ -138,22 +146,40 @@ class PaymentGatewayController extends Controller
             ? 'https://passport.duitku.com/webapi/api/merchant/paymentmethod/getpaymentmethod'
             : 'https://sandbox.duitku.com/webapi/api/merchant/paymentmethod/getpaymentmethod';
 
-        $datetime = now()->toDateTimeString();
-        $signature = hash('sha256', $merchantCode . $datetime . $apiKey);
+        // Generate datetime and signature according to Duitku API docs
+        $datetime = date('Y-m-d H:i:s');
+        $paymentAmount = 10000; // Amount required by API (minimal amount for testing)
+        $signature = hash('sha256', $merchantCode . $paymentAmount . $datetime . $apiKey);
 
         try {
-            $response = Http::post($apiUrl, [
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])->post($apiUrl, [
                 'merchantcode' => $merchantCode,
+                'amount' => $paymentAmount,
                 'datetime' => $datetime,
                 'signature' => $signature,
             ]);
 
-            if ($response->failed() || !isset($response->json()['paymentFee'])) {
-                return back()->with('error', 'Gagal mengambil data dari Duitku. Response: ' . $response->body());
+            if ($response->failed()) {
+                return back()->with('error', 'Gagal mengambil data dari Duitku. HTTP Code: ' . $response->status() . '. Response: ' . $response->body());
             }
 
-            $paymentMethods = $response->json()['paymentFee'];
+            $responseData = $response->json();
+
+            // Check response code
+            if (!isset($responseData['responseCode']) || $responseData['responseCode'] !== '00') {
+                $errorMsg = $responseData['responseMessage'] ?? 'Unknown error';
+                return back()->with('error', 'Duitku API Error: ' . $errorMsg);
+            }
+
+            if (!isset($responseData['paymentFee']) || empty($responseData['paymentFee'])) {
+                return back()->with('error', 'Tidak ada payment method yang tersedia dari Duitku.');
+            }
+
+            $paymentMethods = $responseData['paymentFee'];
             $syncedCount = 0;
+            $updatedCount = 0;
 
             foreach ($paymentMethods as $method) {
                 // Skip if this is the config entry
@@ -161,19 +187,29 @@ class PaymentGatewayController extends Controller
                     continue;
                 }
                 
-                PaymentGateway::updateOrCreate(
+                $paymentGateway = PaymentGateway::updateOrCreate(
                     ['code' => $method['paymentMethod']],
                     [
                         'name' => $method['paymentName'],
                         'icon_url' => $method['paymentImage'],
-                        'type' => 'Duitku',
-                        'group' => 'Payment Gateway',
+                        'is_active' => false, // Default inactive, admin can activate manually
                     ]
                 );
-                $syncedCount++;
+
+                if ($paymentGateway->wasRecentlyCreated) {
+                    $syncedCount++;
+                } else {
+                    $updatedCount++;
+                }
             }
 
-            return back()->with('success', $syncedCount . ' payment gateway berhasil disinkronisasi.');
+            $message = "Sinkronisasi berhasil! {$syncedCount} payment gateway baru ditambahkan";
+            if ($updatedCount > 0) {
+                $message .= ", {$updatedCount} payment gateway diperbarui";
+            }
+            $message .= ".";
+
+            return back()->with('success', $message);
         } catch (\Exception $e) {
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -248,5 +284,196 @@ class PaymentGatewayController extends Controller
         $paymentGateway->update($updateData);
 
         return back()->with('success', "Payment gateway {$paymentGateway->name} berhasil diperbarui.");
+    }
+
+    public function fetchPaymentMethods()
+    {
+        // Get Duitku configuration from database
+        $duitkuConfig = PaymentGateway::where('code', 'duitku_config')->first();
+
+        if (!$duitkuConfig || !$duitkuConfig->merchant_code || !$duitkuConfig->api_key) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Konfigurasi Duitku belum diatur. Silakan atur konfigurasi terlebih dahulu.'
+            ], 400);
+        }
+
+        $merchantCode = $duitkuConfig->merchant_code;
+        $apiKey = $duitkuConfig->api_key;
+        $environment = $duitkuConfig->environment;
+        
+        // Set API URL based on environment
+        $apiUrl = $environment === 'production' 
+            ? 'https://passport.duitku.com/webapi/api/merchant/paymentmethod/getpaymentmethod'
+            : 'https://sandbox.duitku.com/webapi/api/merchant/paymentmethod/getpaymentmethod';
+
+        // Generate datetime and signature according to Duitku API docs
+        $datetime = date('Y-m-d H:i:s');
+        $paymentAmount = 10000; // Amount required by API
+        $signature = hash('sha256', $merchantCode . $paymentAmount . $datetime . $apiKey);
+
+        try {
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])->post($apiUrl, [
+                'merchantcode' => $merchantCode,
+                'amount' => $paymentAmount,
+                'datetime' => $datetime,
+                'signature' => $signature,
+            ]);
+
+            if ($response->failed()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal mengambil data dari Duitku. HTTP Code: ' . $response->status()
+                ], 500);
+            }
+
+            $responseData = $response->json();
+
+            // Check response code
+            if (!isset($responseData['responseCode']) || $responseData['responseCode'] !== '00') {
+                $errorMsg = $responseData['responseMessage'] ?? 'Unknown error';
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Duitku API Error: ' . $errorMsg
+                ], 500);
+            }
+
+            if (!isset($responseData['paymentFee']) || empty($responseData['paymentFee'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak ada payment method yang tersedia dari Duitku.'
+                ], 404);
+            }
+
+            $paymentMethods = $responseData['paymentFee'];
+            
+            // Get Duitku gateway
+            $duitkuGateway = PaymentGateway::where('code', 'duitku_config')->first();
+            
+            if (!$duitkuGateway) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Konfigurasi Duitku tidak ditemukan.'
+                ], 404);
+            }
+            
+            // Check which methods already exist in payment_methods table
+            $existingCodes = PaymentMethod::where('payment_gateway_id', $duitkuGateway->id)
+                ->whereIn('code', array_column($paymentMethods, 'paymentMethod'))
+                ->pluck('code')
+                ->toArray();
+
+            // Mark existing methods
+            foreach ($paymentMethods as &$method) {
+                $method['exists'] = in_array($method['paymentMethod'], $existingCodes);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $paymentMethods
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function savePaymentMethods(Request $request)
+    {
+        $validated = $request->validate([
+            'payment_methods' => 'required|array',
+            'payment_methods.*.paymentMethod' => 'required|string',
+            'payment_methods.*.paymentName' => 'required|string',
+            'payment_methods.*.paymentImage' => 'required|string',
+            'payment_methods.*.totalFee' => 'nullable|numeric',
+        ]);
+
+        // Get Duitku config to use as parent payment gateway
+        $duitkuGateway = PaymentGateway::where('code', 'duitku_config')->first();
+        
+        if (!$duitkuGateway) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Konfigurasi Duitku tidak ditemukan. Silakan setup konfigurasi terlebih dahulu.'
+            ], 400);
+        }
+
+        $savedCount = 0;
+        $updatedCount = 0;
+
+        foreach ($validated['payment_methods'] as $method) {
+            $paymentMethod = PaymentMethod::updateOrCreate(
+                [
+                    'payment_gateway_id' => $duitkuGateway->id,
+                    'code' => $method['paymentMethod']
+                ],
+                [
+                    'name' => $method['paymentName'],
+                    'image_url' => $method['paymentImage'],
+                    'total_fee' => $method['totalFee'] ?? 0,
+                    'is_active' => false, // Default inactive, admin can activate manually
+                ]
+            );
+
+            if ($paymentMethod->wasRecentlyCreated) {
+                $savedCount++;
+            } else {
+                $updatedCount++;
+            }
+        }
+
+        $message = "Berhasil menyimpan payment methods! ";
+        if ($savedCount > 0) {
+            $message .= "{$savedCount} baru ditambahkan";
+        }
+        if ($updatedCount > 0) {
+            if ($savedCount > 0) $message .= ", ";
+            $message .= "{$updatedCount} diperbarui";
+        }
+        $message .= ".";
+
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'saved' => $savedCount,
+            'updated' => $updatedCount
+        ]);
+    }
+
+    public function toggleMethodStatus($id)
+    {
+        $paymentMethod = PaymentMethod::findOrFail($id);
+        $paymentMethod->update(['is_active' => !$paymentMethod->is_active]);
+
+        $status = $paymentMethod->is_active ? 'diaktifkan' : 'dinonaktifkan';
+        return back()->with('success', "Payment method {$paymentMethod->name} berhasil {$status}.");
+    }
+
+    public function updateMethod(Request $request, $id)
+    {
+        $paymentMethod = PaymentMethod::findOrFail($id);
+
+        $validated = $request->validate([
+            'fee_customer_flat' => 'required|numeric|min:0',
+            'fee_customer_percent' => 'required|numeric|min:0|max:100',
+            'sort_order' => 'nullable|integer|min:0',
+            'description' => 'nullable|string',
+        ]);
+
+        $paymentMethod->update($validated);
+
+        return back()->with('success', "Payment method {$paymentMethod->name} berhasil diperbarui.");
+    }
+
+    public function destroyMethod($id)
+    {
+        $paymentMethod = PaymentMethod::findOrFail($id);
+        $paymentMethod->delete();
+        
+        return back()->with('success', 'Payment method berhasil dihapus.');
     }
 }

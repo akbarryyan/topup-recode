@@ -99,4 +99,20 @@ class PaymentGateway extends Model
     {
         return self::where('code', $code)->where('is_active', true)->first();
     }
+
+    /**
+     * Relationship to PaymentMethods
+     */
+    public function paymentMethods()
+    {
+        return $this->hasMany(PaymentMethod::class);
+    }
+
+    /**
+     * Get active payment methods
+     */
+    public function activePaymentMethods()
+    {
+        return $this->hasMany(PaymentMethod::class)->where('is_active', true)->orderBy('sort_order')->orderBy('name');
+    }
 }
