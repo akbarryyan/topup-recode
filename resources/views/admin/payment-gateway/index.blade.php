@@ -2,10 +2,6 @@
 
 @section('title', 'Kelola Payment Gateway')
 
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('library/izitoast/dist/css/iziToast.min.css') }}">
-@endpush
-
 @section('content')
 <div class="main-content">
     <section class="section">
@@ -44,9 +40,19 @@
                         <a href="{{ route('admin.payment-gateways.config') }}" class="btn btn-warning mr-2">
                             <i class="fas fa-cog"></i> Konfigurasi
                         </a>
-                        <button type="button" id="fetch-methods-button" class="btn btn-info mr-2" data-toggle="modal" data-target="#paymentMethodsModal">
-                            <i class="fas fa-download"></i> Lihat Payment Method
-                        </button>
+                        <div class="btn-group mr-2" role="group">
+                            <button id="btnFetchMethods" type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-download"></i> Lihat Payment Method
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="btnFetchMethods">
+                                <button class="dropdown-item" type="button" id="fetch-duitku-methods" data-toggle="modal" data-target="#paymentMethodsModal">
+                                    <i class="fas fa-wallet"></i> Duitku Payment Method
+                                </button>
+                                <button class="dropdown-item" type="button" id="fetch-tripay-channels" data-toggle="modal" data-target="#tripayChannelsModal">
+                                    <i class="fas fa-money-check-alt"></i> Tripay Payment Channel
+                                </button>
+                            </div>
+                        </div>
                         <form id="sync-form" action="{{ route('admin.payment-gateways.sync') }}" method="POST" class="d-inline">
                             @csrf
                             <button type="button" id="sync-button" class="btn btn-primary">
@@ -66,6 +72,7 @@
                                     <th>Kode</th>
                                     <th>Merchant Code</th>
                                     <th>API Key</th>
+                                    <th>Private Key</th>
                                     <th>Environment</th>
                                     <th class="text-center">Status</th>
                                     <th class="text-center">Aksi</th>
@@ -88,6 +95,13 @@
                                         <td>
                                             @if($pg->api_key)
                                                 <code>{{ $pg->masked_api_key }}</code>
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($pg->private_key)
+                                                <code>{{ $pg->masked_private_key }}</code>
                                             @else
                                                 <span class="text-muted">-</span>
                                             @endif
@@ -126,7 +140,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="9" class="text-center">Belum ada data payment gateway.</td>
+                                        <td colspan="10" class="text-center">Belum ada data payment gateway.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -140,24 +154,51 @@
         <div class="tab-pane fade" id="payment-methods" role="tabpanel">
             <div class="card">
                 <div class="card-header">
-                    <h4>Daftar Payment Methods (Duitku)</h4>
+                    <h4>Daftar Payment Methods</h4>
                     <div class="card-header-action">
-                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#paymentMethodsModal">
-                            <i class="fas fa-download"></i> Tambah dari Duitku
-                        </button>
+                        <div class="btn-group mr-2" role="group">
+                            <button id="filterPaymentMethods" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-filter"></i> Filter Gateway: <span id="current-filter">Semua</span>
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="filterPaymentMethods">
+                                <button class="dropdown-item filter-gateway" data-gateway="all" type="button">
+                                    <i class="fas fa-list"></i> Semua Gateway
+                                </button>
+                                <div class="dropdown-divider"></div>
+                                @foreach($paymentGateways as $pg)
+                                <button class="dropdown-item filter-gateway" data-gateway="{{ $pg->id }}" type="button">
+                                    <i class="fas fa-wallet"></i> {{ $pg->name }}
+                                </button>
+                                @endforeach
+                            </div>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button id="btnAddMethods" type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-download"></i> Tambah Payment Method
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="btnAddMethods">
+                                <button class="dropdown-item" type="button" data-toggle="modal" data-target="#paymentMethodsModal">
+                                    <i class="fas fa-wallet"></i> Dari Duitku
+                                </button>
+                                <button class="dropdown-item" type="button" data-toggle="modal" data-target="#tripayChannelsModal">
+                                    <i class="fas fa-money-check-alt"></i> Dari Tripay
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
                     @if($paymentMethods->isEmpty())
                         <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> Belum ada payment method. Klik tombol "Tambah dari Duitku" untuk mengambil payment methods dari Duitku API.
+                            <i class="fas fa-info-circle"></i> Belum ada payment method yang tersimpan. Klik tombol <strong>Tambah Payment Method</strong> untuk mengambil data dari Duitku atau Tripay.
                         </div>
                     @else
                         <div class="table-responsive">
-                            <table class="table table-striped">
+                            <table class="table table-striped" id="payment-methods-table">
                                 <thead>
                                     <tr>
                                         <th class="text-center">#</th>
+                                        <th>Gateway</th>
                                         <th>Logo</th>
                                         <th>Payment Name</th>
                                         <th>Code</th>
@@ -169,8 +210,11 @@
                                 </thead>
                                 <tbody>
                                     @foreach($paymentMethods as $pm)
-                                        <tr>
+                                        <tr class="payment-method-row" data-gateway-id="{{ $pm->payment_gateway_id }}">
                                             <td class="text-center">{{ $loop->iteration }}</td>
+                                            <td>
+                                                <span class="badge badge-primary">{{ $pm->paymentGateway->name ?? '-' }}</span>
+                                            </td>
                                             <td>
                                                 @if($pm->image_url)
                                                     <img src="{{ $pm->image_url }}" alt="{{ $pm->name }}" width="60" class="rounded">
@@ -257,6 +301,12 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="private_key">Private Key</label>
+                        <input type="text" class="form-control" id="private_key" name="private_key" placeholder="Masukkan Private Key (opsional)">
+                        <small class="form-text text-muted">Private Key untuk gateway tertentu (misal: Tripay). Akan disimpan ter-enkripsi</small>
+                    </div>
+
+                    <div class="form-group">
                         <label for="environment">Environment <span class="text-danger">*</span></label>
                         <select class="form-control" id="environment" name="environment" required>
                             <option value="sandbox">Sandbox (Testing)</option>
@@ -332,6 +382,12 @@
                         <label for="edit_api_key{{ $pg->id }}">API Key</label>
                         <input type="text" class="form-control" id="edit_api_key{{ $pg->id }}" name="api_key" placeholder="Kosongkan jika tidak ingin mengubah">
                         <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah API Key yang sudah ada</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit_private_key{{ $pg->id }}">Private Key</label>
+                        <input type="text" class="form-control" id="edit_private_key{{ $pg->id }}" name="private_key" placeholder="Kosongkan jika tidak ingin mengubah">
+                        <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah Private Key yang sudah ada</small>
                     </div>
 
                     <div class="form-group">
@@ -456,28 +512,105 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Tripay Payment Channels -->
+<div class="modal fade" id="tripayChannelsModal" tabindex="-1" role="dialog" aria-labelledby="tripayChannelsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tripayChannelsModalLabel">
+                    <i class="fas fa-list"></i> Payment Channels dari Tripay
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="tripay-channels-loading" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <p class="mt-3">Mengambil data dari Tripay...</p>
+                </div>
+                <div id="tripay-channels-error" class="alert alert-danger" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i> <span id="tripay-error-message"></span>
+                </div>
+                <div id="tripay-channels-content" style="display: none;">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Pilih payment channel yang ingin Anda simpan ke database.
+                        <span class="badge badge-warning">Sudah Ada</span> menandakan channel sudah tersimpan di database.
+                    </div>
+                    <div class="mb-3">
+                        <button type="button" id="tripay-select-all" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-check-square"></i> Pilih Semua
+                        </button>
+                        <button type="button" id="tripay-deselect-all" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-square"></i> Hapus Semua Pilihan
+                        </button>
+                        <button type="button" id="tripay-select-new" class="btn btn-sm btn-success">
+                            <i class="fas fa-check"></i> Pilih Yang Baru Saja
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th width="50">
+                                        <input type="checkbox" id="tripay-select-all-checkbox">
+                                    </th>
+                                    <th>Logo</th>
+                                    <th>Channel Name</th>
+                                    <th>Code</th>
+                                    <th>Group</th>
+                                    <th>Fee Merchant</th>
+                                    <th>Fee Customer</th>
+                                    <th>Status</th>
+                                    <th>Active</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tripay-channels-list">
+                                <!-- Data akan diisi via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Tutup
+                </button>
+                <button type="button" id="save-selected-channels" class="btn btn-success" style="display: none;">
+                    <i class="fas fa-save"></i> Simpan Terpilih
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('library/izitoast/dist/js/iziToast.min.js') }}"></script>
-    <script src="{{ asset('library/sweetalert/dist/sweetalert.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert@2.1.2/dist/sweetalert.min.js"></script>
 
     @if(session('success'))
     <script>
-        iziToast.success({
+        swal({
             title: 'Berhasil!',
-            message: '{{ session('success') }}',
-            position: 'topRight'
+            text: '{{ session('success') }}',
+            icon: 'success',
+            timer: 3000,
+            buttons: false
         });
     </script>
     @endif
 
     @if(session('error'))
     <script>
-        iziToast.error({
+        swal({
             title: 'Gagal!',
-            message: '{{ session('error') }}',
-            position: 'topRight'
+            text: '{{ session('error') }}',
+            icon: 'error',
+            timer: 3000,
+            buttons: false
         });
     </script>
     @endif
@@ -673,10 +806,11 @@
                 });
 
                 if (selectedMethods.length === 0) {
-                    iziToast.warning({
+                    swal({
                         title: 'Peringatan!',
-                        message: 'Pilih minimal 1 payment method untuk disimpan.',
-                        position: 'topRight'
+                        text: 'Pilih minimal 1 payment method untuk disimpan.',
+                        icon: 'warning',
+                        button: 'OK'
                     });
                     return;
                 }
@@ -694,38 +828,263 @@
                         payment_methods: selectedMethods
                     },
                     success: function(response) {
+                        console.log('Duitku Save Response:', response);
                         if (response.success) {
-                            iziToast.success({
-                                title: 'Berhasil!',
-                                message: response.message,
-                                position: 'topRight'
-                            });
+                            // Remove loading state
+                            $('#save-selected-methods').removeClass('btn-progress').prop('disabled', false);
+                            
+                            // Close modal
                             $('#paymentMethodsModal').modal('hide');
-                            // Reload page after 1 second
-                            setTimeout(function() {
+                            
+                            // Show success and reload
+                            swal({
+                                title: 'Berhasil!',
+                                text: response.message,
+                                icon: 'success',
+                                timer: 2000,
+                                buttons: false
+                            }).then(function() {
                                 location.reload();
-                            }, 1000);
+                            });
                         } else {
-                            iziToast.error({
+                            $('#save-selected-methods').removeClass('btn-progress').prop('disabled', false);
+                            swal({
                                 title: 'Gagal!',
-                                message: response.message,
-                                position: 'topRight'
+                                text: response.message,
+                                icon: 'error',
+                                button: 'OK'
                             });
                         }
                     },
                     error: function(xhr) {
+                        console.error('Duitku Save Error:', xhr);
                         let message = 'Terjadi kesalahan saat menyimpan data.';
                         if (xhr.responseJSON && xhr.responseJSON.message) {
                             message = xhr.responseJSON.message;
                         }
-                        iziToast.error({
-                            title: 'Gagal!',
-                            message: message,
-                            position: 'topRight'
-                        });
-                    },
-                    complete: function() {
                         $('#save-selected-methods').removeClass('btn-progress').prop('disabled', false);
+                        swal({
+                            title: 'Gagal!',
+                            text: message,
+                            icon: 'error',
+                            button: 'OK'
+                        });
+                    }
+                });
+            });
+
+            // ========== TRIPAY PAYMENT CHANNELS ==========
+            let tripayChannelsData = [];
+
+            $('#tripayChannelsModal').on('shown.bs.modal', function() {
+                // Reset modal content
+                $('#tripay-channels-loading').show();
+                $('#tripay-channels-error').hide();
+                $('#tripay-channels-content').hide();
+                $('#save-selected-channels').hide();
+                $('#tripay-channels-list').empty();
+
+                // Fetch payment channels from Tripay API
+                $.ajax({
+                    url: '{{ route('admin.payment-gateways.fetch-tripay-channels') }}',
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            tripayChannelsData = response.data;
+                            displayTripayChannels(tripayChannelsData);
+                            $('#tripay-channels-loading').hide();
+                            $('#tripay-channels-content').show();
+                            $('#save-selected-channels').show();
+                        } else {
+                            showTripayError(response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Tripay Error:', xhr);
+                        let message = 'Terjadi kesalahan saat mengambil data.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            message = xhr.responseJSON.message;
+                        } else if (xhr.status === 0) {
+                            message = 'Tidak dapat terhubung ke server. Pastikan koneksi internet Anda stabil.';
+                        } else {
+                            message = 'HTTP Error ' + xhr.status + ': ' + xhr.statusText;
+                        }
+                        showTripayError(message);
+                    }
+                });
+            });
+
+            function showTripayError(message) {
+                $('#tripay-channels-loading').hide();
+                $('#tripay-error-message').text(message);
+                $('#tripay-channels-error').show();
+            }
+
+            function displayTripayChannels(channels) {
+                let html = '';
+                channels.forEach(function(channel) {
+                    let statusBadge = channel.exists 
+                        ? '<span class="badge badge-warning">Sudah Ada</span>' 
+                        : '<span class="badge badge-success">Baru</span>';
+                    
+                    let activeBadge = channel.active 
+                        ? '<span class="badge badge-success">Active</span>' 
+                        : '<span class="badge badge-danger">Inactive</span>';
+                    
+                    html += `
+                        <tr>
+                            <td class="text-center">
+                                <input type="checkbox" class="tripay-channel-checkbox" 
+                                    data-channel='${JSON.stringify(channel)}' 
+                                    ${channel.exists ? '' : 'checked'}>
+                            </td>
+                            <td>
+                                <img src="${channel.icon_url}" alt="${channel.name}" width="60" class="rounded">
+                            </td>
+                            <td><strong>${channel.name}</strong></td>
+                            <td><code>${channel.code}</code></td>
+                            <td><span class="badge badge-info">${channel.group}</span></td>
+                            <td>${channel.fee_merchant_display}</td>
+                            <td>${channel.fee_customer_display}</td>
+                            <td>${statusBadge}</td>
+                            <td>${activeBadge}</td>
+                        </tr>
+                    `;
+                });
+                $('#tripay-channels-list').html(html);
+            }
+
+            // Tripay Select All Checkbox
+            $('#tripay-select-all-checkbox').on('change', function() {
+                $('.tripay-channel-checkbox').prop('checked', $(this).is(':checked'));
+            });
+
+            // Tripay Select All Button
+            $('#tripay-select-all').on('click', function() {
+                $('.tripay-channel-checkbox').prop('checked', true);
+                $('#tripay-select-all-checkbox').prop('checked', true);
+            });
+
+            // Tripay Deselect All Button
+            $('#tripay-deselect-all').on('click', function() {
+                $('.tripay-channel-checkbox').prop('checked', false);
+                $('#tripay-select-all-checkbox').prop('checked', false);
+            });
+
+            // Tripay Select New Only Button
+            $('#tripay-select-new').on('click', function() {
+                $('.tripay-channel-checkbox').each(function() {
+                    let channel = JSON.parse($(this).attr('data-channel'));
+                    $(this).prop('checked', !channel.exists);
+                });
+                $('#tripay-select-all-checkbox').prop('checked', false);
+            });
+
+            // ========== FILTER PAYMENT METHODS BY GATEWAY ==========
+            $('.filter-gateway').on('click', function() {
+                const gatewayId = $(this).data('gateway');
+                const gatewayName = $(this).text().trim();
+                
+                $('#current-filter').text(gatewayName);
+                
+                if (gatewayId === 'all') {
+                    $('.payment-method-row').show();
+                } else {
+                    $('.payment-method-row').hide();
+                    $(`.payment-method-row[data-gateway-id="${gatewayId}"]`).show();
+                }
+                
+                // Update numbering
+                let visibleIndex = 1;
+                $('.payment-method-row:visible').each(function() {
+                    $(this).find('td:first').text(visibleIndex++);
+                });
+            });
+
+            // Save Selected Tripay Channels
+            $('#save-selected-channels').on('click', function() {
+                let selectedChannels = [];
+                $('.tripay-channel-checkbox:checked').each(function() {
+                    let channel = JSON.parse($(this).attr('data-channel'));
+                    selectedChannels.push(channel);
+                });
+
+                if (selectedChannels.length === 0) {
+                    swal({
+                        title: 'Peringatan!',
+                        text: 'Pilih minimal 1 payment channel untuk disimpan.',
+                        icon: 'warning',
+                        button: 'OK'
+                    });
+                    return;
+                }
+
+                // Debug: log data yang akan dikirim
+                console.log('Selected Channels:', selectedChannels);
+                console.log('Sample Channel:', selectedChannels[0]);
+
+                // Show loading
+                $(this).addClass('btn-progress').prop('disabled', true);
+
+                $.ajax({
+                    url: '{{ route('admin.payment-gateways.save-tripay-channels') }}',
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: {
+                        payment_channels: selectedChannels
+                    },
+                    success: function(response) {
+                        console.log('Tripay Save Response:', response);
+                        if (response.success) {
+                            // Remove loading state
+                            $('#save-selected-channels').removeClass('btn-progress').prop('disabled', false);
+                            
+                            // Close modal
+                            $('#tripayChannelsModal').modal('hide');
+                            
+                            // Show success and reload
+                            swal({
+                                title: 'Berhasil!',
+                                text: response.message,
+                                icon: 'success',
+                                timer: 2000,
+                                buttons: false
+                            }).then(function() {
+                                location.reload();
+                            });
+                        } else {
+                            $('#save-selected-channels').removeClass('btn-progress').prop('disabled', false);
+                            swal({
+                                title: 'Gagal!',
+                                text: response.message,
+                                icon: 'error',
+                                button: 'OK'
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Tripay Save Error:', xhr);
+                        let message = 'Terjadi kesalahan saat menyimpan data.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            message = xhr.responseJSON.message;
+                        } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            // Handle validation errors
+                            let errors = xhr.responseJSON.errors;
+                            let errorList = Object.values(errors).flat().join('\n');
+                            message = 'Validation Error:\n' + errorList;
+                        }
+                        $('#save-selected-channels').removeClass('btn-progress').prop('disabled', false);
+                        swal({
+                            title: 'Gagal!',
+                            text: message,
+                            icon: 'error',
+                            button: 'OK'
+                        });
                     }
                 });
             });

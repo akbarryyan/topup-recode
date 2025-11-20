@@ -15,6 +15,7 @@ class PaymentGateway extends Model
         'code',
         'merchant_code',
         'api_key',
+        'private_key',
         'environment',
         'is_active',
         'callback_url',
@@ -61,6 +62,32 @@ class PaymentGateway extends Model
     }
 
     /**
+     * Encrypt Private Key before saving
+     */
+    public function setPrivateKeyAttribute($value)
+    {
+        if ($value) {
+            $this->attributes['private_key'] = Crypt::encryptString($value);
+        }
+    }
+
+    /**
+     * Decrypt Private Key when retrieving
+     */
+    public function getPrivateKeyAttribute($value)
+    {
+        if (!$value) {
+            return null;
+        }
+        
+        try {
+            return Crypt::decryptString($value);
+        } catch (\Exception $e) {
+            return $value;
+        }
+    }
+
+    /**
      * Get masked API Key for display
      */
     public function getMaskedApiKeyAttribute()
@@ -74,6 +101,22 @@ class PaymentGateway extends Model
             return str_repeat('*', strlen($apiKey));
         }
         return substr($apiKey, 0, 4) . str_repeat('*', strlen($apiKey) - 8) . substr($apiKey, -4);
+    }
+
+    /**
+     * Get masked Private Key for display
+     */
+    public function getMaskedPrivateKeyAttribute()
+    {
+        $privateKey = $this->private_key;
+        if (!$privateKey) {
+            return '-';
+        }
+        
+        if (strlen($privateKey) <= 8) {
+            return str_repeat('*', strlen($privateKey));
+        }
+        return substr($privateKey, 0, 4) . str_repeat('*', strlen($privateKey) - 8) . substr($privateKey, -4);
     }
 
     /**

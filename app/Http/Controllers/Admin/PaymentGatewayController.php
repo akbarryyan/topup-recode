@@ -15,11 +15,8 @@ class PaymentGatewayController extends Controller
     {
         $paymentGateways = PaymentGateway::orderBy('name')->get();
         
-        // Get Duitku payment methods
-        $duitkuGateway = PaymentGateway::where('code', 'duitku_config')->first();
-        $paymentMethods = $duitkuGateway 
-            ? PaymentMethod::where('payment_gateway_id', $duitkuGateway->id)->orderBy('name')->get()
-            : collect();
+        // Get all payment methods with their gateway relationship
+        $paymentMethods = PaymentMethod::with('paymentGateway')->orderBy('name')->get();
         
         return view('admin.payment-gateway.index', compact('paymentGateways', 'paymentMethods'));
     }
@@ -30,6 +27,7 @@ class PaymentGatewayController extends Controller
             'name' => 'required|string|max:255',
             'merchant_code' => 'required|string|max:255',
             'api_key' => 'required|string',
+            'private_key' => 'nullable|string',
             'environment' => 'required|in:sandbox,production',
             'icon' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
             'callback_url' => 'nullable|url',
@@ -70,6 +68,7 @@ class PaymentGatewayController extends Controller
             'code' => $code,
             'merchant_code' => $validated['merchant_code'],
             'api_key' => $validated['api_key'],
+            'private_key' => $validated['private_key'] ?? null,
             'environment' => $validated['environment'],
             'icon_url' => $iconUrl,
             'callback_url' => $validated['callback_url'] ?? null,
@@ -232,6 +231,7 @@ class PaymentGatewayController extends Controller
             'name' => 'required|string|max:255',
             'merchant_code' => 'required|string|max:255',
             'api_key' => 'nullable|string',
+            'private_key' => 'nullable|string',
             'environment' => 'required|in:sandbox,production',
             'icon' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
             'callback_url' => 'nullable|url',
@@ -252,6 +252,11 @@ class PaymentGatewayController extends Controller
         // Update API Key only if provided
         if (!empty($validated['api_key'])) {
             $updateData['api_key'] = $validated['api_key'];
+        }
+
+        // Update Private Key only if provided
+        if (!empty($validated['private_key'])) {
+            $updateData['private_key'] = $validated['private_key'];
         }
 
         // Handle icon upload if new file provided
@@ -475,5 +480,173 @@ class PaymentGatewayController extends Controller
         $paymentMethod->delete();
         
         return back()->with('success', 'Payment method berhasil dihapus.');
+    }
+
+    public function fetchTripayPaymentChannels()
+    {
+        // Get Tripay configuration from database
+        $tripayConfig = PaymentGateway::where('code', 'tripay_config')->first();
+
+        if (!$tripayConfig || !$tripayConfig->api_key) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Konfigurasi Tripay belum diatur. Silakan atur konfigurasi terlebih dahulu.'
+            ], 400);
+        }
+
+        $apiKey = $tripayConfig->api_key;
+        $environment = $tripayConfig->environment;
+        
+        // Set API URL based on environment
+        $apiUrl = $environment === 'production' 
+            ? 'https://tripay.co.id/api/merchant/payment-channel'
+            : 'https://tripay.co.id/api-sandbox/merchant/payment-channel';
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $apiKey,
+            ])->get($apiUrl);
+
+            if ($response->failed()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal mengambil data dari Tripay. HTTP Code: ' . $response->status()
+                ], 500);
+            }
+
+            $responseData = $response->json();
+
+            // Check response success
+            if (!isset($responseData['success']) || $responseData['success'] !== true) {
+                $errorMsg = $responseData['message'] ?? 'Unknown error';
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tripay API Error: ' . $errorMsg
+                ], 500);
+            }
+
+            if (!isset($responseData['data']) || empty($responseData['data'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak ada payment channel yang tersedia dari Tripay.'
+                ], 404);
+            }
+
+            $paymentChannels = $responseData['data'];
+            
+            // Get Tripay gateway
+            $tripayGateway = PaymentGateway::where('code', 'tripay_config')->first();
+            
+            if (!$tripayGateway) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Konfigurasi Tripay tidak ditemukan.'
+                ], 404);
+            }
+            
+            // Check which channels already exist in payment_methods table
+            $existingCodes = PaymentMethod::where('payment_gateway_id', $tripayGateway->id)
+                ->whereIn('code', array_column($paymentChannels, 'code'))
+                ->pluck('code')
+                ->toArray();
+
+            // Mark existing channels and format data
+            foreach ($paymentChannels as &$channel) {
+                $channel['exists'] = in_array($channel['code'], $existingCodes);
+                // Format fee untuk display
+                $channel['fee_merchant_display'] = 'Rp ' . number_format($channel['fee_merchant']['flat'], 0, ',', '.') . 
+                    ($channel['fee_merchant']['percent'] > 0 ? ' + ' . $channel['fee_merchant']['percent'] . '%' : '');
+                $channel['fee_customer_display'] = 'Rp ' . number_format($channel['fee_customer']['flat'], 0, ',', '.') . 
+                    ($channel['fee_customer']['percent'] > 0 ? ' + ' . $channel['fee_customer']['percent'] . '%' : '');
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $paymentChannels
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function saveTripayPaymentChannels(Request $request)
+    {
+        $validated = $request->validate([
+            'payment_channels' => 'required|array',
+            'payment_channels.*.code' => 'required|string',
+            'payment_channels.*.name' => 'required|string',
+            'payment_channels.*.group' => 'required|string',
+            'payment_channels.*.icon_url' => 'required|string',
+            'payment_channels.*.fee_merchant' => 'required|array',
+            'payment_channels.*.fee_customer' => 'required|array',
+            'payment_channels.*.total_fee' => 'required|array',
+            'payment_channels.*.minimum_fee' => 'nullable|numeric',
+            'payment_channels.*.maximum_fee' => 'nullable|numeric',
+            'payment_channels.*.active' => 'required|in:true,false,1,0',
+        ]);
+
+        // Get Tripay config to use as parent payment gateway
+        $tripayGateway = PaymentGateway::where('code', 'tripay_config')->first();
+        
+        if (!$tripayGateway) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Konfigurasi Tripay tidak ditemukan. Silakan setup konfigurasi terlebih dahulu.'
+            ], 400);
+        }
+
+        $savedCount = 0;
+        $updatedCount = 0;
+
+        foreach ($validated['payment_channels'] as $channel) {
+            // Convert active to proper boolean
+            $isActive = filter_var($channel['active'], FILTER_VALIDATE_BOOLEAN);
+            
+            $paymentMethod = PaymentMethod::updateOrCreate(
+                [
+                    'payment_gateway_id' => $tripayGateway->id,
+                    'code' => $channel['code']
+                ],
+                [
+                    'name' => $channel['name'],
+                    'image_url' => $channel['icon_url'],
+                    'fee_merchant_flat' => $channel['fee_merchant']['flat'] ?? 0,
+                    'fee_merchant_percent' => $channel['fee_merchant']['percent'] ?? 0,
+                    'fee_customer_flat' => $channel['fee_customer']['flat'] ?? 0,
+                    'fee_customer_percent' => $channel['fee_customer']['percent'] ?? 0,
+                    'total_fee' => $channel['total_fee']['flat'] ?? 0,
+                    'is_active' => $isActive,
+                    'description' => 'Group: ' . $channel['group'] . 
+                        ' | Min: Rp ' . number_format($channel['minimum_fee'] ?? 0, 0, ',', '.') . 
+                        ' | Max: Rp ' . number_format($channel['maximum_fee'] ?? 0, 0, ',', '.'),
+                ]
+            );
+
+            if ($paymentMethod->wasRecentlyCreated) {
+                $savedCount++;
+            } else {
+                $updatedCount++;
+            }
+        }
+
+        $message = "Berhasil menyimpan payment channels! ";
+        if ($savedCount > 0) {
+            $message .= "{$savedCount} baru ditambahkan";
+        }
+        if ($updatedCount > 0) {
+            if ($savedCount > 0) $message .= ", ";
+            $message .= "{$updatedCount} diperbarui";
+        }
+        $message .= ".";
+
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'saved' => $savedCount,
+            'updated' => $updatedCount
+        ]);
     }
 }

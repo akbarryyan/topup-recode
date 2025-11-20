@@ -91,8 +91,15 @@ Route::prefix('admin')->middleware('web')->group(function () {
             Route::get('/config', [PaymentGatewayController::class, 'config'])->name('config');
             Route::put('/config', [PaymentGatewayController::class, 'updateConfig'])->name('config.update');
             Route::post('/sync', [PaymentGatewayController::class, 'sync'])->name('sync');
+            
+            // Duitku Payment Methods
             Route::post('/fetch-methods', [PaymentGatewayController::class, 'fetchPaymentMethods'])->name('fetch-methods');
             Route::post('/save-methods', [PaymentGatewayController::class, 'savePaymentMethods'])->name('save-methods');
+            
+            // Tripay Payment Channels
+            Route::post('/fetch-tripay-channels', [PaymentGatewayController::class, 'fetchTripayPaymentChannels'])->name('fetch-tripay-channels');
+            Route::post('/save-tripay-channels', [PaymentGatewayController::class, 'saveTripayPaymentChannels'])->name('save-tripay-channels');
+            
             Route::patch('/{id}/toggle', [PaymentGatewayController::class, 'toggleStatus'])->name('toggle');
             Route::put('/{id}', [PaymentGatewayController::class, 'update'])->name('update');
             Route::delete('/{id}', [PaymentGatewayController::class, 'destroy'])->name('destroy');
