@@ -5,6 +5,7 @@ use App\Models\GameService;
 use App\Models\GameImage;
 use App\Models\PrepaidService;
 use App\Models\BrandImage;
+use App\Models\PaymentMethod;
 
 Route::get('/', function () {
     // Get active game services grouped by game
@@ -44,3 +45,70 @@ Route::get('/leaderboard', function () {
 Route::get('/article', function () {
     return view('article');
 })->name('article');
+
+// Order Game Route
+Route::get('/order/{gameSlug}', function ($gameSlug) {
+    // Convert slug back to game name (e.g., 'free-fire' -> 'Free Fire')
+    // Try to find game by matching slug pattern
+    $allGames = GameService::select('game')
+        ->where('is_active', true)
+        ->where('status', 'available')
+        ->distinct()
+        ->get()
+        ->pluck('game');
+    
+    $matchedGame = null;
+    foreach ($allGames as $gameName) {
+        $gameSlugFromDb = strtolower(str_replace(' ', '-', $gameName));
+        if ($gameSlugFromDb === $gameSlug) {
+            $matchedGame = $gameName;
+            break;
+        }
+    }
+    
+    // If no match found, abort 404
+    if (!$matchedGame) {
+        abort(404, 'Game tidak ditemukan atau tidak tersedia');
+    }
+    
+    // Get game services for this game
+    $services = GameService::where('game', $matchedGame)
+        ->where('is_active', true)
+        ->where('status', 'available')
+        ->orderBy('price_basic')
+        ->get();
+    
+    // Get game image
+    $gameImage = GameImage::where('game_name', $matchedGame)->first();
+    
+    // Get active payment methods grouped by category
+    $paymentMethods = PaymentMethod::with('paymentGateway')
+        ->where('is_active', true)
+        ->orderBy('sort_order')
+        ->orderBy('name')
+        ->get()
+        ->groupBy(function($item) {
+            // Categorize based on code/name
+            $code = strtolower($item->code);
+            $name = strtolower($item->name);
+            
+            if (strpos($code, 'qris') !== false || strpos($name, 'qris') !== false) {
+                return 'qris';
+            } elseif (strpos($name, 'virtual account') !== false || strpos($code, 'va') !== false || 
+                      strpos($name, 'bank') !== false) {
+                return 'virtual_account';
+            } elseif (strpos($name, 'alfamart') !== false || strpos($name, 'indomaret') !== false ||
+                      strpos($name, 'retail') !== false) {
+                return 'retail';
+            } else {
+                return 'ewallet';
+            }
+        });
+    
+    return view('order.game', [
+        'game' => $matchedGame,
+        'services' => $services,
+        'gameImage' => $gameImage,
+        'paymentMethods' => $paymentMethods
+    ]);
+})->name('order.game');

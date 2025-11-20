@@ -180,6 +180,18 @@
                 });
             });
 
+            // Handle product click to go to order page
+            document.querySelectorAll('#topup-game-products .product-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const gameName = this.getAttribute('data-name');
+                    if (gameName) {
+                        // Convert game name to URL-friendly format (lowercase, replace spaces with hyphens)
+                        const gameSlug = gameName.toLowerCase().replace(/\s+/g, '-');
+                        window.location.href = `/order/${gameSlug}`;
+                    }
+                });
+            });
+
             // Show More/Less functionality for all product sections
             document.querySelectorAll('.show-more-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
