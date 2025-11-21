@@ -22,6 +22,12 @@
                 </a>
             </li>
 
+            <li class="{{ request()->routeIs('admin.game-account-fields*') ? 'active' : '' }}">
+              <a class="nav-link" href="{{ route('admin.game-account-fields.index') }}">
+                <i class="fas fa-id-card"></i> <span>Field Akun Game</span>
+              </a>
+            </li>
+
             <li class="{{ request()->routeIs('admin.prepaid-services*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin.prepaid-services.index') }}">
                     <i class="fas fa-mobile-alt"></i> <span>Layanan Pulsa & PPOB</span>

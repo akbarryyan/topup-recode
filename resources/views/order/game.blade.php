@@ -4,29 +4,39 @@
 
 @section('content')
 <x-order.content :game="$game" :gameImage="$gameImage">
-    <!-- User ID Form -->
+    <!-- Account Fields -->
     <div class="bg-[#1D1618] rounded px-3 py-3">
         <h2 class="text-white text-lg mb-4 flex items-center gap-2">
-            Input Account
+            Input Akun
             <i class="fas fa-info-circle text-green-500"></i>
         </h2>
-        
+
         <div class="space-y-4">
-            <div class="flex items-center justify-center gap-3">
-                <input type="text" 
-                       id="user_id" 
-                       name="user_id"
-                       class="w-40 bg-[#27272A] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-400 placeholder:text-center focus:outline-none focus:border-blue-500 transition-colors"
-                       placeholder="*User ID">
-                <input type="text" 
-                       id="zone_id" 
-                       name="zone_id"
-                       class="w-40 bg-[#27272A] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-400 placeholder:text-center focus:outline-none focus:border-blue-500 transition-colors"
-                       placeholder="*Zone ID">
-            </div>
-            
-            <div class="text-gray-400 text-[13px] italic">
-                <p>Untuk mengetahui User ID di Mobile Legends, klik ikon profil di kiri atas layar utama, dan ID Anda akan tertera di bawah nama karakter. Salin ID tersebut untuk digunakan saat melakukan transaksi.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach($accountFields as $field)
+                @php
+                    $inputId = 'account_' . $field->field_key;
+                @endphp
+                <div>
+                    <label for="{{ $inputId }}" class="block text-sm text-gray-300 mb-2">
+                        {{ $field->label }}
+                        @if($field->is_required)
+                            <span class="text-red-500">*</span>
+                        @endif
+                    </label>
+                    <input type="{{ $field->input_type }}"
+                           id="{{ $inputId }}"
+                           name="account_fields[{{ $field->field_key }}]"
+                           data-account-field
+                           data-field-key="{{ $field->field_key }}"
+                           data-required="{{ $field->is_required ? '1' : '0' }}"
+                           class="w-full bg-[#27272A] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+                           placeholder="{{ $field->placeholder ?? $field->label }}">
+                    @if($field->helper_text)
+                        <p class="text-gray-400 text-[13px] italic mt-2">{{ $field->helper_text }}</p>
+                    @endif
+                </div>
+                @endforeach
             </div>
         </div>
     </div>
@@ -40,8 +50,8 @@
         <div class="space-y-4">
             <div>
                 <input type="text" 
-                       id="whatsapp" 
-                       name="whatsapp"
+                       id="contact_email" 
+                       name="contact_email"
                        class="w-full bg-[#27272A] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
                        placeholder="*Email">
             </div>
@@ -277,7 +287,7 @@
             <div>
                 <label class="block text-gray-300 text-sm mb-2">WhatsApp Number</label>
                 <input type="text" 
-                       id="whatsapp" 
+                       id="contact_whatsapp" 
                        name="whatsapp"
                        class="w-full bg-[#0f1117] border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
                        placeholder="08xxxxxxxxxx">
@@ -328,6 +338,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedItem = null;
     let selectedPayment = null;
     let currentCategory = 'instant'; // Default category for Mobile Legends
+    const accountFieldInputs = document.querySelectorAll('[data-account-field]');
+    const whatsappInput = document.getElementById('contact_whatsapp');
     
     // Function to filter and render items
     function renderItems(category) {
@@ -560,13 +572,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Check form validity
     function checkFormValidity() {
-        const userId = document.getElementById('user_id').value.trim();
-        const whatsapp = document.getElementById('whatsapp').value.trim();
+        const requiredFieldsFilled = Array.from(accountFieldInputs).every(input => {
+            if (input.dataset.required === '1') {
+                return input.value.trim() !== '';
+            }
+            return true;
+        });
+        const whatsappValue = whatsappInput ? whatsappInput.value.trim() : '';
         const hasSelectedItem = selectedItem !== null;
         const hasSelectedPayment = selectedPayment !== null;
         
         const btnOrder = document.getElementById('btn-order');
-        if (userId && whatsapp && hasSelectedItem && hasSelectedPayment) {
+        if (requiredFieldsFilled && whatsappValue && hasSelectedItem && hasSelectedPayment) {
             btnOrder.disabled = false;
         } else {
             btnOrder.disabled = true;
@@ -574,14 +591,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Listen to input changes
-    document.getElementById('user_id').addEventListener('input', checkFormValidity);
-    document.getElementById('whatsapp').addEventListener('input', checkFormValidity);
+    accountFieldInputs.forEach(input => {
+        input.addEventListener('input', checkFormValidity);
+    });
+    if (whatsappInput) {
+        whatsappInput.addEventListener('input', checkFormValidity);
+    }
     
     // Handle order submission
     document.getElementById('btn-order').addEventListener('click', function() {
-        const userId = document.getElementById('user_id').value.trim();
-        const zoneId = document.getElementById('zone_id').value.trim();
-        const whatsapp = document.getElementById('whatsapp').value.trim();
+        const whatsapp = whatsappInput ? whatsappInput.value.trim() : '';
+        const accountData = {};
+        accountFieldInputs.forEach(input => {
+            accountData[input.dataset.fieldKey] = input.value.trim();
+        });
         
         if (!selectedItem) {
             if (typeof swal !== 'undefined') {
@@ -600,8 +623,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // TODO: Submit order to backend
         console.log('Order Data:', {
             game: '{{ $game }}',
-            user_id: userId,
-            zone_id: zoneId,
+            account_fields: accountData,
             item_code: selectedItem.code,
             item_price: selectedItem.price,
             payment_method_id: selectedPayment ? selectedPayment.id : null,

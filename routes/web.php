@@ -1,15 +1,19 @@
 <?php
 
+use App\Models\News;
 use App\Models\Banner;
 use App\Models\GameImage;
 use App\Models\BrandImage;
 use App\Models\GameService;
-use App\Models\News;
 use App\Models\PaymentMethod;
 use App\Models\PrepaidService;
 use App\Models\WebsiteSetting;
-use Illuminate\Support\Facades\Route;
+use App\Models\GameAccountField;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\LeaderboardController;
 
 // Share website settings with all views
 View::composer('*', function ($view) {
@@ -70,11 +74,11 @@ Route::get('/login', function () {
 Route::get('/invoices', function () {
     return view('check-invoice');
 })->name('invoices');
-Route::get('/leaderboard', [App\Http\Controllers\LeaderboardController::class, 'index'])->name('leaderboard');
-Route::get('/leaderboard/data/{period}', [App\Http\Controllers\LeaderboardController::class, 'getData'])->name('leaderboard.data');
-Route::get('/article', [App\Http\Controllers\ArticleController::class, 'index'])->name('article');
-Route::get('/contact-us', [App\Http\Controllers\ContactController::class, 'index'])->name('contact-us');
-Route::post('/contact-us', [App\Http\Controllers\ContactController::class, 'store'])->name('contact-us.store');
+Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard');
+Route::get('/leaderboard/data/{period}', [LeaderboardController::class, 'getData'])->name('leaderboard.data');
+Route::get('/article', [ArticleController::class, 'index'])->name('article');
+Route::get('/contact-us', [ContactController::class, 'index'])->name('contact-us');
+Route::post('/contact-us', [ContactController::class, 'store'])->name('contact-us.store');
 
 // Order Game Route
 Route::get('/order/{gameSlug}', function ($gameSlug) {
@@ -135,10 +139,28 @@ Route::get('/order/{gameSlug}', function ($gameSlug) {
             }
         });
     
+    $accountFields = GameAccountField::forGame($matchedGame)->get();
+
+    if ($accountFields->isEmpty()) {
+        $accountFields = collect([
+            GameAccountField::make([
+                'game_name' => $matchedGame,
+                'field_key' => 'user_id',
+                'label' => 'User ID',
+                'placeholder' => 'Masukkan User ID',
+                'input_type' => 'text',
+                'is_required' => true,
+                'helper_text' => 'Pastikan User ID benar agar top up berhasil.',
+                'sort_order' => 1,
+            ]),
+        ]);
+    }
+
     return view('order.game', [
         'game' => $matchedGame,
         'services' => $services,
         'gameImage' => $gameImage,
-        'paymentMethods' => $paymentMethods
+        'paymentMethods' => $paymentMethods,
+        'accountFields' => $accountFields,
     ]);
 })->name('order.game');

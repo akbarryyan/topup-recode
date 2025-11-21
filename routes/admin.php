@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\GameServiceController;
 use App\Http\Controllers\Admin\PaymentGatewayController;
+use App\Http\Controllers\Admin\GameAccountFieldController;
 use App\Http\Controllers\Admin\PrepaidServiceController;
 use App\Http\Controllers\Admin\GameTransactionController;
 use App\Http\Controllers\Admin\PrepaidTransactionController;
@@ -50,6 +51,14 @@ Route::prefix('admin')->middleware('web')->group(function () {
             Route::get('/', [WebsiteSettingController::class, 'index'])->name('index');
             Route::post('/', [WebsiteSettingController::class, 'update'])->name('update');
             Route::delete('/logo', [WebsiteSettingController::class, 'deleteLogo'])->name('delete-logo');
+        });
+
+        // Game Account Fields Routes
+        Route::prefix('game-account-fields')->name('admin.game-account-fields.')->group(function () {
+            Route::get('/', [GameAccountFieldController::class, 'index'])->name('index');
+            Route::post('/', [GameAccountFieldController::class, 'store'])->name('store');
+            Route::put('/{gameAccountField}', [GameAccountFieldController::class, 'update'])->name('update');
+            Route::delete('/{gameAccountField}', [GameAccountFieldController::class, 'destroy'])->name('destroy');
         });
 
         // Contact Management Routes
