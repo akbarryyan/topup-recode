@@ -40,6 +40,12 @@
                 </a>
             </li>
 
+            <li class="{{ request()->routeIs('admin.banners*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.banners.index') }}">
+                    <i class="fas fa-images"></i> <span>Kelola Banner</span>
+                </a>
+            </li>
+
             <li class="dropdown {{ request()->routeIs('admin.game-transactions*') || request()->routeIs('admin.prepaid-transactions*') ? 'active' : '' }}">
                 <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
                     <i class="fas fa-receipt"></i> <span>Kelola Transaksi</span>

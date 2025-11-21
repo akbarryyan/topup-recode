@@ -1,14 +1,19 @@
 <?php
 
+use App\Models\News;
+use App\Models\User;
+use App\Models\GameService;
+use App\Models\PrepaidService;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\GameServiceController;
-use App\Http\Controllers\Admin\PrepaidServiceController;
 use App\Http\Controllers\Admin\NewsController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\GameServiceController;
+use App\Http\Controllers\Admin\PaymentGatewayController;
+use App\Http\Controllers\Admin\PrepaidServiceController;
 use App\Http\Controllers\Admin\GameTransactionController;
 use App\Http\Controllers\Admin\PrepaidTransactionController;
-use App\Http\Controllers\Admin\PaymentGatewayController;
 
 Route::prefix('admin')->middleware('web')->group(function () {
     // Login routes (guest only)
@@ -21,10 +26,10 @@ Route::prefix('admin')->middleware('web')->group(function () {
     Route::middleware('admin')->group(function () {
         Route::get('/', function () {
             $stats = [
-                'total_users' => \App\Models\User::count(),
-                'total_news' => \App\Models\News::count(),
-                'total_prepaid_services' => \App\Models\PrepaidService::count(),
-                'total_game_services' => \App\Models\GameService::count(),
+                'total_users' => User::count(),
+                'total_news' => News::count(),
+                'total_prepaid_services' => PrepaidService::count(),
+                'total_game_services' => GameService::count(),
             ];
             return view('admin.dashboard', compact('stats'));
         })->name('admin.dashboard');
@@ -72,6 +77,15 @@ Route::prefix('admin')->middleware('web')->group(function () {
             Route::get('/{id}/edit', [NewsController::class, 'edit'])->name('edit');
             Route::put('/{id}', [NewsController::class, 'update'])->name('update');
             Route::delete('/{id}', [NewsController::class, 'destroy'])->name('destroy');
+        });
+
+        // Banner Routes
+        Route::prefix('banners')->name('admin.banners.')->group(function () {
+            Route::get('/', [BannerController::class, 'index'])->name('index');
+            Route::post('/', [BannerController::class, 'store'])->name('store');
+            Route::put('/{id}', [BannerController::class, 'update'])->name('update');
+            Route::patch('/{id}/toggle', [BannerController::class, 'toggleStatus'])->name('toggle');
+            Route::delete('/{id}', [BannerController::class, 'destroy'])->name('destroy');
         });
 
         // Game Transaction Routes

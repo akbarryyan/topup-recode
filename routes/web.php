@@ -1,11 +1,12 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Models\GameService;
+use App\Models\Banner;
 use App\Models\GameImage;
-use App\Models\PrepaidService;
 use App\Models\BrandImage;
+use App\Models\GameService;
 use App\Models\PaymentMethod;
+use App\Models\PrepaidService;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     // Get active game services grouped by game
@@ -28,7 +29,13 @@ Route::get('/', function () {
     // Get brand images
     $brandImages = BrandImage::all()->keyBy('brand_name');
     
-    return view('welcome', compact('gameServices', 'gameImages', 'prepaidServices', 'brandImages'));
+    // Get active banners
+    $banners = Banner::where('is_active', true)
+        ->orderBy('sort_order')
+        ->orderBy('created_at', 'desc')
+        ->get();
+    
+    return view('welcome', compact('gameServices', 'gameImages', 'prepaidServices', 'brandImages', 'banners'));
 });
 Route::get('/register', function () {
     return view('auth.register');
