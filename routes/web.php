@@ -7,7 +7,18 @@ use App\Models\GameService;
 use App\Models\News;
 use App\Models\PaymentMethod;
 use App\Models\PrepaidService;
+use App\Models\WebsiteSetting;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
+
+// Share website settings with all views
+View::composer('*', function ($view) {
+    $view->with('websiteLogo', WebsiteSetting::get('website_logo'));
+    $view->with('websiteName', WebsiteSetting::get('website_name', 'NVD STORE'));
+    $view->with('websiteDescription', WebsiteSetting::get('website_description', 'Top Up Games Favoritmu'));
+    $view->with('websitePhone', WebsiteSetting::get('website_phone', '6282227113307'));
+    $view->with('websiteAddress', WebsiteSetting::get('website_address', 'Medan Sunggal, Kota Medan, Sumatera Utara 20122'));
+});
 
 Route::get('/', function () {
     // Get active game services grouped by game
@@ -59,12 +70,9 @@ Route::get('/login', function () {
 Route::get('/invoices', function () {
     return view('check-invoice');
 })->name('invoices');
-Route::get('/leaderboard', function () {
-    return view('leaderboard');
-})->name('leaderboard');
-Route::get('/article', function () {
-    return view('article');
-})->name('article');
+Route::get('/leaderboard', [App\Http\Controllers\LeaderboardController::class, 'index'])->name('leaderboard');
+Route::get('/leaderboard/data/{period}', [App\Http\Controllers\LeaderboardController::class, 'getData'])->name('leaderboard.data');
+Route::get('/article', [App\Http\Controllers\ArticleController::class, 'index'])->name('article');
 
 // Order Game Route
 Route::get('/order/{gameSlug}', function ($gameSlug) {

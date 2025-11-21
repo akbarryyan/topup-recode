@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\PaymentGatewayController;
 use App\Http\Controllers\Admin\PrepaidServiceController;
 use App\Http\Controllers\Admin\GameTransactionController;
 use App\Http\Controllers\Admin\PrepaidTransactionController;
+use App\Http\Controllers\Admin\WebsiteSettingController;
 
 Route::prefix('admin')->middleware('web')->group(function () {
     // Login routes (guest only)
@@ -43,9 +44,12 @@ Route::prefix('admin')->middleware('web')->group(function () {
         Route::put('/users/{id}', [UserController::class, 'update'])->name('admin.users.update');
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
 
-        Route::get('/settings', function () {
-            return view('admin.settings.index');
-        })->name('admin.settings');
+        // Website Settings Routes
+        Route::prefix('website-settings')->name('admin.website-settings.')->group(function () {
+            Route::get('/', [WebsiteSettingController::class, 'index'])->name('index');
+            Route::post('/', [WebsiteSettingController::class, 'update'])->name('update');
+            Route::delete('/logo', [WebsiteSettingController::class, 'deleteLogo'])->name('delete-logo');
+        });
 
         // Game Services Routes
         Route::prefix('game-services')->name('admin.game-services.')->group(function () {

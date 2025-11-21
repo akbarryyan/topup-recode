@@ -63,4 +63,40 @@ class PrepaidTransaction extends Model
     {
         return 'Rp ' . number_format((float) $this->balance, 0, ',', '.');
     }
+
+    /**
+     * Scope for successful transactions only
+     */
+    public function scopeSuccess($query)
+    {
+        return $query->where('status', 'success');
+    }
+
+    /**
+     * Scope for today's transactions
+     */
+    public function scopeToday($query)
+    {
+        return $query->whereDate('created_at', today());
+    }
+
+    /**
+     * Scope for this week's transactions
+     */
+    public function scopeThisWeek($query)
+    {
+        return $query->whereBetween('created_at', [
+            now()->startOfWeek(),
+            now()->endOfWeek()
+        ]);
+    }
+
+    /**
+     * Scope for this month's transactions
+     */
+    public function scopeThisMonth($query)
+    {
+        return $query->whereMonth('created_at', now()->month)
+                     ->whereYear('created_at', now()->year);
+    }
 }

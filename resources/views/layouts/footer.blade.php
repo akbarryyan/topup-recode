@@ -4,10 +4,14 @@
         <!-- Logo & Description -->
         <div class="mb-6">
             <div class="flex items-center gap-2 mb-3">
-                <img src="https://vocagame.com/_next/image?url=%2Fassets%2Flogo%2Flogo-vocagame.webp&w=256&q=75" alt="Logo" class="h-8">
+                @if($websiteLogo)
+                    <img src="{{ $websiteLogo }}" alt="{{ $websiteName }}" class="h-8">
+                @else
+                    <span class="text-2xl font-bold text-white">{{ $websiteName }}</span>
+                @endif
             </div>
             <p class="text-gray-400 text-sm leading-relaxed max-w-xl">
-                Top Up Games Favoritmu di NVDSTORE! Tersedia Berbagai Macam Produk, Layanan & Pembayaran yang bisa digunakan. Proses Otomatis, Aman, & Pastinya Terjangkau.
+                {{ $websiteDescription }}
             </p>
         </div>
 
@@ -16,12 +20,12 @@
             <!-- Phone -->
             <div class="flex items-center gap-3">
                 <i class="ri-phone-fill text-yellow-500 text-xl"></i>
-                <span class="text-gray-300 text-sm">6282227113307</span>
+                <span class="text-gray-300 text-sm">{{ $websitePhone }}</span>
             </div>
             <!-- Address -->
             <div class="flex items-start gap-3">
                 <i class="ri-map-pin-fill text-yellow-500 text-xl mt-0.5"></i>
-                <span class="text-gray-300 text-sm">Medan Sunggal, Kota Medan, Sumatera Utara 20122</span>
+                <span class="text-gray-300 text-sm">{{ $websiteAddress }}</span>
             </div>
         </div>
 
@@ -69,7 +73,7 @@
             <div class="flex items-center justify-between">
                 <!-- Copyright -->
                 <div class="text-gray-400 text-xs">
-                    <p>© 2025 NVD STORE INDONESIA</p>
+                    <p>© {{ date('Y') }} {{ strtoupper($websiteName) }}</p>
                     <p>#TOPUPTANPARAGU. All rights reserved.</p>
                 </div>
                 <!-- Theme Toggle (Optional) -->

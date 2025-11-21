@@ -15,9 +15,30 @@
                     <i id="icon-daily" class="ri-arrow-down-s-line text-xl lg:text-2xl transition-transform"></i>
                 </button>
                 <div id="content-daily" class="p-3 lg:p-4">
-                    <div class="bg-[#18181B] rounded-lg lg:rounded-xl p-4 lg:p-6 text-center text-gray-400 text-xs lg:text-sm">
-                        No transactions for hari yet
+                    @if($dailyData->count() > 0)
+                    <div class="space-y-2 lg:space-y-3">
+                        @foreach($dailyData as $index => $user)
+                        <div class="flex items-center justify-between text-{{ $index < 3 ? 'white' : 'gray-400' }} text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
+                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                                <span class="font-semibold shrink-0">{{ $index + 1 }}.</span>
+                                <span class="truncate">{{ $user['username'] }}</span>
+                                @if($index === 0)
+                                <span class="text-lg lg:text-xl shrink-0">🥇</span>
+                                @elseif($index === 1)
+                                <span class="text-lg lg:text-xl shrink-0">💎</span>
+                                @elseif($index === 2)
+                                <span class="text-lg lg:text-xl shrink-0">🥉</span>
+                                @endif
+                            </div>
+                            <span class="font-semibold {{ $index === 0 ? 'text-amber-500' : '' }} text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp {{ number_format($user['total_amount'], 0, ',', '.') }}</span>
+                        </div>
+                        @endforeach
                     </div>
+                    @else
+                    <div class="bg-[#18181B] rounded-lg lg:rounded-xl p-4 lg:p-6 text-center text-gray-400 text-xs lg:text-sm">
+                        Belum ada transaksi hari ini
+                    </div>
+                    @endif
                 </div>
             </div>
 
@@ -28,9 +49,30 @@
                     <i id="icon-weekly" class="ri-arrow-down-s-line text-xl lg:text-2xl transition-transform"></i>
                 </button>
                 <div id="content-weekly" class="p-3 lg:p-4">
-                    <div class="bg-[#18181B] rounded-lg lg:rounded-xl p-4 lg:p-6 text-center text-gray-400 text-xs lg:text-sm">
-                        No transactions for minggu yet
+                    @if($weeklyData->count() > 0)
+                    <div class="space-y-2 lg:space-y-3">
+                        @foreach($weeklyData as $index => $user)
+                        <div class="flex items-center justify-between text-{{ $index < 3 ? 'white' : 'gray-400' }} text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
+                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                                <span class="font-semibold shrink-0">{{ $index + 1 }}.</span>
+                                <span class="truncate">{{ $user['username'] }}</span>
+                                @if($index === 0)
+                                <span class="text-lg lg:text-xl shrink-0">🥇</span>
+                                @elseif($index === 1)
+                                <span class="text-lg lg:text-xl shrink-0">💎</span>
+                                @elseif($index === 2)
+                                <span class="text-lg lg:text-xl shrink-0">🥉</span>
+                                @endif
+                            </div>
+                            <span class="font-semibold {{ $index === 0 ? 'text-amber-500' : '' }} text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp {{ number_format($user['total_amount'], 0, ',', '.') }}</span>
+                        </div>
+                        @endforeach
                     </div>
+                    @else
+                    <div class="bg-[#18181B] rounded-lg lg:rounded-xl p-4 lg:p-6 text-center text-gray-400 text-xs lg:text-sm">
+                        Belum ada transaksi minggu ini
+                    </div>
+                    @endif
                 </div>
             </div>
 
@@ -41,101 +83,31 @@
                     <i id="icon-monthly" class="ri-arrow-down-s-line text-xl lg:text-2xl transition-transform"></i>
                 </button>
                 <div id="content-monthly" class="p-3 lg:p-4">
+                    @if($monthlyData->count() > 0)
                     <!-- Leaderboard List -->
                     <div class="space-y-2 lg:space-y-3">
-                        <!-- Rank 1 -->
-                        <div class="flex items-center justify-between text-white text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
+                        @foreach($monthlyData as $index => $user)
+                        <div class="flex items-center justify-between text-{{ $index < 3 ? 'white' : 'gray-400' }} text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
                             <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                                <span class="font-semibold shrink-0">1.</span>
-                                <span class="truncate">Ridho DL</span>
+                                <span class="font-semibold shrink-0">{{ $index + 1 }}.</span>
+                                <span class="truncate">{{ $user['username'] }}</span>
+                                @if($index === 0)
                                 <span class="text-lg lg:text-xl shrink-0">🥇</span>
-                            </div>
-                            <span class="font-semibold text-amber-500 text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 1,012,945</span>
-                        </div>
-
-                        <!-- Rank 2 -->
-                        <div class="flex items-center justify-between text-white text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
-                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                                <span class="font-semibold shrink-0">2.</span>
-                                <span class="truncate">Guest</span>
+                                @elseif($index === 1)
                                 <span class="text-lg lg:text-xl shrink-0">💎</span>
-                            </div>
-                            <span class="font-semibold text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 6,982</span>
-                        </div>
-
-                        <!-- Rank 3 -->
-                        <div class="flex items-center justify-between text-white text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
-                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                                <span class="font-semibold shrink-0">3.</span>
-                                <span class="truncate">Ghafy Algafry</span>
+                                @elseif($index === 2)
                                 <span class="text-lg lg:text-xl shrink-0">🥉</span>
+                                @endif
                             </div>
-                            <span class="font-semibold text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 1,648</span>
+                            <span class="font-semibold {{ $index === 0 ? 'text-amber-500' : '' }} text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp {{ number_format($user['total_amount'], 0, ',', '.') }}</span>
                         </div>
-
-                        <!-- Rank 4 -->
-                        <div class="flex items-center justify-between text-gray-400 text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
-                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                                <span class="font-semibold shrink-0">4.</span>
-                                <span class="truncate">Ahmad</span>
-                            </div>
-                            <span class="font-semibold text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 1,200</span>
-                        </div>
-
-                        <!-- Rank 5 -->
-                        <div class="flex items-center justify-between text-gray-400 text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
-                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                                <span class="font-semibold shrink-0">5.</span>
-                                <span class="truncate">Budi</span>
-                            </div>
-                            <span class="font-semibold text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 980</span>
-                        </div>
-
-                        <!-- Rank 6 -->
-                        <div class="flex items-center justify-between text-gray-400 text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
-                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                                <span class="font-semibold shrink-0">6.</span>
-                                <span class="truncate">Citra</span>
-                            </div>
-                            <span class="font-semibold text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 875</span>
-                        </div>
-
-                        <!-- Rank 7 -->
-                        <div class="flex items-center justify-between text-gray-400 text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
-                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                                <span class="font-semibold shrink-0">7.</span>
-                                <span class="truncate">Doni</span>
-                            </div>
-                            <span class="font-semibold text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 750</span>
-                        </div>
-
-                        <!-- Rank 8 -->
-                        <div class="flex items-center justify-between text-gray-400 text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
-                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                                <span class="font-semibold shrink-0">8.</span>
-                                <span class="truncate">Eka</span>
-                            </div>
-                            <span class="font-semibold text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 650</span>
-                        </div>
-
-                        <!-- Rank 9 -->
-                        <div class="flex items-center justify-between text-gray-400 text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
-                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                                <span class="font-semibold shrink-0">9.</span>
-                                <span class="truncate">Faisal</span>
-                            </div>
-                            <span class="font-semibold text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 550</span>
-                        </div>
-
-                        <!-- Rank 10 -->
-                        <div class="flex items-center justify-between text-gray-400 text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
-                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
-                                <span class="font-semibold shrink-0">10.</span>
-                                <span class="truncate">Gita</span>
-                            </div>
-                            <span class="font-semibold text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 480</span>
-                        </div>
+                        @endforeach
                     </div>
+                    @else
+                    <div class="bg-[#18181B] rounded-lg lg:rounded-xl p-4 lg:p-6 text-center text-gray-400 text-xs lg:text-sm">
+                        Belum ada transaksi bulan ini
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>

@@ -46,6 +46,12 @@
                 </a>
             </li>
 
+            <li class="{{ request()->routeIs('admin.website-settings*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.website-settings.index') }}">
+                    <i class="fas fa-cog"></i> <span>Kelola Website</span>
+                </a>
+            </li>
+
             <li class="dropdown {{ request()->routeIs('admin.game-transactions*') || request()->routeIs('admin.prepaid-transactions*') ? 'active' : '' }}">
                 <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
                     <i class="fas fa-receipt"></i> <span>Kelola Transaksi</span>

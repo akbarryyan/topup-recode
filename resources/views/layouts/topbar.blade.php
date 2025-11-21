@@ -3,7 +3,11 @@
     <div class="flex items-center justify-between px-4 lg:px-8 py-3 border-b border-gray-800">
         <!-- Logo Section -->
         <div class="shrink-0">
-            <img src="https://vocagame.com/_next/image?url=%2Fassets%2Flogo%2Flogo-vocagame.webp&w=256&q=75" alt="Logo" class="h-7 lg:h-8 w-auto">
+            @if($websiteLogo)
+                <img src="{{ $websiteLogo }}" alt="{{ $websiteName }}" class="h-7 lg:h-8 w-auto">
+            @else
+                <span class="text-xl font-bold text-white">{{ $websiteName }}</span>
+            @endif
         </div>
 
         <!-- Search Bar (Desktop only) -->
@@ -84,7 +88,11 @@
     <div class="p-6 overflow-y-auto h-full">
         <!-- Close Button & Logo -->
         <div class="flex items-center justify-between mb-8">
-            <img src="https://vocagame.com/_next/image?url=%2Fassets%2Flogo%2Flogo-vocagame.webp&w=256&q=75" alt="Logo" class="h-6">
+            @if($websiteLogo)
+                <img src="{{ $websiteLogo }}" alt="{{ $websiteName }}" class="h-6">
+            @else
+                <span class="text-lg font-bold text-white">{{ $websiteName }}</span>
+            @endif
             <button id="closeMenu" class="text-gray-400 hover:text-white transition-colors">
                 <i class="ri-close-line text-2xl"></i>
             </button>
