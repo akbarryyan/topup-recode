@@ -1,139 +1,139 @@
-<div class="bg-[#000000] px-3 sm:px-6 py-12">
-    <div class="max-w-2xl mx-auto">
+<div class="bg-[#000000] px-3 lg:px-8 py-8 lg:py-12">
+    <div class="max-w-4xl mx-auto">
         <!-- Header Title-->
-        <div class="text-center text-gray-200 mb-8">
-            <h1 class="text-[23px] font-semibold">Leaderboard</h1>
-            <p class="text-[13px] text-gray-400">Top 10 Pembelian Terbanyak di NVD STORE INDONESIA, Data ini diperbarui otomatis dari sistem kami</p>
+        <div class="text-center text-gray-200 mb-6 lg:mb-8">
+            <h1 class="text-xl lg:text-2xl xl:text-3xl font-semibold mb-2">Leaderboard</h1>
+            <p class="text-xs lg:text-sm text-gray-400 px-4">Top 10 Pembelian Terbanyak di NVD STORE INDONESIA, Data ini diperbarui otomatis dari sistem kami</p>
         </div>
 
         <!-- Tab Navigation -->
-        <div class="flex flex-col gap-6">
+        <div class="flex flex-col gap-4 lg:gap-6">
             <!-- Tab 1: Hari Ini -->
-            <div class="bg-[#0E0E10] rounded-2xl overflow-hidden">
-                <button onclick="toggleTab('daily')" class="w-full px-4 py-3 bg-[#18181B] text-white text-left font-medium text-[14px] flex items-center justify-between hover:bg-[#1f1f23] transition">
+            <div class="bg-[#0E0E10] rounded-xl lg:rounded-2xl overflow-hidden shadow-lg">
+                <button onclick="toggleTab('daily')" class="w-full px-4 lg:px-6 py-3 lg:py-4 bg-[#18181B] text-white text-left font-medium text-sm lg:text-base flex items-center justify-between hover:bg-[#1f1f23] transition">
                     <span>Top 10 - Hari ini</span>
-                    <i id="icon-daily" class="ri-arrow-down-s-line text-xl transition-transform"></i>
+                    <i id="icon-daily" class="ri-arrow-down-s-line text-xl lg:text-2xl transition-transform"></i>
                 </button>
-                <div id="content-daily" class="p-4">
-                    <div class="bg-[#18181B] rounded-xl p-4 text-center text-gray-400 text-[13px]">
+                <div id="content-daily" class="p-3 lg:p-4">
+                    <div class="bg-[#18181B] rounded-lg lg:rounded-xl p-4 lg:p-6 text-center text-gray-400 text-xs lg:text-sm">
                         No transactions for hari yet
                     </div>
                 </div>
             </div>
 
             <!-- Tab 2: Minggu Ini -->
-            <div class="bg-[#0E0E10] rounded-2xl overflow-hidden">
-                <button onclick="toggleTab('weekly')" class="w-full px-4 py-3 bg-[#18181B] text-white text-left font-medium text-[14px] flex items-center justify-between hover:bg-[#1f1f23] transition">
+            <div class="bg-[#0E0E10] rounded-xl lg:rounded-2xl overflow-hidden shadow-lg">
+                <button onclick="toggleTab('weekly')" class="w-full px-4 lg:px-6 py-3 lg:py-4 bg-[#18181B] text-white text-left font-medium text-sm lg:text-base flex items-center justify-between hover:bg-[#1f1f23] transition">
                     <span>Top 10 - Minggu ini</span>
-                    <i id="icon-weekly" class="ri-arrow-down-s-line text-xl transition-transform"></i>
+                    <i id="icon-weekly" class="ri-arrow-down-s-line text-xl lg:text-2xl transition-transform"></i>
                 </button>
-                <div id="content-weekly" class="p-4">
-                    <div class="bg-[#18181B] rounded-xl p-4 text-center text-gray-400 text-[13px]">
+                <div id="content-weekly" class="p-3 lg:p-4">
+                    <div class="bg-[#18181B] rounded-lg lg:rounded-xl p-4 lg:p-6 text-center text-gray-400 text-xs lg:text-sm">
                         No transactions for minggu yet
                     </div>
                 </div>
             </div>
 
             <!-- Tab 3: Bulan Ini -->
-            <div class="bg-[#0E0E10] rounded-2xl overflow-hidden">
-                <button onclick="toggleTab('monthly')" class="w-full px-4 py-3 bg-[#18181B] text-white text-left font-medium text-[14px] flex items-center justify-between hover:bg-[#1f1f23] transition">
+            <div class="bg-[#0E0E10] rounded-xl lg:rounded-2xl overflow-hidden shadow-lg">
+                <button onclick="toggleTab('monthly')" class="w-full px-4 lg:px-6 py-3 lg:py-4 bg-[#18181B] text-white text-left font-medium text-sm lg:text-base flex items-center justify-between hover:bg-[#1f1f23] transition">
                     <span>Top 10 - Bulan ini</span>
-                    <i id="icon-monthly" class="ri-arrow-down-s-line text-xl transition-transform"></i>
+                    <i id="icon-monthly" class="ri-arrow-down-s-line text-xl lg:text-2xl transition-transform"></i>
                 </button>
-                <div id="content-monthly" class="p-4">
+                <div id="content-monthly" class="p-3 lg:p-4">
                     <!-- Leaderboard List -->
-                    <div class="space-y-3">
+                    <div class="space-y-2 lg:space-y-3">
                         <!-- Rank 1 -->
-                        <div class="flex items-center justify-between text-white text-[14px] hover:bg-[#1f1f23] p-2 rounded-lg transition">
-                            <div class="flex items-center gap-2">
-                                <span class="font-semibold">1.</span>
-                                <span>Ridho DL</span>
-                                <span class="text-lg">🥇</span>
+                        <div class="flex items-center justify-between text-white text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
+                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                                <span class="font-semibold shrink-0">1.</span>
+                                <span class="truncate">Ridho DL</span>
+                                <span class="text-lg lg:text-xl shrink-0">🥇</span>
                             </div>
-                            <span class="font-semibold text-amber-500">Rp 1,012,945</span>
+                            <span class="font-semibold text-amber-500 text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 1,012,945</span>
                         </div>
 
                         <!-- Rank 2 -->
-                        <div class="flex items-center justify-between text-white text-[14px] hover:bg-[#1f1f23] p-2 rounded-lg transition">
-                            <div class="flex items-center gap-2">
-                                <span class="font-semibold">2.</span>
-                                <span>Guest</span>
-                                <span class="text-lg">💎</span>
+                        <div class="flex items-center justify-between text-white text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
+                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                                <span class="font-semibold shrink-0">2.</span>
+                                <span class="truncate">Guest</span>
+                                <span class="text-lg lg:text-xl shrink-0">💎</span>
                             </div>
-                            <span class="font-semibold">Rp 6,982</span>
+                            <span class="font-semibold text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 6,982</span>
                         </div>
 
                         <!-- Rank 3 -->
-                        <div class="flex items-center justify-between text-white text-[14px] hover:bg-[#1f1f23] p-2 rounded-lg transition">
-                            <div class="flex items-center gap-2">
-                                <span class="font-semibold">3.</span>
-                                <span>Ghafy Algafry</span>
-                                <span class="text-lg">🥉</span>
+                        <div class="flex items-center justify-between text-white text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
+                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                                <span class="font-semibold shrink-0">3.</span>
+                                <span class="truncate">Ghafy Algafry</span>
+                                <span class="text-lg lg:text-xl shrink-0">🥉</span>
                             </div>
-                            <span class="font-semibold">Rp 1,648</span>
+                            <span class="font-semibold text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 1,648</span>
                         </div>
 
                         <!-- Rank 4 -->
-                        <div class="flex items-center justify-between text-gray-400 text-[14px] hover:bg-[#1f1f23] p-2 rounded-lg transition">
-                            <div class="flex items-center gap-2">
-                                <span class="font-semibold">4.</span>
-                                <span>Ahmad</span>
+                        <div class="flex items-center justify-between text-gray-400 text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
+                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                                <span class="font-semibold shrink-0">4.</span>
+                                <span class="truncate">Ahmad</span>
                             </div>
-                            <span class="font-semibold">Rp 1,200</span>
+                            <span class="font-semibold text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 1,200</span>
                         </div>
 
                         <!-- Rank 5 -->
-                        <div class="flex items-center justify-between text-gray-400 text-[14px] hover:bg-[#1f1f23] p-2 rounded-lg transition">
-                            <div class="flex items-center gap-2">
-                                <span class="font-semibold">5.</span>
-                                <span>Budi</span>
+                        <div class="flex items-center justify-between text-gray-400 text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
+                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                                <span class="font-semibold shrink-0">5.</span>
+                                <span class="truncate">Budi</span>
                             </div>
-                            <span class="font-semibold">Rp 980</span>
+                            <span class="font-semibold text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 980</span>
                         </div>
 
                         <!-- Rank 6 -->
-                        <div class="flex items-center justify-between text-gray-400 text-[14px] hover:bg-[#1f1f23] p-2 rounded-lg transition">
-                            <div class="flex items-center gap-2">
-                                <span class="font-semibold">6.</span>
-                                <span>Citra</span>
+                        <div class="flex items-center justify-between text-gray-400 text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
+                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                                <span class="font-semibold shrink-0">6.</span>
+                                <span class="truncate">Citra</span>
                             </div>
-                            <span class="font-semibold">Rp 875</span>
+                            <span class="font-semibold text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 875</span>
                         </div>
 
                         <!-- Rank 7 -->
-                        <div class="flex items-center justify-between text-gray-400 text-[14px] hover:bg-[#1f1f23] p-2 rounded-lg transition">
-                            <div class="flex items-center gap-2">
-                                <span class="font-semibold">7.</span>
-                                <span>Doni</span>
+                        <div class="flex items-center justify-between text-gray-400 text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
+                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                                <span class="font-semibold shrink-0">7.</span>
+                                <span class="truncate">Doni</span>
                             </div>
-                            <span class="font-semibold">Rp 750</span>
+                            <span class="font-semibold text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 750</span>
                         </div>
 
                         <!-- Rank 8 -->
-                        <div class="flex items-center justify-between text-gray-400 text-[14px] hover:bg-[#1f1f23] p-2 rounded-lg transition">
-                            <div class="flex items-center gap-2">
-                                <span class="font-semibold">8.</span>
-                                <span>Eka</span>
+                        <div class="flex items-center justify-between text-gray-400 text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
+                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                                <span class="font-semibold shrink-0">8.</span>
+                                <span class="truncate">Eka</span>
                             </div>
-                            <span class="font-semibold">Rp 650</span>
+                            <span class="font-semibold text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 650</span>
                         </div>
 
                         <!-- Rank 9 -->
-                        <div class="flex items-center justify-between text-gray-400 text-[14px] hover:bg-[#1f1f23] p-2 rounded-lg transition">
-                            <div class="flex items-center gap-2">
-                                <span class="font-semibold">9.</span>
-                                <span>Faisal</span>
+                        <div class="flex items-center justify-between text-gray-400 text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
+                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                                <span class="font-semibold shrink-0">9.</span>
+                                <span class="truncate">Faisal</span>
                             </div>
-                            <span class="font-semibold">Rp 550</span>
+                            <span class="font-semibold text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 550</span>
                         </div>
 
                         <!-- Rank 10 -->
-                        <div class="flex items-center justify-between text-gray-400 text-[14px] hover:bg-[#1f1f23] p-2 rounded-lg transition">
-                            <div class="flex items-center gap-2">
-                                <span class="font-semibold">10.</span>
-                                <span>Gita</span>
+                        <div class="flex items-center justify-between text-gray-400 text-sm lg:text-base hover:bg-[#1f1f23] p-2 lg:p-3 rounded-lg transition">
+                            <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
+                                <span class="font-semibold shrink-0">10.</span>
+                                <span class="truncate">Gita</span>
                             </div>
-                            <span class="font-semibold">Rp 480</span>
+                            <span class="font-semibold text-xs lg:text-sm xl:text-base shrink-0 ml-2">Rp 480</span>
                         </div>
                     </div>
                 </div>

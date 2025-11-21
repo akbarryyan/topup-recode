@@ -1,4 +1,4 @@
-<div class="w-full bg-[#0E0E10] backdrop-blur-md shadow-2xl text-gray-300 fixed top-0 left-0 right-0 z-50">
+<div class="w-full bg-[#0E0E10] backdrop-blur-md shadow-2xl text-gray-300 fixed top-0 left-0 right-0 z-100">
     <!-- Top Section: Logo, Search, Language, Sign In -->
     <div class="flex items-center justify-between px-4 lg:px-8 py-3 border-b border-gray-800">
         <!-- Logo Section -->

@@ -23,10 +23,11 @@
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
+            background-color: #000000;
         }
     </style>
 </head>
-<body class="pt-12">
+<body class="pt-[120px] lg:pt-[140px] bg-[#000000]">
     @include('layouts.topbar')
 
     @yield('content')

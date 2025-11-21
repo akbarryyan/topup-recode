@@ -4,6 +4,7 @@ use App\Models\Banner;
 use App\Models\GameImage;
 use App\Models\BrandImage;
 use App\Models\GameService;
+use App\Models\News;
 use App\Models\PaymentMethod;
 use App\Models\PrepaidService;
 use Illuminate\Support\Facades\Route;
@@ -35,7 +36,19 @@ Route::get('/', function () {
         ->orderBy('created_at', 'desc')
         ->get();
     
-    return view('welcome', compact('gameServices', 'gameImages', 'prepaidServices', 'brandImages', 'banners'));
+    // Get popular games for carousel
+    $popularGames = ['Mobile Legends (Global)', 'Free Fire', 'PUBG Mobile (GLOBAL)', 'Genshin Impact'];
+    $popularGameData = GameImage::whereIn('game_name', $popularGames)
+        ->get()
+        ->keyBy('game_name');
+    
+    // Get latest published news (limit 3)
+    $news = News::published()
+        ->orderBy('published_at', 'desc')
+        ->limit(3)
+        ->get();
+    
+    return view('welcome', compact('gameServices', 'gameImages', 'prepaidServices', 'brandImages', 'banners', 'popularGameData', 'news'));
 });
 Route::get('/register', function () {
     return view('auth.register');

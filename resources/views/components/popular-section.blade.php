@@ -1,149 +1,60 @@
 <!-- Popular Section -->
-<div class="bg-[#000000] px-3 pt-10 pb-12">
-    <div class="flex items-center gap-2 mb-4">
-        <i class="ri-fire-fill text-[24px] text-yellow-500"></i>
-        <h2 class="text-white text-xl font-bold">PALING POPULER!</h2>
+<div class="bg-[#000000] px-3 lg:px-8 pt-10 lg:pt-12 pb-12 lg:pb-16">
+    <div class="flex items-center gap-2 lg:gap-3 mb-4 lg:mb-6 max-w-7xl mx-auto">
+        <i class="ri-fire-fill text-[24px] lg:text-[32px] text-yellow-500"></i>
+        <h2 class="text-white text-xl lg:text-2xl font-bold">PALING POPULER!</h2>
     </div>
 
     <!-- Carousel Container -->
-    <div class="relative h-60 sm:h-[260px] md:h-[300px] lg:h-[340px] flex items-center justify-center overflow-hidden">
+    <div class="relative h-60 sm:h-[280px] md:h-80 lg:h-[380px] xl:h-[420px] flex items-center justify-center overflow-hidden max-w-7xl mx-auto">
         <!-- Carousel Wrapper -->
         <div class="relative w-full h-full flex items-center justify-center perspective-1000">
             <div id="popularCarousel" class="relative w-full h-full flex items-center justify-center">
-                <!-- Card 1 - Arena of Valor -->
-                <div class="carousel-card absolute transition-all duration-700 ease-out w-[200px] h-[280px] rounded-xl overflow-hidden shadow-2xl">
-                        <div class="relative h-full bg-linear-to-b from-gray-800 to-gray-900">
-                            <img src="{{ asset('image/aov.webp') }}" alt="Arena of Valor" class="w-full h-full object-cover">
-                            <div class="absolute bottom-0 w-full bg-linear-to-t from-black to-transparent p-3">
-                                <h3 class="text-white text-sm font-semibold">ARENA OF VALOR</h3>
-                                <p class="text-gray-300 text-xs">Voucher</p>
+                @php
+                    // Mapping database names to display names and slugs
+                    $popularGamesMap = [
+                        'Mobile Legends (Global)' => ['display' => 'Mobile Legends', 'slug' => 'mobile-legends'],
+                        'Free Fire' => ['display' => 'Free Fire', 'slug' => 'free-fire'],
+                        'PUBG Mobile (GLOBAL)' => ['display' => 'PUBG Mobile', 'slug' => 'pubg-mobile'],
+                        'Genshin Impact' => ['display' => 'Genshin Impact', 'slug' => 'genshin-impact']
+                    ];
+                @endphp
+                
+                @foreach($popularGamesMap as $dbName => $gameInfo)
+                    @if(isset($popularGameData[$dbName]))
+                        <div class="carousel-card absolute transition-all duration-700 ease-out w-[200px] h-[280px] rounded-xl overflow-hidden shadow-2xl cursor-pointer" onclick="window.location.href='/order/{{ $gameInfo['slug'] }}'">
+                            <div class="relative h-full">
+                                <img src="{{ asset('storage/game-images/' . $popularGameData[$dbName]->image) }}" 
+                                     alt="{{ $gameInfo['display'] }}" 
+                                     class="w-full h-full object-cover">
+                                <div class="absolute bottom-0 w-full bg-linear-to-t from-black to-transparent p-3 lg:p-4">
+                                    <h3 class="text-white text-sm lg:text-base font-bold uppercase">{{ $gameInfo['display'] }}</h3>
+                                    <p class="text-gray-300 text-xs lg:text-sm">Top Up Game</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                <!-- Card 2 - Genshin Impact -->
-                <div class="carousel-card absolute transition-all duration-700 ease-out w-[200px] h-[280px] rounded-xl overflow-hidden shadow-2xl">
-                    <div class="relative h-full">
-                        <img src="{{ asset('image/genshin.webp') }}" alt="Genshin Impact" class="w-full h-full object-cover">
-                        <div class="absolute bottom-0 w-full bg-linear-to-t from-black to-transparent p-4">
-                            <h3 class="text-white text-base font-bold">GENSHIN IMPACT</h3>
-                            <p class="text-gray-300 text-sm">HoYoverse</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 3 - Mobile Legends (Center/Featured) -->
-                <div class="carousel-card absolute transition-all duration-700 ease-out w-[200px] h-[280px] rounded-xl overflow-hidden shadow-2xl">
-                    <div class="relative h-full">
-                        <img src="{{ asset('image/ml-tur.png') }}" alt="Mobile Legends" class="w-full h-full object-cover">
-                        <div class="absolute bottom-0 w-full bg-linear-to-t from-yellow-600 to-transparent p-4">
-                            <div class="bg-yellow-500/90 rounded-lg py-2 text-center">
-                                <p class="text-black text-sm font-bold">ROOM TOURNAMENT</p>
-                                <p class="text-black text-xs">Moonton</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 4 - Mobile Legends Skin -->
-                <div class="carousel-card absolute transition-all duration-700 ease-out w-[200px] h-[280px] rounded-xl overflow-hidden shadow-2xl">
-                    <div class="relative h-full">
-                        <img src="{{ asset('image/ml-skin.png') }}" alt="Mobile Legends Skin" class="w-full h-full object-cover">
-                        <div class="absolute bottom-0 w-full bg-linear-to-t from-black to-transparent p-4">
-                            <h3 class="text-white text-base font-bold">SKIN MOBILE LEGENDS</h3>
-                            <p class="text-gray-300 text-sm">Moonton</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 5 - Mobile Legends Gift -->
-                <div class="carousel-card absolute transition-all duration-700 ease-out w-[200px] h-[280px] rounded-xl overflow-hidden shadow-2xl">
-                    <div class="relative h-full bg-linear-to-b from-gray-800 to-gray-900">
-                        <img src="{{ asset('image/ml-item.png') }}" alt="Mobile Legends Gift" class="w-full h-full object-cover">
-                        <div class="absolute bottom-0 w-full bg-linear-to-t from-black to-transparent p-3">
-                            <h3 class="text-white text-sm font-semibold">GIFT ITEM</h3>
-                            <p class="text-gray-300 text-xs">Moonton</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 6 - Free Fire -->
-                <div class="carousel-card absolute transition-all duration-700 ease-out w-[200px] h-[280px] rounded-xl overflow-hidden shadow-2xl">
-                    <div class="relative h-full bg-linear-to-b from-gray-800 to-gray-900">
-                        <img src="{{ asset('image/ff.webp') }}" alt="Free Fire" class="w-full h-full object-cover">
-                        <div class="absolute bottom-0 w-full bg-linear-to-t from-black to-transparent p-3">
-                            <h3 class="text-white text-sm font-semibold">FREE FIRE</h3>
-                            <p class="text-gray-300 text-xs">Garena</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 7 - PUBG Mobile -->
-                <div class="carousel-card absolute transition-all duration-700 ease-out w-[200px] h-[280px] rounded-xl overflow-hidden shadow-2xl">
-                    <div class="relative h-full">
-                        <img src="{{ asset('image/pubg.webp') }}" alt="PUBG Mobile" class="w-full h-full object-cover">
-                        <div class="absolute bottom-0 w-full bg-linear-to-t from-black to-transparent p-4">
-                            <h3 class="text-white text-base font-bold">PUBG MOBILE</h3>
-                            <p class="text-gray-300 text-sm">Tencent</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 8 - Valorant -->
-                <div class="carousel-card absolute transition-all duration-700 ease-out w-[200px] h-[280px] rounded-xl overflow-hidden shadow-2xl">
-                    <div class="relative h-full bg-linear-to-b from-gray-800 to-gray-900">
-                        <img src="{{ asset('image/valorant.webp') }}" alt="Valorant" class="w-full h-full object-cover">
-                        <div class="absolute bottom-0 w-full bg-linear-to-t from-black to-transparent p-3">
-                            <h3 class="text-white text-sm font-semibold">VALORANT</h3>
-                            <p class="text-gray-300 text-xs">Riot Games</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 9 - Roblox -->
-                <div class="carousel-card absolute transition-all duration-700 ease-out w-[200px] h-[280px] rounded-xl overflow-hidden shadow-2xl">
-                    <div class="relative h-full">
-                        <img src="{{ asset('image/roblox.webp') }}" alt="Roblox" class="w-full h-full object-cover">
-                        <div class="absolute bottom-0 w-full bg-linear-to-t from-black to-transparent p-4">
-                            <h3 class="text-white text-base font-bold">ROBLOX</h3>
-                            <p class="text-gray-300 text-sm">Roblox Corporation</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 10 - Honkai Star Rail -->
-                <div class="carousel-card absolute transition-all duration-700 ease-out w-[200px] h-[280px] rounded-xl overflow-hidden shadow-2xl">
-                    <div class="relative h-full bg-linear-to-b from-gray-800 to-gray-900">
-                        <img src="{{ asset('image/honkai.webp') }}" alt="Honkai Star Rail" class="w-full h-full object-cover">
-                        <div class="absolute bottom-0 w-full bg-linear-to-t from-black to-transparent p-3">
-                            <h3 class="text-white text-sm font-semibold">HONKAI STAR RAIL</h3>
-                            <p class="text-gray-300 text-xs">HoYoverse</p>
-                        </div>
-                    </div>
-                </div>
+                    @endif
+                @endforeach
             </div>
         </div>
 
         <!-- Navigation Buttons -->
-        <button id="prevBtn" class="absolute left-1 sm:left-2 md:left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center z-50 transition-all">
-            <i class="ri-arrow-left-s-line text-xl sm:text-2xl"></i>
+        <button id="prevBtn" class="absolute left-2 sm:left-4 md:left-8 lg:left-12 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 backdrop-blur-sm text-white w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-full flex items-center justify-center z-50 transition-all shadow-lg">
+            <i class="ri-arrow-left-s-line text-xl sm:text-2xl lg:text-3xl"></i>
         </button>
-        <button id="nextBtn" class="absolute right-1 sm:right-2 md:right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center z-50 transition-all">
-            <i class="ri-arrow-right-s-line text-xl sm:text-2xl"></i>
+        <button id="nextBtn" class="absolute right-2 sm:right-4 md:right-8 lg:right-12 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 backdrop-blur-sm text-white w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-full flex items-center justify-center z-50 transition-all shadow-lg">
+            <i class="ri-arrow-right-s-line text-xl sm:text-2xl lg:text-3xl"></i>
         </button>
 
         <!-- Indicators -->
-        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex justify-center gap-1.5 sm:gap-2 z-60">
-            <button class="indicator w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-yellow-500 transition-all" data-slide="0"></button>
-            <button class="indicator w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-gray-500 transition-all" data-slide="1"></button>
-            <button class="indicator w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-gray-500 transition-all" data-slide="2"></button>
-            <button class="indicator w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-gray-500 transition-all" data-slide="3"></button>
-            <button class="indicator w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-gray-500 transition-all" data-slide="4"></button>
-            <button class="indicator w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-gray-500 transition-all" data-slide="5"></button>
-            <button class="indicator w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-gray-500 transition-all" data-slide="6"></button>
-            <button class="indicator w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-gray-500 transition-all" data-slide="7"></button>
-            <button class="indicator w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-gray-500 transition-all" data-slide="8"></button>
-            <button class="indicator w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-gray-500 transition-all" data-slide="9"></button>
+        <div class="absolute bottom-4 lg:bottom-6 left-1/2 -translate-x-1/2 flex justify-center gap-2 sm:gap-2.5 lg:gap-3 z-60">
+            @php $indicatorIndex = 0; @endphp
+            @foreach($popularGamesMap as $dbName => $gameInfo)
+                @if(isset($popularGameData[$dbName]))
+                    <button class="indicator w-2 h-2 sm:w-2.5 sm:h-2.5 lg:w-3 lg:h-3 rounded-full {{ $indicatorIndex === 0 ? 'bg-yellow-500' : 'bg-gray-500' }} transition-all hover:scale-125" data-slide="{{ $indicatorIndex }}"></button>
+                    @php $indicatorIndex++; @endphp
+                @endif
+            @endforeach
         </div>
     </div>
 </div>
@@ -157,7 +68,7 @@
         const indicators = document.querySelectorAll('.indicator');
         const cards = document.querySelectorAll('.carousel-card');
         let currentSlide = 0;
-        const totalSlides = 10; // Total cards
+        const totalSlides = cards.length; // Dynamic total based on available cards
 
         function updateCarousel() {
             // Responsive breakpoints
@@ -165,33 +76,40 @@
             let centerWidth, centerHeight, sideWidth, sideHeight, spacing;
             
             if (width < 640) {
-                // Mobile
-                centerWidth = 150;
-                centerHeight = 210;
-                sideWidth = 110;
-                sideHeight = 150;
-                spacing = 100;
+                // Mobile (xs)
+                centerWidth = 140;
+                centerHeight = 190;
+                sideWidth = 100;
+                sideHeight = 140;
+                spacing = 80;
             } else if (width < 768) {
-                // Small tablets
+                // Small tablets (sm)
+                centerWidth = 160;
+                centerHeight = 220;
+                sideWidth = 120;
+                sideHeight = 165;
+                spacing = 90;
+            } else if (width < 1024) {
+                // Medium tablets (md)
                 centerWidth = 180;
-                centerHeight = 240;
+                centerHeight = 250;
                 sideWidth = 130;
                 sideHeight = 180;
-                spacing = 120;
-            } else if (width < 1024) {
-                // Tablets
+                spacing = 100;
+            } else if (width < 1280) {
+                // Desktop (lg)
                 centerWidth = 200;
-                centerHeight = 270;
-                sideWidth = 150;
+                centerHeight = 280;
+                sideWidth = 145;
                 sideHeight = 200;
-                spacing = 140;
+                spacing = 115;
             } else {
-                // Desktop
+                // Large Desktop (xl)
                 centerWidth = 220;
                 centerHeight = 300;
                 sideWidth = 160;
                 sideHeight = 220;
-                spacing = 160;
+                spacing = 130;
             }
             
             cards.forEach((card, index) => {
@@ -231,8 +149,8 @@
                     cardWidth = sideWidth;
                     cardHeight = sideHeight;
                 } else if (absDiff === 2) {
-                    // Second left/right cards
-                    translateX = diff * (spacing + 60);
+                    // Second left/right cards - reduced spacing
+                    translateX = diff * (spacing + 25);
                     translateZ = -400;
                     scale = 0.55;
                     opacity = 0.3;
@@ -243,7 +161,7 @@
                     cardHeight = sideHeight * 0.8;
                 } else {
                     // Hidden cards
-                    translateX = diff * (spacing + 100);
+                    translateX = diff * (spacing + 50);
                     translateZ = -600;
                     scale = 0.4;
                     opacity = 0;

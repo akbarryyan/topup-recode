@@ -3,7 +3,7 @@
 @section('content')
 <div class="w-full">
     <!-- Banner Section -->
-    <div class="relative bg-[#27272A] px-3 lg:px-8 pt-2 pb-8 lg:pb-12">
+    <div class="relative bg-[#27272A] px-3 lg:px-8 pt-4 lg:pt-6 pb-8 lg:pb-12">
         <div class="max-w-7xl mx-auto">
             <!-- Banner Carousel -->
             <div class="relative overflow-hidden rounded-xl lg:rounded-2xl">
@@ -101,7 +101,7 @@
                                      alt="{{ $gameName }}" 
                                      class="w-full h-full object-cover rounded-lg lg:rounded-xl hover:scale-105 transition-transform duration-300">
                             @endif
-                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 lg:p-3">
+                            <div class="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2 lg:p-3">
                                 <p class="text-white text-xs lg:text-sm font-semibold truncate">{{ $gameName }}</p>
                             </div>
                         </button>
@@ -138,7 +138,7 @@
                                      alt="{{ $brandName }}" 
                                      class="w-full h-full object-cover rounded-lg lg:rounded-xl hover:scale-105 transition-transform duration-300">
                             @endif
-                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 lg:p-3">
+                            <div class="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2 lg:p-3">
                                 <p class="text-white text-xs lg:text-sm font-semibold truncate">{{ $brandName }}</p>
                             </div>
                         </button>
