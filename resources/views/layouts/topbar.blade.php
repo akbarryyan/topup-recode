@@ -73,7 +73,7 @@
             <i class="ri-article-line text-[16px]"></i>
             <span class="text-sm font-medium">Articles</span>
         </a>
-        <a href="#" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors group">
+        <a href="{{ route('contact-us') }}" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors group">
             <i class="ri-customer-service-2-line text-[16px]"></i>
             <span class="text-sm font-medium">Contact Us</span>
         </a>
@@ -140,7 +140,7 @@
             </a>
 
             <!-- Contact Us -->
-            <a href="#" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
+            <a href="{{ route('contact-us') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
                 <i class="ri-customer-service-2-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
                 <span class="font-medium">Hubungi Kami</span>
             </a>

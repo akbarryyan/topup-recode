@@ -73,6 +73,8 @@ Route::get('/invoices', function () {
 Route::get('/leaderboard', [App\Http\Controllers\LeaderboardController::class, 'index'])->name('leaderboard');
 Route::get('/leaderboard/data/{period}', [App\Http\Controllers\LeaderboardController::class, 'getData'])->name('leaderboard.data');
 Route::get('/article', [App\Http\Controllers\ArticleController::class, 'index'])->name('article');
+Route::get('/contact-us', [App\Http\Controllers\ContactController::class, 'index'])->name('contact-us');
+Route::post('/contact-us', [App\Http\Controllers\ContactController::class, 'store'])->name('contact-us.store');
 
 // Order Game Route
 Route::get('/order/{gameSlug}', function ($gameSlug) {

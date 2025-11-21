@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\PrepaidServiceController;
 use App\Http\Controllers\Admin\GameTransactionController;
 use App\Http\Controllers\Admin\PrepaidTransactionController;
 use App\Http\Controllers\Admin\WebsiteSettingController;
+use App\Http\Controllers\Admin\ContactController;
 
 Route::prefix('admin')->middleware('web')->group(function () {
     // Login routes (guest only)
@@ -49,6 +50,14 @@ Route::prefix('admin')->middleware('web')->group(function () {
             Route::get('/', [WebsiteSettingController::class, 'index'])->name('index');
             Route::post('/', [WebsiteSettingController::class, 'update'])->name('update');
             Route::delete('/logo', [WebsiteSettingController::class, 'deleteLogo'])->name('delete-logo');
+        });
+
+        // Contact Management Routes
+        Route::prefix('contacts')->name('admin.contacts.')->group(function () {
+            Route::get('/', [ContactController::class, 'index'])->name('index');
+            Route::get('/{id}', [ContactController::class, 'show'])->name('show');
+            Route::patch('/{id}/status', [ContactController::class, 'updateStatus'])->name('update-status');
+            Route::delete('/{id}', [ContactController::class, 'destroy'])->name('destroy');
         });
 
         // Game Services Routes
