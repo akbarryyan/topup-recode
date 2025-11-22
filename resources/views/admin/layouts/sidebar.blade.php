@@ -58,6 +58,12 @@
                 </a>
             </li>
 
+            <li class="{{ request()->routeIs('admin.vip-reseller-settings*') ? 'active' : '' }}">
+              <a class="nav-link" href="{{ route('admin.vip-reseller-settings.index') }}">
+                <i class="fas fa-link"></i> <span>VIP Reseller API</span>
+              </a>
+            </li>
+
             <li class="{{ request()->routeIs('admin.contacts*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('admin.contacts.index') }}">
                     <i class="fas fa-envelope"></i> <span>Kelola Contact Us</span>

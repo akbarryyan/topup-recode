@@ -17,6 +17,8 @@ use App\Http\Controllers\Admin\GameTransactionController;
 use App\Http\Controllers\Admin\PrepaidTransactionController;
 use App\Http\Controllers\Admin\WebsiteSettingController;
 use App\Http\Controllers\Admin\ContactController;
+use App\Http\Controllers\Admin\VipResellerSettingController;
+use App\Http\Controllers\Admin\AdminProfileController;
 
 Route::prefix('admin')->middleware('web')->group(function () {
     // Login routes (guest only)
@@ -39,6 +41,9 @@ Route::prefix('admin')->middleware('web')->group(function () {
 
         Route::post('/logout', [AuthController::class, 'logout'])->name('admin.logout');
 
+        Route::get('/profile', [AdminProfileController::class, 'edit'])->name('admin.profile.edit');
+        Route::put('/profile', [AdminProfileController::class, 'update'])->name('admin.profile.update');
+
         // Users Management
         Route::get('/users', [UserController::class, 'index'])->name('admin.users');
         Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');
@@ -51,6 +56,13 @@ Route::prefix('admin')->middleware('web')->group(function () {
             Route::get('/', [WebsiteSettingController::class, 'index'])->name('index');
             Route::post('/', [WebsiteSettingController::class, 'update'])->name('update');
             Route::delete('/logo', [WebsiteSettingController::class, 'deleteLogo'])->name('delete-logo');
+        });
+
+        // VIP Reseller Settings Routes
+        Route::prefix('vip-reseller')->name('admin.vip-reseller-settings.')->group(function () {
+            Route::get('/', [VipResellerSettingController::class, 'index'])->name('index');
+            Route::put('/', [VipResellerSettingController::class, 'update'])->name('update');
+            Route::post('/check-profile', [VipResellerSettingController::class, 'checkProfile'])->name('check-profile');
         });
 
         // Game Account Fields Routes

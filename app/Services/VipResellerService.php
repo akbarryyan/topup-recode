@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\VipResellerSetting;
 
 class VipResellerService
 {
@@ -11,13 +12,33 @@ class VipResellerService
     protected $apiId;
     protected $apiKey;
     protected $sign;
+    protected bool $configured = false;
 
     public function __construct()
     {
-        $this->apiUrl = config('services.vip_reseller.api_url');
-        $this->apiId = config('services.vip_reseller.api_id');
-        $this->apiKey = config('services.vip_reseller.api_key');
-        $this->sign = config('services.vip_reseller.sign');
+        $this->loadConfiguration();
+    }
+
+    protected function loadConfiguration(): void
+    {
+        $setting = VipResellerSetting::current();
+
+        $this->apiUrl = optional($setting)->api_url ?? config('services.vip_reseller.api_url');
+        $this->apiId = optional($setting)->api_id ?? config('services.vip_reseller.api_id');
+        $this->apiKey = optional($setting)->api_key ?? config('services.vip_reseller.api_key');
+        $this->sign = optional($setting)->sign ?? config('services.vip_reseller.sign');
+
+        $this->configured = !empty($this->apiUrl) && !empty($this->apiKey) && !empty($this->sign);
+    }
+
+    protected function ensureConfigured(): bool
+    {
+        if ($this->configured) {
+            return true;
+        }
+
+        Log::warning('VIP Reseller configuration is incomplete.');
+        return false;
     }
 
     /**
@@ -25,6 +46,14 @@ class VipResellerService
      */
     public function getGameServices($filterType = null, $filterValue = null, $filterStatus = null)
     {
+        if (!$this->ensureConfigured()) {
+            return [
+                'success' => false,
+                'data' => [],
+                'message' => 'Konfigurasi VIP Reseller belum lengkap. Mohon lengkapi credensial API.',
+            ];
+        }
+
         try {
             $payload = [
                 'key' => $this->apiKey,
@@ -114,6 +143,14 @@ class VipResellerService
      */
     public function getServiceStock($serviceCode)
     {
+        if (!$this->ensureConfigured()) {
+            return [
+                'success' => false,
+                'data' => [],
+                'message' => 'Konfigurasi VIP Reseller belum lengkap. Mohon lengkapi credensial API.',
+            ];
+        }
+
         try {
             $payload = [
                 'key' => $this->apiKey,
@@ -177,6 +214,14 @@ class VipResellerService
      */
     public function getPrepaidServices($filterType = null, $filterValue = null)
     {
+        if (!$this->ensureConfigured()) {
+            return [
+                'success' => false,
+                'data' => [],
+                'message' => 'Konfigurasi VIP Reseller belum lengkap. Mohon lengkapi credensial API.',
+            ];
+        }
+
         try {
             $payload = [
                 'key' => $this->apiKey,
@@ -255,5 +300,73 @@ class VipResellerService
     public function getPrepaidServicesByType($typeName)
     {
         return $this->getPrepaidServices('type', $typeName);
+    }
+
+    /**
+     * Fetch authenticated reseller profile
+     */
+    public function getProfile()
+    {
+        if (!$this->ensureConfigured()) {
+            return [
+                'success' => false,
+                'data' => [],
+                'message' => 'Konfigurasi VIP Reseller belum lengkap. Mohon lengkapi credensial API.',
+            ];
+        }
+
+        try {
+            $payload = [
+                'key' => $this->apiKey,
+                'sign' => $this->sign,
+            ];
+
+            Log::info('VIP Reseller Profile API Request', [
+                'url' => $this->apiUrl . '/profile',
+                'payload' => $payload,
+            ]);
+
+            $response = Http::timeout(15)
+                ->asForm()
+                ->post($this->apiUrl . '/profile', $payload);
+
+            Log::info('VIP Reseller Profile API Response', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+
+                if (isset($data['result']) && $data['result'] === true) {
+                    return [
+                        'success' => true,
+                        'data' => $data['data'] ?? [],
+                        'message' => $data['message'] ?? 'Profil berhasil diambil.',
+                    ];
+                }
+
+                return [
+                    'success' => false,
+                    'data' => [],
+                    'message' => $data['message'] ?? 'Gagal mengambil profil.',
+                ];
+            }
+
+            return [
+                'success' => false,
+                'data' => [],
+                'message' => 'API request failed: ' . $response->status(),
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('VIP Reseller Profile API Error: ' . $e->getMessage());
+
+            return [
+                'success' => false,
+                'data' => [],
+                'message' => 'Error: ' . $e->getMessage(),
+            ];
+        }
     }
 }
