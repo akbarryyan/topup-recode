@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\WebsiteSetting;
+use App\Models\MaintenanceSetting;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
@@ -12,7 +13,9 @@ class WebsiteSettingController extends Controller
     public function index()
     {
         $settings = WebsiteSetting::all()->keyBy('key');
-        return view('admin.website-settings.index', compact('settings'));
+        $maintenanceSetting = MaintenanceSetting::current();
+
+        return view('admin.website-settings.index', compact('settings', 'maintenanceSetting'));
     }
 
     public function update(Request $request)

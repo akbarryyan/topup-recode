@@ -28,7 +28,7 @@
     
         <div class="section-body">
             <div class="row">
-                <div class="col-12">
+                <div class="col-12 col-lg-8">
                     <div class="card">
                         <div class="card-header">
                             <h4>Pengaturan Website</h4>
@@ -138,6 +138,68 @@
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Mode Maintenance</h4>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">
+                                Aktifkan mode maintenance untuk menampilkan pesan pemeliharaan kepada pengunjung. Halaman admin tetap dapat diakses.
+                            </p>
+                            <form action="{{ route('admin.website-settings.maintenance') }}" method="POST">
+                                @csrf
+                                @method('PUT')
+
+                                <div class="form-group">
+                                    <label class="custom-switch">
+                                        <input type="checkbox" name="is_active" value="1" class="custom-switch-input" {{ old('is_active', $maintenanceSetting->is_active) ? 'checked' : '' }}>
+                                        <span class="custom-switch-indicator"></span>
+                                        <span class="custom-switch-description">Aktifkan Maintenance Mode</span>
+                                    </label>
+                                    <small class="form-text text-muted">Saat aktif, seluruh pengunjung diarahkan ke halaman maintenance.</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Judul Pesan <span class="text-danger">*</span></label>
+                                    <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title', $maintenanceSetting->title) }}" required>
+                                    @error('title')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Deskripsi Pesan</label>
+                                    <textarea name="message" rows="3" class="form-control @error('message') is-invalid @enderror">{{ old('message', $maintenanceSetting->message) }}</textarea>
+                                    @error('message')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Teks Tombol</label>
+                                    <input type="text" name="button_text" class="form-control @error('button_text') is-invalid @enderror" value="{{ old('button_text', $maintenanceSetting->button_text) }}" placeholder="Contoh: Hubungi Kami">
+                                    @error('button_text')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group">
+                                    <label>URL Tombol</label>
+                                    <input type="text" name="button_url" class="form-control @error('button_url') is-invalid @enderror" value="{{ old('button_url', $maintenanceSetting->button_url) }}" placeholder="Contoh: https://wa.me/628xxx">
+                                    @error('button_url')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <button type="submit" class="btn btn-warning btn-block">
+                                    <i class="fas fa-tools"></i> Simpan Pengaturan Maintenance
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
