@@ -1,3 +1,4 @@
+<div class="mt-12 lg:mt-28">
 <div class="bg-[#000000] px-3 lg:px-8 py-6 lg:py-12">
     <div class="max-w-7xl mx-auto">
         <div class="bg-[#0E0E10] rounded-xl p-4 sm:p-6 lg:p-8">
@@ -108,4 +109,5 @@
             </div>
         </div>
     </div>
+</div>
 </div>

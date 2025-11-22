@@ -1,3 +1,4 @@
+<div class="mt-16 lg:mt-32">
 <div class="bg-[#000000] px-3 lg:px-8 py-6 lg:py-12">
     <div class="max-w-7xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
@@ -86,4 +87,5 @@
             </div>
         </div>
     </div>
+</div>
 </div>

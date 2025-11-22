@@ -20,14 +20,18 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username',
             'email' => 'required|email|unique:users,email',
+            'phone' => 'nullable|string|max:30',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|in:user,admin',
         ]);
 
         User::create([
             'name' => $validated['name'],
+            'username' => $validated['username'],
             'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
             'password' => bcrypt($validated['password']),
             'role' => $validated['role'],
         ]);
@@ -47,8 +51,9 @@ class UserController extends Controller
 
         $rules = [
             'name' => 'required|string|max:255',
-            'username' => 'nullable|string|max:255|unique:users,username,' . $user->id,
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
             'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|max:30',
             'role' => 'required|in:user,admin',
         ];
 
@@ -63,6 +68,7 @@ class UserController extends Controller
         $user->name = $validated['name'];
         $user->username = $validated['username'];
         $user->email = $validated['email'];
+        $user->phone = $validated['phone'] ?? null;
         $user->role = $validated['role'];
 
         // Update password jika diisi

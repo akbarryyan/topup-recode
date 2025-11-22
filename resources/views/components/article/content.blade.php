@@ -1,3 +1,4 @@
+<div class="mt-16 lg:mt-32">
 <div class="bg-[#000000] px-3 lg:px-8 py-6 lg:py-8">
     <div class="max-w-7xl mx-auto">
         <h1 class="text-gray-100 font-semibold text-xl lg:text-2xl mb-4 lg:mb-6">Artikel & Berita</h1>
@@ -28,4 +29,5 @@
         </div>
         @endif
     </div>
+</div>
 </div>

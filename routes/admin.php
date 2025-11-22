@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\VipResellerSettingController;
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Admin\MaintenanceSettingController;
+use App\Http\Controllers\Admin\DashboardController;
 
 Route::prefix('admin')->middleware('web')->group(function () {
     // Login routes (guest only)
@@ -30,15 +31,7 @@ Route::prefix('admin')->middleware('web')->group(function () {
 
     // Protected admin routes (auth + admin role required)
     Route::middleware('admin')->group(function () {
-        Route::get('/', function () {
-            $stats = [
-                'total_users' => User::count(),
-                'total_news' => News::count(),
-                'total_prepaid_services' => PrepaidService::count(),
-                'total_game_services' => GameService::count(),
-            ];
-            return view('admin.dashboard', compact('stats'));
-        })->name('admin.dashboard');
+        Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
 
         Route::post('/logout', [AuthController::class, 'logout'])->name('admin.logout');
 

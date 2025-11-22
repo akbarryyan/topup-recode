@@ -27,11 +27,13 @@
         }
     </style>
 </head>
-<body class="pt-[120px] lg:pt-[140px] bg-[#000000]">
+<body>
     @include('layouts.topbar')
 
     @yield('content')
 
     @include('layouts.footer')
+
+    @stack('scripts')
 </body>
 </html>

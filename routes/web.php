@@ -12,8 +12,10 @@ use App\Models\GameAccountField;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LeaderboardController;
+use App\Http\Controllers\ProfileController;
 
 // Share website settings with all views
 View::composer('*', function ($view) {
@@ -65,12 +67,22 @@ Route::get('/', function () {
     
     return view('welcome', compact('gameServices', 'gameImages', 'prepaidServices', 'brandImages', 'banners', 'popularGameData', 'news'));
 });
-Route::get('/register', function () {
-    return view('auth.register');
-})->name('register');
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
+Route::middleware('guest')->group(function () {
+    Route::get('/auth/login', [AuthenticatedSessionController::class, 'showLoginForm'])->name('login');
+    Route::post('/auth/login', [AuthenticatedSessionController::class, 'login'])->name('login.attempt');
+
+    Route::get('/auth/register', [AuthenticatedSessionController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/auth/register', [AuthenticatedSessionController::class, 'register'])->name('register.store');
+});
+
+Route::post('/auth/logout', [AuthenticatedSessionController::class, 'logout'])
+    ->middleware('auth')
+    ->name('logout');
+    
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+});
+
 Route::get('/invoices', function () {
     return view('check-invoice');
 })->name('invoices');

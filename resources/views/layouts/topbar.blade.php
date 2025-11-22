@@ -1,17 +1,25 @@
+@php($currentUser = Auth::user())
 <div class="w-full bg-[#0E0E10] backdrop-blur-md shadow-2xl text-gray-300 fixed top-0 left-0 right-0 z-100">
     <!-- Top Section: Logo, Search, Language, Sign In -->
     <div class="flex items-center justify-between px-4 lg:px-8 py-3 border-b border-gray-800">
-        <!-- Logo Section -->
-        <div class="shrink-0">
-            @if($websiteLogo)
-                <img src="{{ $websiteLogo }}" alt="{{ $websiteName }}" class="h-7 lg:h-8 w-auto">
-            @else
-                <span class="text-xl font-bold text-white">{{ $websiteName }}</span>
-            @endif
+        <!-- Left Section: Hamburger (auth) + Logo -->
+        <div class="flex items-center gap-3">
+            @auth
+                <button id="menuToggle" class="lg:hidden text-gray-300 hover:text-white transition-colors">
+                    <i class="ri-menu-3-fill text-[22px]"></i>
+                </button>
+            @endauth
+            <div class="shrink-0">
+                @if($websiteLogo)
+                    <img src="{{ $websiteLogo }}" alt="{{ $websiteName }}" class="h-7 lg:h-8 w-auto">
+                @else
+                    <span class="text-xl font-bold text-white">{{ $websiteName }}</span>
+                @endif
+            </div>
         </div>
 
         <!-- Search Bar (Desktop only) -->
-        <div class="hidden lg:flex flex-1 max-w-2xl mx-8">
+        <div class="hidden lg:flex flex-1 max-w-4xl mx-8">
             <div class="relative w-full">
                 <i class="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
                 <input type="text" 
@@ -28,21 +36,107 @@
                 <span class="text-sm font-medium">EN / IDR</span>
             </div>
 
-            <!-- Sign In Button (Desktop only) -->
+            <!-- Sign In / Account Button (Desktop only) -->
+            @guest
             <a href="{{ route('login') }}" class="hidden lg:flex items-center gap-2 px-4 py-2 bg-transparent border border-gray-700 text-white hover:bg-[#27272A] hover:border-gray-500 rounded-lg transition-all">
                 <i class="ri-google-fill text-[18px]"></i>
                 <span class="font-medium">Sign In</span>
             </a>
+            @else
+            <div class="hidden lg:block relative">
+                <button id="desktopAccountButton" class="flex items-center gap-2 px-3 py-2 text-white rounded-full transition-all">
+                    <div class="w-9 h-9 rounded-full bg-rose-600 flex items-center justify-center font-semibold">
+                        {{ strtoupper(\Illuminate\Support\Str::substr($currentUser->name, 0, 1)) }}
+                    </div>
+                </button>
+
+                <div id="desktopAccountDropdown" class="hidden absolute right-0 mt-3 w-64 bg-[#1F1F23] rounded-2xl border border-white/10 shadow-2xl py-4 px-4 text-white">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-11 h-11 rounded-full bg-rose-600 flex items-center justify-center font-semibold">
+                            {{ strtoupper(\Illuminate\Support\Str::substr($currentUser->name, 0, 1)) }}
+                        </div>
+                        <div>
+                            <p class="font-semibold leading-tight">{{ $currentUser->name }}</p>
+                            <p class="text-xs text-gray-400">{{ $currentUser->email }}</p>
+                        </div>
+                    </div>
+                    <span class="inline-flex items-center text-xs px-2 py-1 rounded-full bg-white/10 capitalize mb-4">{{ $currentUser->role }}</span>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center justify-between text-gray-300">
+                            <div class="flex items-center gap-2">
+                                <i class="ri-wallet-3-line"></i>
+                                <span>Saldo</span>
+                            </div>
+                            <span class="font-semibold">Rp 0</span>
+                        </div>
+                        <a href="{{ url('/profile') }}" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
+                            <i class="ri-user-line"></i>
+                            <span>Profil</span>
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="w-full flex items-center gap-2 text-left text-gray-300 hover:text-white transition-colors">
+                                <i class="ri-logout-circle-r-line"></i>
+                                <span>Keluar</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            @endguest
 
             <!-- Search Icon (Mobile only) -->
             <button class="lg:hidden text-gray-300 hover:text-white transition-colors">
                 <i class="ri-search-line text-[22px]"></i>
             </button>
 
-            <!-- Hamburger Menu (Mobile only) -->
+            @auth
+            <div class="relative lg:hidden">
+                <button id="accountFab" class="w-8 h-8 rounded-full bg-rose-600 text-white font-semibold flex items-center justify-center shadow-lg shadow-rose-500/40 focus:outline-none focus:ring-2 focus:ring-rose-300">
+                    {{ strtoupper(\Illuminate\Support\Str::substr($currentUser->name, 0, 1)) }}
+                </button>
+
+                <div id="accountDropdown" class="hidden absolute right-0 mt-3 w-64 bg-[#1F1F23] rounded-2xl border border-white/10 shadow-2xl py-4 px-4 text-white">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-11 h-11 rounded-full bg-rose-600 flex items-center justify-center font-semibold">
+                            {{ strtoupper(\Illuminate\Support\Str::substr($currentUser->name, 0, 1)) }}
+                        </div>
+                        <div>
+                            <p class="font-semibold leading-tight">{{ $currentUser->name }}</p>
+                            <p class="text-xs text-gray-400">{{ $currentUser->email }}</p>
+                        </div>
+                    </div>
+                    <span class="inline-flex items-center text-xs px-2 py-1 rounded-full bg-white/10 capitalize mb-4">{{ $currentUser->role }}</span>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center justify-between text-gray-300">
+                            <div class="flex items-center gap-2">
+                                <i class="ri-wallet-3-line"></i>
+                                <span>Saldo</span>
+                            </div>
+                            <span class="font-semibold">Rp 0</span>
+                        </div>
+                        <a href="{{ url('/profile') }}" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
+                            <i class="ri-user-line"></i>
+                            <span>Profil</span>
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="w-full flex items-center gap-2 text-left text-gray-300 hover:text-white transition-colors">
+                                <i class="ri-logout-circle-r-line"></i>
+                                <span>Keluar</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            @endauth
+
+            <!-- Hamburger Menu (Mobile only for guests) -->
+            @guest
             <button id="menuToggle" class="lg:hidden text-gray-300 hover:text-white transition-colors">
                 <i class="ri-menu-3-fill text-[22px]"></i>
             </button>
+            @endguest
         </div>
     </div>
 
@@ -81,10 +175,10 @@
 </div>
 
 <!-- Overlay -->
-<div id="menuOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-68 hidden transition-opacity duration-300 opacity-0"></div>
+<div id="menuOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-105 hidden transition-opacity duration-300 opacity-0"></div>
 
 <!-- Sidebar Menu (Mobile only) -->
-<div id="sidebarMenu" class="lg:hidden fixed top-0 right-0 h-full w-72 bg-[#18181B] shadow-2xl z-68 transform translate-x-full transition-transform duration-300 ease-in-out">
+<div id="sidebarMenu" class="lg:hidden fixed top-0 left-0 h-full w-72 bg-[#18181B] shadow-2xl z-110 transform -translate-x-full transition-transform duration-300 ease-in-out">
     <div class="p-6 overflow-y-auto h-full">
         <!-- Close Button & Logo -->
         <div class="flex items-center justify-between mb-8">
@@ -144,15 +238,40 @@
                 <i class="ri-customer-service-2-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
                 <span class="font-medium">Hubungi Kami</span>
             </a>
+
+            @auth
+            <div class="mt-6 mb-2 px-4 text-xs font-semibold tracking-wide text-gray-500">Akun Saya</div>
+            <a href="{{ url('/profile') }}" class="flex items-center gap-4 px-4 py-3 text-white hover:bg-[#27272A] rounded-lg transition-colors group">
+                <i class="ri-user-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
+                <span class="font-medium">Profile</span>
+            </a>
+            <a href="{{ url('/saldo') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
+                <i class="ri-wallet-3-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
+                <span class="font-medium">Saldo</span>
+            </a>
+            <a href="{{ url('/transactions') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
+                <i class="ri-file-list-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
+                <span class="font-medium">Transaksi</span>
+            </a>
+            <form method="POST" action="{{ route('logout') }}" class="mt-4">
+                @csrf
+                <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors">
+                    <i class="ri-logout-circle-r-line text-[18px]"></i>
+                    <span class="font-medium">Keluar</span>
+                </button>
+            </form>
+            @endauth
         </nav>
 
         <!-- Sign In Button -->
+        @guest
         <div class="mt-8 pt-6 border-t border-gray-800">
             <a href="{{ route('login') }}" class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-transparent border border-gray-700 text-white hover:bg-[#27272A] hover:border-gray-500 rounded-lg transition-all">
                 <i class="ri-login-box-line text-[18px]"></i>
                 <span class="font-medium">Sign In</span>
             </a>
         </div>
+        @endguest
     </div>
 </div>
 
@@ -165,21 +284,27 @@
         const calculatorToggle = document.getElementById('calculatorToggle');
         const calculatorSubmenu = document.getElementById('calculatorSubmenu');
         const calculatorArrow = document.getElementById('calculatorArrow');
+        const accountFab = document.getElementById('accountFab');
+        const accountDropdown = document.getElementById('accountDropdown');
+        const desktopAccountButton = document.getElementById('desktopAccountButton');
+        const desktopAccountDropdown = document.getElementById('desktopAccountDropdown');
 
-        // Open menu
-        menuToggle.addEventListener('click', function() {
-            sidebarMenu.classList.remove('translate-x-full');
-            menuOverlay.classList.remove('hidden');
-            setTimeout(() => {
-                menuOverlay.classList.remove('opacity-0');
-                menuOverlay.classList.add('opacity-100');
-            }, 10);
-            document.body.style.overflow = 'hidden'; // Prevent scroll
-        });
+        if (menuToggle) {
+            // Open menu
+            menuToggle.addEventListener('click', function() {
+                sidebarMenu.classList.remove('-translate-x-full');
+                menuOverlay.classList.remove('hidden');
+                setTimeout(() => {
+                    menuOverlay.classList.remove('opacity-0');
+                    menuOverlay.classList.add('opacity-100');
+                }, 10);
+                document.body.style.overflow = 'hidden'; // Prevent scroll
+            });
+        }
 
         // Close menu
         function closeMenuFunc() {
-            sidebarMenu.classList.add('translate-x-full');
+            sidebarMenu.classList.add('-translate-x-full');
             menuOverlay.classList.remove('opacity-100');
             menuOverlay.classList.add('opacity-0');
             setTimeout(() => {
@@ -197,11 +322,45 @@
             calculatorArrow.classList.toggle('rotate-180');
         });
 
+        function hideDropdown(dropdown) {
+            if (dropdown && !dropdown.classList.contains('hidden')) {
+                dropdown.classList.add('hidden');
+            }
+        }
+
         // Close menu on ESC key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeMenuFunc();
+                hideDropdown(accountDropdown);
+                hideDropdown(desktopAccountDropdown);
             }
         });
+
+        if (accountFab && accountDropdown) {
+            accountFab.addEventListener('click', function(e) {
+                e.stopPropagation();
+                accountDropdown.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!accountDropdown.contains(e.target) && !accountFab.contains(e.target)) {
+                    accountDropdown.classList.add('hidden');
+                }
+            });
+        }
+
+        if (desktopAccountButton && desktopAccountDropdown) {
+            desktopAccountButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                desktopAccountDropdown.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!desktopAccountDropdown.contains(e.target) && !desktopAccountButton.contains(e.target)) {
+                    desktopAccountDropdown.classList.add('hidden');
+                }
+            });
+        }
     });
 </script>

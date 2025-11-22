@@ -44,7 +44,7 @@
     <!-- Sidebar Register -->
     <div class="sidebar w-full md:w-[560px] min-h-screen p-8 md:p-12 flex flex-col text-white overflow-y-auto">
         <!-- Close Button -->
-        <button onclick="window.location.href='/'" class="absolute top-6 left-6 text-white bg-[#222222] hover:text-gray-300 px-2 rounded-xl transition cursor-pointer">
+        <button onclick="window.location.href='{{ url('/') }}'" class="absolute top-6 left-6 text-white bg-[#222222] hover:text-gray-300 px-2 rounded-xl transition cursor-pointer">
             <i class="ri-close-line text-[22px] cursor-pointer"></i>
         </button>
 
@@ -52,7 +52,13 @@
             <h1 class="font-bold mb-1 text-[22px]">Daftar</h1>
             <p class="text-gray-200 mb-6 text-[13px]">Masukkan informasi pendaftaran yang valid.</p>
 
-            <form id="registerForm" action="{{ route('register') }}" method="POST">
+            @if ($errors->any())
+                <div class="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/40 text-red-300 text-sm">
+                    {{ $errors->first() }}
+                </div>
+            @endif
+
+            <form id="registerForm" action="{{ route('register.store') }}" method="POST">
                 @csrf
                 
                 <!-- Nama Lengkap & Username -->
@@ -60,14 +66,22 @@
                     <div>
                         <label class="block text-[13px] mb-2">Nama lengkap</label>
                         <input type="text" name="name" placeholder="Nama lengkap" 
-                            class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition" 
+                            value="{{ old('name') }}"
+                            class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition @error('name') border-red-500 focus:border-red-500 @enderror" 
                             required>
+                        @error('name')
+                            <p class="mt-2 text-xs text-red-400">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div>
                         <label class="block text-[13px] mb-2">Username</label>
                         <input type="text" name="username" placeholder="Username" 
-                            class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition" 
+                            value="{{ old('username') }}"
+                            class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition @error('username') border-red-500 focus:border-red-500 @enderror" 
                             required>
+                        @error('username')
+                            <p class="mt-2 text-xs text-red-400">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
@@ -75,8 +89,12 @@
                 <div class="mb-2">
                     <label class="block text-[13px] mb-2">Alamat email</label>
                     <input type="email" name="email" placeholder="Alamat email" 
-                        class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition" 
+                        value="{{ old('email') }}"
+                        class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition @error('email') border-red-500 focus:border-red-500 @enderror" 
                         required>
+                    @error('email')
+                        <p class="mt-2 text-xs text-red-400">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Nomor WhatsApp -->
@@ -85,15 +103,20 @@
                     <div class="flex gap-2">
                         <select name="country_code" 
                             class="country-select px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white w-24 focus:border-gray-400 transition">
-                            <option value="+62" selected>🇮🇩 +62</option>
-                            <option value="+60">🇲🇾 +60</option>
-                            <option value="+65">🇸🇬 +65</option>
-                            <option value="+1">🇺🇸 +1</option>
+                            @php($selectedCode = old('country_code', '+62'))
+                            <option value="+62" {{ $selectedCode === '+62' ? 'selected' : '' }}>🇮🇩 +62</option>
+                            <option value="+60" {{ $selectedCode === '+60' ? 'selected' : '' }}>🇲🇾 +60</option>
+                            <option value="+65" {{ $selectedCode === '+65' ? 'selected' : '' }}>🇸🇬 +65</option>
+                            <option value="+1" {{ $selectedCode === '+1' ? 'selected' : '' }}>🇺🇸 +1</option>
                         </select>
                         <input type="tel" name="phone" placeholder="+62" 
-                            class="flex-1 px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition" 
+                            value="{{ old('phone') }}"
+                            class="flex-1 px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition @error('phone') border-red-500 focus:border-red-500 @enderror" 
                             required>
                     </div>
+                    @error('phone')
+                        <p class="mt-2 text-xs text-red-400">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Kata Sandi & Konfirmasi -->
@@ -102,13 +125,16 @@
                         <label class="block text-[13px] mb-2">Kata sandi</label>
                         <div class="relative">
                             <input type="password" id="password" name="password" placeholder="Kata sandi" 
-                                class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition" 
+                                class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition @error('password') border-red-500 focus:border-red-500 @enderror" 
                                 required>
                             <button type="button" onclick="togglePassword('password', 'togglePassword1')" 
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition">
                                 <i id="togglePassword1" class="ri-eye-off-line text-xl"></i>
                             </button>
                         </div>
+                        @error('password')
+                            <p class="mt-2 text-xs text-red-400">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div>
                         <label class="block text-[13px] mb-2">Konfirmasi kata sandi</label>
@@ -127,7 +153,7 @@
                 <!-- Checkbox Syarat dan Ketentuan -->
                 <div class="flex items-start gap-2 mb-6">
                     <input type="checkbox" id="terms" name="terms" 
-                        class="mt-1 w-4 h-4 rounded border-gray-600 bg-gray-600/50" required>
+                        class="mt-1 w-4 h-4 rounded border-gray-600 bg-gray-600/50" required {{ old('terms') ? 'checked' : '' }}>
                     <label for="terms" class="text-sm text-gray-300">
                         Saya setuju dengan 
                         <a href="#" class="text-amber-500 hover:text-amber-400">Syarat dan Ketentuan</a> 
@@ -135,6 +161,9 @@
                         <a href="#" class="text-amber-500 hover:text-amber-400">Kebijakan Pribadi</a>.
                     </label>
                 </div>
+                @error('terms')
+                    <p class="-mt-4 mb-4 text-xs text-red-400">{{ $message }}</p>
+                @enderror
 
                 <!-- reCAPTCHA -->
                 <div class="flex items-center gap-3 mb-6">

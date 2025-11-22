@@ -141,9 +141,23 @@
                                                 @enderror
                                             </div>
                                             <div class="form-group">
+                                                <label for="username">Username <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control @error('username') is-invalid @enderror" id="username" name="username" value="{{ old('username') }}" required>
+                                                @error('username')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                            <div class="form-group">
                                                 <label for="email">Email <span class="text-danger">*</span></label>
                                                 <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" required>
                                                 @error('email')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="phone">Nomor WhatsApp</label>
+                                                <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') }}">
+                                                @error('phone')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
                                             </div>
@@ -205,6 +219,10 @@
                                             <tr>
                                                 <th>Email</th>
                                                 <td>{{ $user->email }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Nomor WhatsApp</th>
+                                                <td>{{ $user->phone ?? '-' }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Role</th>

@@ -18,7 +18,9 @@ class DatabaseSeeder extends Seeder
         // Create admin user
         User::create([
             'name' => 'Admin',
+            'username' => 'admin',
             'email' => 'admin@example.com',
+            'phone' => '628111111111',
             'password' => bcrypt('password'),
             'role' => 'admin',
         ]);
@@ -26,7 +28,9 @@ class DatabaseSeeder extends Seeder
         // Create regular user
         User::create([
             'name' => 'User',
+            'username' => 'customer',
             'email' => 'user@example.com',
+            'phone' => '628122222222',
             'password' => bcrypt('password'),
             'role' => 'user',
         ]);

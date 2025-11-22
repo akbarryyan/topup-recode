@@ -30,6 +30,10 @@ class CheckMaintenanceMode
             return true;
         }
 
+        if ($request->is('auth') || $request->is('auth/*')) {
+            return true;
+        }
+
         if ($request->is('storage/*')) {
             return true;
         }

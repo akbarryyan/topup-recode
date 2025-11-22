@@ -3,62 +3,45 @@
 @section('content')
 <div class="w-full">
     <!-- Banner Section -->
-    <div class="relative bg-[#27272A] px-3 lg:px-8 pt-4 lg:pt-6 pb-8 lg:pb-12">
-        <div class="max-w-7xl mx-auto">
-            <!-- Banner Carousel -->
-            <div class="relative overflow-hidden rounded-xl lg:rounded-2xl">
-                <div id="banner-carousel" class="flex transition-transform duration-500 ease-in-out">
-                    @forelse($banners as $banner)
-                    <div class="banner-slide w-full shrink-0">
-                        @if($banner->link)
-                        <a href="{{ $banner->link }}" target="_blank">
+    <div class="mt-14 lg:mt-[124px]">
+        <div class="relative bg-[#27272A] px-3 lg:px-8 pt-4 lg:pt-6 pb-8 lg:pb-12">
+            <div class="mx-auto">
+                <!-- Banner Carousel -->
+                <div class="overflow-hidden rounded-xl lg:rounded-2xl">
+                    <div id="banner-carousel" class="flex transition-transform duration-500 ease-in-out">
+                        @forelse($banners as $banner)
+                        <div class="banner-slide w-full shrink-0">
+                            @if($banner->link)
+                            <a href="{{ $banner->link }}" target="_blank">
+                                <img src="{{ $banner->image_url }}" alt="{{ $banner->title }}" class="w-full h-auto object-cover">
+                            </a>
+                            @else
                             <img src="{{ $banner->image_url }}" alt="{{ $banner->title }}" class="w-full h-auto object-cover">
-                        </a>
-                        @else
-                        <img src="{{ $banner->image_url }}" alt="{{ $banner->title }}" class="w-full h-auto object-cover">
-                        @endif
-                    </div>
-                    @empty
-                    <div class="banner-slide w-full shrink-0">
-                        <img src="{{ asset('image/banner1.webp') }}" alt="Default Banner" class="w-full h-auto object-cover">
-                    </div>
-                    @endforelse
-                </div>
-
-                <!-- Navigation Arrows (Desktop) -->
-                <button id="prev-banner" class="hidden lg:flex absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-10 h-10 rounded-full items-center justify-center backdrop-blur-sm transition-all">
-                    <i class="ri-arrow-left-s-line text-xl"></i>
-                </button>
-                <button id="next-banner" class="hidden lg:flex absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-10 h-10 rounded-full items-center justify-center backdrop-blur-sm transition-all">
-                    <i class="ri-arrow-right-s-line text-xl"></i>
-                </button>
-
-                <!-- Indicators -->
-                @if($banners->count() > 1)
-                <div class="absolute bottom-3 lg:bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                    @foreach($banners as $index => $banner)
-                    <button class="banner-indicator w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full {{ $index === 0 ? 'bg-white' : 'bg-white/50' }} transition-all" data-index="{{ $index }}"></button>
-                    @endforeach
-                </div>
-                @endif
-            </div>
-    
-            <!-- Credit Section -->
-            <div class="absolute w-[calc(100%-24px)] lg:w-auto lg:right-8 left-3 lg:left-auto bottom-4 lg:bottom-8 md:hidden">
-                <div class="bg-[#27272A] shadow-lg px-4 lg:px-6 py-2 lg:py-3 rounded-lg lg:rounded-xl flex items-center justify-between gap-4 lg:min-w-[400px]">
-                    <!-- Icon Left -->
-                    <div class="flex items-center gap-3 lg:gap-4">
-                        <i class="ri-exchange-dollar-line text-[28px] lg:text-[32px] text-gray-200"></i>
-                        <!-- Title Credit -->
-                        <div>
-                            <h1 class="text-gray-200 font-semibold text-sm lg:text-base">Voca Credit</h1>
-                            <p class="text-gray-400 text-[12px] lg:text-sm">Login untuk menampilkan saldo</p>
+                            @endif
                         </div>
+                        @empty
+                        <div class="banner-slide w-full shrink-0">
+                            <img src="{{ asset('image/banner1.webp') }}" alt="Default Banner" class="w-full h-auto object-cover">
+                        </div>
+                        @endforelse
                     </div>
-                    <!-- Button Login Right -->
-                    <div>
-                        <button class="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold text-[13px] lg:text-sm py-1.5 lg:py-2 px-4 lg:px-6 rounded-2xl transition-colors">Masuk</button>
+    
+                    <!-- Navigation Arrows (Desktop) -->
+                    <button id="prev-banner" class="hidden lg:flex absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-10 h-10 rounded-full items-center justify-center backdrop-blur-sm transition-all">
+                        <i class="ri-arrow-left-s-line text-xl"></i>
+                    </button>
+                    <button id="next-banner" class="hidden lg:flex absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-10 h-10 rounded-full items-center justify-center backdrop-blur-sm transition-all">
+                        <i class="ri-arrow-right-s-line text-xl"></i>
+                    </button>
+    
+                    <!-- Indicators -->
+                    @if($banners->count() > 1)
+                    <div class="absolute bottom-3 lg:bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                        @foreach($banners as $index => $banner)
+                        <button class="banner-indicator w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full {{ $index === 0 ? 'bg-white' : 'bg-white/50' }} transition-all" data-index="{{ $index }}"></button>
+                        @endforeach
                     </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -169,6 +152,38 @@
         .scrollbar-hide {
             -ms-overflow-style: none;  /* IE and Edge */
             scrollbar-width: none;  /* Firefox */
+        }
+
+        .banner-wrapper {
+            min-height: 180px;
+        }
+
+        .banner-slide {
+            background-color: #111114;
+        }
+
+        .banner-slide img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+
+        @media (min-width: 768px) {
+            .banner-slide img {
+                height: 320px;
+                object-fit: cover;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .banner-slide img {
+                height: auto;
+                object-fit: cover;
+            }
+            .banner-credit {
+                position: absolute;
+            }
         }
     </style>
 

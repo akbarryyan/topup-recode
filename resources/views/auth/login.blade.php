@@ -37,7 +37,7 @@
     <!-- Sidebar Login -->
     <div class="sidebar w-full md:w-[560px] min-h-screen p-8 md:p-12 flex flex-col text-white overflow-y-auto">
         <!-- Close Button -->
-        <button onclick="window.location.href='/'" class="absolute top-6 left-6 text-white bg-[#222222] hover:text-gray-300 px-2 rounded-xl transition cursor-pointer">
+        <button onclick="window.location.href='{{ url('/') }}'" class="absolute top-6 left-6 text-white bg-[#222222] hover:text-gray-300 px-2 rounded-xl transition cursor-pointer">
             <i class="ri-close-line text-[22px] cursor-pointer"></i>
         </button>
 
@@ -45,16 +45,28 @@
             <h1 class="text-[22px] font-bold mb-1">Masuk</h1>
             <p class="text-gray-200 mb-6 text-[13px]">Masuk dengan akun yang telah Kamu daftarkan.</p>
 
-            {{-- action="{{ route('login.submit') }}" --}}
-            <form id="loginForm" action="#" method="POST">
+            @if ($errors->any())
+                <div class="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/40 text-red-300 text-sm">
+                    {{ $errors->first() }}
+                    @if ($errors->has('username'))
+                        <p class="mt-2 text-xs text-red-300">Hubungi CS jika kamu butuh bantuan membuka akses.</p>
+                    @endif
+                </div>
+            @endif
+
+            <form id="loginForm" action="{{ route('login.attempt') }}" method="POST">
                 @csrf
                 
                 <!-- Username -->
                 <div class="mb-4">
-                    <label class="block text-[13px] mb-2">Username</label>
-                    <input type="text" name="username" placeholder="Username" 
-                        class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition" 
+                    <label class="block text-[13px] mb-2">Email atau Username</label>
+                    <input type="text" name="username" placeholder="Email atau username" 
+                        value="{{ old('username') }}"
+                        class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition @error('username') border-red-500 focus:border-red-500 @enderror" 
                         required>
+                    @error('username')
+                        <p class="mt-2 text-xs text-red-400">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Kata Sandi -->
@@ -62,20 +74,24 @@
                     <label class="block text-[13px] mb-2">Kata sandi</label>
                     <div class="relative">
                         <input type="password" id="password" name="password" placeholder="Kata sandi" 
-                            class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition" 
+                            class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition @error('password') border-red-500 focus:border-red-500 @enderror" 
                             required>
                         <button type="button" onclick="togglePassword('password', 'togglePasswordIcon')" 
                             class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition">
                             <i id="togglePasswordIcon" class="ri-eye-off-line text-xl"></i>
                         </button>
                     </div>
+                    @error('password')
+                        <p class="mt-2 text-xs text-red-400">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Remember Me & Forgot Password -->
                 <div class="flex items-center justify-between mb-6">
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" name="remember" 
-                            class="w-4 h-4 rounded border-gray-600 bg-gray-600/50">
+                            class="w-4 h-4 rounded border-gray-600 bg-gray-600/50"
+                            {{ old('remember') ? 'checked' : '' }}>
                         <span class="text-[13px] text-gray-300">Ingat akun ku</span>
                     </label>
                     <a href="#" class="text-[13px] text-amber-500 hover:text-amber-400">Lupa kata sandi mu?</a>
