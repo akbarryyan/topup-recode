@@ -84,8 +84,18 @@ Route::middleware('auth')->group(function () {
     
     // Top Up routes
     Route::post('/topup/create', [App\Http\Controllers\TopUpController::class, 'create'])->name('topup.create');
-    Route::post('/topup/callback', [App\Http\Controllers\TopUpController::class, 'callback'])->name('topup.callback');
 });
+
+// Duitku Callback - Server to Server (POST)
+// Protected by IP whitelist middleware
+Route::post('/payment/duitku/callback', [App\Http\Controllers\TopUpController::class, 'callback'])
+    ->middleware('duitku.ip')
+    ->name('topup.callback');
+
+// Duitku Redirect - User Return URL (GET)
+// No authentication required as user may be redirected from external payment page
+Route::get('/payment/duitku/redirect', [App\Http\Controllers\TopUpController::class, 'redirect'])
+    ->name('topup.redirect');
 
 Route::get('/invoices', function () {
     return view('check-invoice');

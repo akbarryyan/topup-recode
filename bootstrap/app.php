@@ -23,6 +23,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'auth' => Authenticate::class,
             'guest' => RedirectIfAuthenticated::class,
+            'duitku.ip' => \App\Http\Middleware\DuitkuIpWhitelist::class,
+        ]);
+
+        // Exclude Duitku callback from CSRF verification (external request)
+        $middleware->validateCsrfTokens(except: [
+            'payment/duitku/callback',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

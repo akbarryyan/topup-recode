@@ -60,8 +60,8 @@ class TopUpController extends Controller
                 'customerVaName' => $user->name,
                 'email' => $user->email,
                 'phoneNumber' => $user->phone ?? '',
-                'callbackUrl' => route('topup.callback'),
-                'returnUrl' => route('profile') . '?tab=mutations',
+                'callbackUrl' => url('/payment/duitku/callback'), // Use absolute URL for callback
+                'returnUrl' => url('/payment/duitku/redirect'), // Use absolute URL for redirect
                 'expiryPeriod' => 60, // 60 minutes
                 'itemDetails' => [
                     [
@@ -139,26 +139,41 @@ class TopUpController extends Controller
 
     /**
      * Handle callback from Duitku
+     * POST request from Duitku server
+     * Used for server-to-server payment confirmation
      */
     public function callback(Request $request)
     {
         Log::info('Duitku Callback Received', $request->all());
 
-        $merchantOrderId = $request->input('merchantOrderId');
+        // Get callback parameters
+        $merchantCode = $request->input('merchantCode');
         $amount = $request->input('amount');
+        $merchantOrderId = $request->input('merchantOrderId');
         $signature = $request->input('signature');
         $resultCode = $request->input('resultCode');
+        $reference = $request->input('reference');
+
+        // Validate required parameters
+        if (empty($merchantCode) || empty($amount) || empty($merchantOrderId) || empty($signature)) {
+            Log::error('Duitku Callback - Bad Parameter', $request->all());
+            return response()->json([
+                'success' => false,
+                'message' => 'Bad Parameter',
+            ], 400);
+        }
 
         // Verify signature
-        if (!$this->duitkuService->verifyCallback($merchantOrderId, $amount, $signature)) {
-            Log::warning('Duitku Callback Invalid Signature', [
+        if (!$this->duitkuService->verifyCallbackSignature($merchantCode, $amount, $merchantOrderId, $signature)) {
+            Log::warning('Duitku Callback - Invalid Signature', [
                 'merchant_order_id' => $merchantOrderId,
+                'received_signature' => $signature,
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid signature',
-            ], 400);
+                'message' => 'Bad Signature',
+            ], 403);
         }
 
         try {
@@ -167,50 +182,121 @@ class TopUpController extends Controller
             // Find transaction by merchantOrderId
             $transaction = TopUpTransaction::where('merchant_order_id', $merchantOrderId)->firstOrFail();
 
+            // Check if transaction is already paid - prevent status change (idempotent)
+            if ($transaction->status === 'paid') {
+                DB::rollBack();
+                Log::info('Duitku Callback - Transaction Already Paid (Idempotent)', [
+                    'merchant_order_id' => $merchantOrderId,
+                    'status' => $transaction->status,
+                    'paid_at' => $transaction->paid_at,
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Transaction already paid',
+                ]);
+            }
+
+            // Process callback data
+            $callbackData = $this->duitkuService->processCallback($request->all());
+            
             // Store callback data
-            $transaction->callback_data = $request->all();
+            $transaction->callback_data = $callbackData;
+            $transaction->reference = $reference; // Update reference if not set
             $transaction->save();
 
             // Update status based on resultCode
+            // 00 = Success, 01 = Failed
             if ($resultCode === '00') {
                 // Payment successful
                 $transaction->markAsPaid();
 
-                // TODO: Add balance to user
-                // $user = $transaction->user;
-                // $user->balance += $transaction->amount;
-                // $user->save();
+                // Add balance to user
+                $user = $transaction->user;
+                $user->balance += $transaction->amount;
+                $user->save();
 
-                // TODO: Create mutation record
-                // Mutation::create([...]);
+                Log::info('Duitku Callback - Payment Success', [
+                    'merchant_order_id' => $merchantOrderId,
+                    'user_id' => $user->id,
+                    'amount' => $transaction->amount,
+                    'reference' => $reference,
+                ]);
 
             } else {
                 // Payment failed
                 $transaction->markAsFailed('Payment failed with result code: ' . $resultCode);
+                
+                Log::warning('Duitku Callback - Payment Failed', [
+                    'merchant_order_id' => $merchantOrderId,
+                    'result_code' => $resultCode,
+                    'reference' => $reference,
+                ]);
             }
 
             DB::commit();
 
-            Log::info('Duitku Callback Processed', [
-                'merchant_order_id' => $merchantOrderId,
-                'result_code' => $resultCode,
-            ]);
-
+            // Return success response to Duitku
             return response()->json([
                 'success' => true,
-                'message' => 'Callback processed',
+                'message' => 'Callback processed successfully',
             ]);
+            
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Duitku Callback Error', [
                 'merchant_order_id' => $merchantOrderId,
-                'message' => $e->getMessage(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to process callback',
             ], 500);
+        }
+    }
+
+    /**
+     * Handle redirect from Duitku
+     * GET request when user returns from payment page
+     * Used only for UI display, NOT for updating transaction status
+     */
+    public function redirect(Request $request)
+    {
+        Log::info('Duitku Redirect Received', $request->all());
+
+        $merchantOrderId = $request->input('merchantOrderId');
+        $resultCode = $request->input('resultCode');
+        $reference = $request->input('reference');
+
+        try {
+            // Find transaction
+            $transaction = TopUpTransaction::where('merchant_order_id', $merchantOrderId)->first();
+
+            if (!$transaction) {
+                return redirect()->route('profile')
+                    ->with('error', 'Transaksi tidak ditemukan');
+            }
+
+            // Redirect based on status (only for display purposes)
+            // Actual status should be updated via callback
+            if ($resultCode === '00') {
+                return redirect()->route('profile', ['tab' => 'mutations'])
+                    ->with('success', 'Pembayaran berhasil! Saldo akan segera ditambahkan.');
+            } else {
+                return redirect()->route('profile', ['tab' => 'mutations'])
+                    ->with('warning', 'Pembayaran pending atau gagal. Silakan cek status transaksi Anda.');
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('Duitku Redirect Error', [
+                'merchant_order_id' => $merchantOrderId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return redirect()->route('profile')
+                ->with('error', 'Terjadi kesalahan saat memproses redirect');
         }
     }
 }

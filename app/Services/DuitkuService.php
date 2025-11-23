@@ -131,11 +131,35 @@ class DuitkuService
 
     /**
      * Verify callback signature
+     * Formula: MD5(merchantCode + amount + merchantOrderId + apiKey)
      */
-    public function verifyCallback($merchantOrderId, $amount, $signature)
+    public function verifyCallbackSignature($merchantCode, $amount, $merchantOrderId, $signature)
     {
-        $calculatedSignature = md5($this->merchantCode . $amount . $this->merchantCode . $this->apiKey);
-        return $signature === $calculatedSignature;
+        $calculatedSignature = md5($merchantCode . $amount . $merchantOrderId . $this->apiKey);
+        return hash_equals($calculatedSignature, $signature);
+    }
+
+    /**
+     * Process callback data and return transaction info
+     */
+    public function processCallback(array $callbackData)
+    {
+        return [
+            'merchant_code' => $callbackData['merchantCode'] ?? null,
+            'amount' => $callbackData['amount'] ?? null,
+            'merchant_order_id' => $callbackData['merchantOrderId'] ?? null,
+            'product_detail' => $callbackData['productDetail'] ?? null,
+            'additional_param' => $callbackData['additionalParam'] ?? null,
+            'payment_code' => $callbackData['paymentCode'] ?? null,
+            'result_code' => $callbackData['resultCode'] ?? null,
+            'merchant_user_id' => $callbackData['merchantUserId'] ?? null,
+            'reference' => $callbackData['reference'] ?? null,
+            'signature' => $callbackData['signature'] ?? null,
+            'publisher_order_id' => $callbackData['publisherOrderId'] ?? null,
+            'sp_user_hash' => $callbackData['spUserHash'] ?? null,
+            'settlement_date' => $callbackData['settlementDate'] ?? null,
+            'issuer_code' => $callbackData['issuerCode'] ?? null,
+        ];
     }
 
     /**
