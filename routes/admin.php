@@ -21,6 +21,8 @@ use App\Http\Controllers\Admin\VipResellerSettingController;
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Admin\MaintenanceSettingController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DepositController;
+use App\Http\Controllers\Admin\MutationController;
 
 Route::prefix('admin')->middleware('web')->group(function () {
     // Login routes (guest only)
@@ -153,6 +155,18 @@ Route::prefix('admin')->middleware('web')->group(function () {
             Route::patch('/{id}/toggle', [PaymentGatewayController::class, 'toggleMethodStatus'])->name('toggle');
             Route::put('/{id}', [PaymentGatewayController::class, 'updateMethod'])->name('update');
             Route::delete('/{id}', [PaymentGatewayController::class, 'destroyMethod'])->name('destroy');
+        });
+
+        // Deposit Management Routes
+        Route::prefix('deposits')->name('admin.deposits.')->group(function () {
+            Route::get('/', [DepositController::class, 'index'])->name('index');
+            Route::get('/{id}', [DepositController::class, 'show'])->name('show');
+        });
+
+        // Mutation Management Routes
+        Route::prefix('mutations')->name('admin.mutations.')->group(function () {
+            Route::get('/', [MutationController::class, 'index'])->name('index');
+            Route::get('/{id}', [MutationController::class, 'show'])->name('show');
         });
     });
 });

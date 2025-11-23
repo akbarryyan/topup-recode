@@ -83,6 +83,20 @@
                     </li>
                 </ul>
             </li>
+
+            <li class="dropdown {{ request()->routeIs('admin.deposits*') || request()->routeIs('admin.mutations*') ? 'active' : '' }}">
+                <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
+                    <i class="fas fa-wallet"></i> <span>Kelola Saldo</span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li class="{{ request()->routeIs('admin.deposits*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.deposits.index') }}">Kelola Deposit</a>
+                    </li>
+                    <li class="{{ request()->routeIs('admin.mutations*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('admin.mutations.index') }}">Kelola Mutasi</a>
+                    </li>
+                </ul>
+            </li>
             
             <li class="menu-header">Example Menu</li>
             <li class="dropdown">
