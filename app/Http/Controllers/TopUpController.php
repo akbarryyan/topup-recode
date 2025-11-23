@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Mutation;
 use App\Models\PaymentMethod;
 use App\Models\TopUpTransaction;
 use App\Services\DuitkuService;
@@ -213,8 +214,28 @@ class TopUpController extends Controller
 
                 // Add balance to user
                 $user = $transaction->user;
+                $balanceBefore = $user->balance;
                 $user->balance += $transaction->amount;
+                $balanceAfter = $user->balance;
                 $user->save();
+
+                // Record mutation
+                Mutation::record(
+                    userId: $user->id,
+                    type: 'credit',
+                    amount: (float)$transaction->amount,
+                    balanceBefore: (float)$balanceBefore,
+                    balanceAfter: (float)$balanceAfter,
+                    description: 'Top Up Saldo',
+                    referenceType: TopUpTransaction::class,
+                    referenceId: $transaction->id,
+                    notes: "Top up via {$transaction->paymentMethod->name}",
+                    metadata: [
+                        'merchant_order_id' => $merchantOrderId,
+                        'reference' => $reference,
+                        'payment_method' => $transaction->paymentMethod->name,
+                    ]
+                );
 
                 Log::info('Duitku Callback - Payment Success', [
                     'merchant_order_id' => $merchantOrderId,

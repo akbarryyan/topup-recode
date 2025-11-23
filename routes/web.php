@@ -84,6 +84,12 @@ Route::middleware('auth')->group(function () {
     
     // Top Up routes
     Route::post('/topup/create', [App\Http\Controllers\TopUpController::class, 'create'])->name('topup.create');
+    
+    // Game Order routes
+    Route::post('/order/game', [App\Http\Controllers\GameOrderController::class, 'store'])->name('order.game.store');
+    
+    // Prepaid Order routes
+    Route::post('/order/prepaid', [App\Http\Controllers\PrepaidOrderController::class, 'store'])->name('order.prepaid.store');
 });
 
 // Duitku Callback - Server to Server (POST)

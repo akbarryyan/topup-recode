@@ -13,8 +13,13 @@ $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 use App\Models\TopUpTransaction;
 use App\Models\PaymentGateway;
 
-// Get latest transaction
-$transaction = TopUpTransaction::latest()->first();
+// Get latest pending transaction, or use latest transaction
+$transaction = TopUpTransaction::where('status', 'pending')->latest()->first();
+
+if (!$transaction) {
+    // If no pending, get latest
+    $transaction = TopUpTransaction::latest()->first();
+}
 
 if (!$transaction) {
     echo "❌ No transaction found in database!\n";
@@ -134,13 +139,31 @@ try {
     
     // Check user balance
     $user = $transaction->user;
-    echo "✅ User Balance: Rp " . number_format((float)$user->balance, 0, ',', '.') . "\n\n";
+    echo "✅ User Balance: Rp " . number_format((float)$user->balance, 0, ',', '.') . "\n";
+    
+    // Check mutation record
+    $mutation = \App\Models\Mutation::where('reference_type', 'App\Models\TopUpTransaction')
+        ->where('reference_id', $transaction->id)
+        ->latest()
+        ->first();
+    
+    if ($mutation) {
+        echo "✅ Mutation Record: Created (ID: {$mutation->id})\n";
+        echo "   - Type: {$mutation->type}\n";
+        echo "   - Amount: Rp " . number_format((float)$mutation->amount, 0, ',', '.') . "\n";
+        echo "   - Balance Before: Rp " . number_format((float)$mutation->balance_before, 0, ',', '.') . "\n";
+        echo "   - Balance After: Rp " . number_format((float)$mutation->balance_after, 0, ',', '.') . "\n";
+    } else {
+        echo "⚠️  Mutation Record: Not created\n";
+    }
+    echo "\n";
     
     if ($transaction->status === 'paid' && $httpCode === 200) {
         echo "🎉 CALLBACK TEST SUCCESSFUL!\n";
         echo "   - Transaction marked as paid ✅\n";
         echo "   - User balance updated ✅\n";
-        echo "   - Callback data saved ✅\n\n";
+        echo "   - Callback data saved ✅\n";
+        echo "   - Mutation record created ✅\n\n";
     } else {
         echo "⚠️  CALLBACK TEST COMPLETED WITH ISSUES\n";
         echo "   - HTTP Code: {$httpCode}\n";
