@@ -18,12 +18,16 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(CheckMaintenanceMode::class);
+        $middleware->web(append: [
+            \App\Http\Middleware\TrackVisitor::class,
+        ]);
 
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'auth' => Authenticate::class,
             'guest' => RedirectIfAuthenticated::class,
             'duitku.ip' => \App\Http\Middleware\DuitkuIpWhitelist::class,
+            'track.visitor' => \App\Http\Middleware\TrackVisitor::class,
         ]);
 
         // Exclude Duitku callback from CSRF verification (external request)

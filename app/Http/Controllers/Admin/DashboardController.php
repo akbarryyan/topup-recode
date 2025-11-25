@@ -10,6 +10,7 @@ use App\Models\PrepaidService;
 use App\Models\PrepaidTransaction;
 use App\Models\TopUpTransaction;
 use App\Models\User;
+use App\Models\Visitor;
 
 class DashboardController extends Controller
 {
@@ -182,6 +183,19 @@ class DashboardController extends Controller
             $chartPrepaidData[] = $prepaidSales;
         }
 
+        // Visitor Statistics
+        $totalVisitors = Visitor::count();
+        $visitorChartData = [];
+        $visitorChartLabels = [];
+
+        for ($i = 29; $i >= 0; $i--) {
+            $date = now()->subDays($i)->startOfDay();
+            $dateEnd = now()->subDays($i)->endOfDay();
+            
+            $visitorChartLabels[] = $date->format('d M');
+            $visitorChartData[] = Visitor::whereBetween('created_at', [$date, $dateEnd])->count();
+        }
+
         return view('admin.dashboard', [
             'stats' => $stats,
             'recentActivities' => $recentActivities,
@@ -191,6 +205,9 @@ class DashboardController extends Controller
             'chartLabels' => $chartLabels,
             'chartGameData' => $chartGameData,
             'chartPrepaidData' => $chartPrepaidData,
+            'totalVisitors' => $totalVisitors,
+            'visitorChartLabels' => $visitorChartLabels,
+            'visitorChartData' => $visitorChartData,
         ]);
     }
 }

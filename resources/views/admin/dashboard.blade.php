@@ -85,6 +85,21 @@
                   </div>
                 </div>
               </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+              <div class="card card-statistic-1">
+                <div class="card-icon bg-info">
+                  <i class="fas fa-users"></i>
+                </div>
+                <div class="card-wrap">
+                  <div class="card-header">
+                    <h4>Total Visitors</h4>
+                  </div>
+                  <div class="card-body">
+                    {{ number_format($totalVisitors) }}
+                  </div>
+                </div>
+              </div>
             </div>                  
           </div>
           <div class="row">
@@ -172,6 +187,22 @@
               </div>
             </div>
           </div>
+
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-12 col-sm-12">
+              <div class="card">
+                <div class="card-header">
+                  <h4>Visitor Statistics (Last 30 Days)</h4>
+                </div>
+                <div class="card-body">
+                  <div style="height: 300px; position: relative;">
+                    <canvas id="visitorChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="row">
             <div class="col-lg-6 col-md-12">
               <div class="card">
@@ -358,6 +389,70 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   console.log('Chart initialized successfully!');
+  // Visitor Chart
+  // Visitor Chart
+  var visitorCtx = document.getElementById('visitorChart').getContext('2d');
+  var visitorChart = new Chart(visitorCtx, {
+    type: 'line',
+    data: {
+      labels: {!! json_encode($visitorChartLabels) !!},
+      datasets: [{
+        label: 'Visitors',
+        data: {!! json_encode($visitorChartData) !!},
+        borderWidth: 2,
+        backgroundColor: 'rgba(103, 119, 239, 0.1)',
+        borderColor: '#6777ef',
+        pointBackgroundColor: '#6777ef',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      legend: {
+        display: false
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true,
+            stepSize: 1,
+            callback: function(value) {
+              if (value % 1 === 0) {
+                return value;
+              }
+            }
+          },
+          gridLines: {
+            drawBorder: false,
+            color: '#f3f4f6'
+          }
+        }],
+        xAxes: [{
+          gridLines: {
+            display: false
+          }
+        }]
+      },
+      tooltips: {
+        backgroundColor: '#1f2937',
+        titleFontSize: 13,
+        bodyFontSize: 12,
+        xPadding: 10,
+        yPadding: 10,
+        displayColors: false,
+        callbacks: {
+          label: function(tooltipItem, data) {
+            return tooltipItem.yLabel + ' Visitors';
+          }
+        }
+      }
+    }
+  });
 });
 </script>
 @endpush
