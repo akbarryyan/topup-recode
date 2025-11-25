@@ -81,6 +81,15 @@
                                     @enderror
                                 </div>
 
+                                <!-- Balance (Read Only) -->
+                                <div class="form-group">
+                                    <label>Balance</label>
+                                    <div class="form-control-plaintext">
+                                        <span class="badge badge-success badge-lg">Rp {{ number_format($user->balance ?? 0, 0, ',', '.') }}</span>
+                                    </div>
+                                    <small class="form-text text-muted">Balance hanya dapat diubah melalui deposit atau transaksi</small>
+                                </div>
+
                                 <!-- Password -->
                                 <div class="form-group">
                                     <label>Password Baru</label>

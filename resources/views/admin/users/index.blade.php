@@ -58,6 +58,7 @@
                                                                     <th>Nama</th>
                                                                     <th>Username</th>
                                                                     <th>Email</th>
+                                                                    <th>Balance</th>
                                                                     <th>Tanggal Daftar</th>
                                                                     <th>Status</th>
                                                                     <th>Action</th>
@@ -70,6 +71,7 @@
                                                                     <td>{{ $user->name }}</td>
                                                                     <td>{{ $user->username ?? '-' }}</td>
                                                                     <td>{{ $user->email }}</td>
+                                                                    <td><span class="badge badge-success">Rp {{ number_format($user->balance ?? 0, 0, ',', '.') }}</span></td>
                                                                     <td>{{ $user->created_at->format('d M Y, H:i') }}</td>
                                                                     <td>
                                                                         <span class="badge badge-success">Active</span>
@@ -103,7 +105,7 @@
                                                                 </tr>
                                                                 @empty
                                                                 <tr>
-                                                                    <td colspan="7" class="text-center text-muted">
+                                                                    <td colspan="8" class="text-center text-muted">
                                                                         <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
                                                                         Tidak ada data user
                                                                     </td>
@@ -223,6 +225,10 @@
                                             <tr>
                                                 <th>Nomor WhatsApp</th>
                                                 <td>{{ $user->phone ?? '-' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Balance</th>
+                                                <td><span class="badge badge-success">Rp {{ number_format($user->balance ?? 0, 0, ',', '.') }}</span></td>
                                             </tr>
                                             <tr>
                                                 <th>Role</th>
