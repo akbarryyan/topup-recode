@@ -166,11 +166,11 @@
                 @enderror
 
                 <!-- reCAPTCHA -->
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="g-recaptcha" data-sitekey="your-site-key"></div>
-                    <button type="button" class="text-gray-400 hover:text-white transition">
-                        <i class="ri-refresh-line text-2xl"></i>
-                    </button>
+                <div class="mb-6">
+                    <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                    @error('g-recaptcha-response')
+                        <p class="mt-2 text-xs text-red-400">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Button Daftar -->
@@ -229,6 +229,14 @@
             if (!terms) {
                 e.preventDefault();
                 alert('Anda harus menyetujui Syarat dan Ketentuan!');
+                return false;
+            }
+
+            // Validate reCAPTCHA
+            const recaptchaResponse = grecaptcha.getResponse();
+            if (!recaptchaResponse) {
+                e.preventDefault();
+                alert('Silakan centang "I\'m not a robot" untuk melanjutkan.');
                 return false;
             }
         });

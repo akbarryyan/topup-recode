@@ -29,6 +29,12 @@ return [
         ],
     ],
 
+    // Google reCAPTCHA
+    'recaptcha' => [
+        'site_key' => env('RECAPTCHA_SITE_KEY'),
+        'secret_key' => env('RECAPTCHA_SECRET_KEY'),
+    ],
+
     // VIP Reseller API
     'vip_reseller' => [
         'api_url' => env('VIP_RESELLER_API_URL', 'https://vip-reseller.co.id/api'),

@@ -4,7 +4,7 @@
             <!-- Header Title-->
             <div class="text-center text-gray-200 mb-6 lg:mb-8">
                 <h1 class="text-2xl lg:text-3xl xl:text-3xl font-semibold mb-2">Leaderboard</h1>
-                <p class="text-xs lg:text-sm text-gray-400 px-4">Top 10 Pembelian Terbanyak di NVD STORE INDONESIA, Data ini diperbarui otomatis dari sistem kami</p>
+                <p class="text-xs lg:text-sm text-gray-400 px-4">Top 10 Pembelian Terbanyak di {{ $websiteName ?? 'NVD STORE' }}, Data ini diperbarui otomatis dari sistem kami</p>
             </div>
     
             <!-- Tab Navigation -->

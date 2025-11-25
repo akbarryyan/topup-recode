@@ -53,7 +53,27 @@
                                     {{ $transaction->created_at->format('d M Y, H:i') }}
                                 </td>
                                 <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm font-medium">
-                                    {{ $transaction->trxid }}
+                                    @auth
+                                        {{ $transaction->trxid }}
+                                    @else
+                                        @php
+                                            $trxid = $transaction->trxid;
+                                            $length = strlen($trxid);
+                                            if ($length > 8) {
+                                                // Show first 4 and last 4 characters, mask the middle
+                                                $masked = substr($trxid, 0, 4) . str_repeat('*', $length - 8) . substr($trxid, -4);
+                                            } else {
+                                                // For short invoice numbers, show first 2 and mask the rest
+                                                $masked = substr($trxid, 0, 2) . str_repeat('*', $length - 2);
+                                            }
+                                        @endphp
+                                        <span class="inline-flex items-center gap-2">
+                                            {{ $masked }}
+                                            <a href="{{ route('login') }}" class="text-amber-500 hover:text-amber-400 text-[10px] sm:text-xs whitespace-nowrap" title="Login untuk melihat nomor lengkap">
+                                                <i class="ri-lock-line"></i> Login
+                                            </a>
+                                        </span>
+                                    @endauth
                                 </td>
                                 <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm">
                                     Rp {{ number_format($transaction->price, 0, ',', '.') }}

@@ -38,8 +38,7 @@
 
             <!-- Sign In / Account Button (Desktop only) -->
             @guest
-            <a href="{{ route('login') }}" class="hidden lg:flex items-center gap-2 px-4 py-2 bg-transparent border border-gray-700 text-white hover:bg-[#27272A] hover:border-gray-500 rounded-lg transition-all">
-                <i class="ri-google-fill text-[18px]"></i>
+            <a href="{{ route('login') }}" class="hidden lg:flex items-center gap-2 px-6 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-2xl transition-all">
                 <span class="font-medium">Sign In</span>
             </a>
             @else

@@ -26,7 +26,15 @@ class AuthenticatedSessionController extends Controller
         $credentials = $request->validate([
             'username' => ['required', 'string'],
             'password' => ['required', 'string'],
+            'g-recaptcha-response' => ['required'],
         ]);
+
+        // Validate reCAPTCHA
+        if (!$this->validateRecaptcha($request->input('g-recaptcha-response'))) {
+            throw ValidationException::withMessages([
+                'username' => 'Verifikasi reCAPTCHA gagal. Silakan coba lagi.',
+            ]);
+        }
 
         $loginField = filter_var($credentials['username'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
@@ -63,7 +71,15 @@ class AuthenticatedSessionController extends Controller
             'phone' => ['required', 'string', 'max:30'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'terms' => ['accepted'],
+            'g-recaptcha-response' => ['required'],
         ]);
+
+        // Validate reCAPTCHA
+        if (!$this->validateRecaptcha($request->input('g-recaptcha-response'))) {
+            throw ValidationException::withMessages([
+                'email' => 'Verifikasi reCAPTCHA gagal. Silakan coba lagi.',
+            ]);
+        }
 
         $phoneNumber = trim($data['phone']);
 
@@ -113,5 +129,39 @@ class AuthenticatedSessionController extends Controller
     protected function throttleKey(Request $request): string
     {
         return Str::transliterate(strtolower($request->input('username')).'|'.$request->ip());
+    }
+
+    /**
+     * Validate Google reCAPTCHA response
+     */
+    protected function validateRecaptcha($recaptchaResponse): bool
+    {
+        $secretKey = config('services.recaptcha.secret_key');
+        
+        if (empty($secretKey)) {
+            // If no secret key is configured, skip validation (for development)
+            return true;
+        }
+
+        $url = 'https://www.google.com/recaptcha/api/siteverify';
+        $data = [
+            'secret' => $secretKey,
+            'response' => $recaptchaResponse,
+            'remoteip' => request()->ip()
+        ];
+
+        $options = [
+            'http' => [
+                'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method' => 'POST',
+                'content' => http_build_query($data)
+            ]
+        ];
+
+        $context = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+        $resultJson = json_decode($result);
+
+        return $resultJson->success ?? false;
     }
 }
