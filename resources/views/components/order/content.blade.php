@@ -6,7 +6,13 @@
         <!-- Background Image with Overlay -->
         <div class="relative h-48 md:h-64">
             @if($gameImage && $gameImage->image)
-                <img src="{{ asset('storage/game-images/' . $gameImage->image) }}" 
+                @php
+                    // Determine if this is a game image or brand image
+                    $imagePath = isset($gameImage->brand_name) 
+                        ? 'storage/brand-images/' . $gameImage->image
+                        : 'storage/game-images/' . $gameImage->image;
+                @endphp
+                <img src="{{ asset($imagePath) }}" 
                      alt="{{ $game }}" 
                      class="w-full h-full object-cover">
             @else
@@ -24,7 +30,12 @@
                     <!-- Game Icon -->
                     <div class="w-28 h-28 md:w-20 md:h-20 rounded overflow-hidden bg-[#1D1618] shrink-0">
                         @if($gameImage && $gameImage->image)
-                            <img src="{{ asset('storage/game-images/' . $gameImage->image) }}" 
+                            @php
+                                $iconPath = isset($gameImage->brand_name)
+                                    ? 'storage/brand-images/' . $gameImage->image
+                                    : 'storage/game-images/' . $gameImage->image;
+                            @endphp
+                            <img src="{{ asset($iconPath) }}" 
                                  alt="{{ $game }}" 
                                  class="w-full h-full object-cover">
                         @else

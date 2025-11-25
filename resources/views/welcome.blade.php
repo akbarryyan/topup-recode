@@ -317,6 +317,18 @@
                 });
             });
 
+            // Handle prepaid product click to go to prepaid order page
+            document.querySelectorAll('#pulsa-data-products .product-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const brandName = this.getAttribute('data-name');
+                    if (brandName) {
+                        // Convert brand name to URL-friendly format (lowercase, replace spaces with hyphens)
+                        const brandSlug = brandName.toLowerCase().replace(/\s+/g, '-');
+                        window.location.href = `/order/prepaid/${brandSlug}`;
+                    }
+                });
+            });
+
             // Show More/Less functionality for all product sections
             document.querySelectorAll('.show-more-btn').forEach(btn => {
                 btn.addEventListener('click', function() {

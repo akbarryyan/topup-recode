@@ -196,3 +196,68 @@ Route::get('/order/{gameSlug}', function ($gameSlug) {
         'accountFields' => $accountFields,
     ]);
 })->name('order.game');
+
+// Order Prepaid Route (Pulsa & Data)
+Route::get('/order/prepaid/{brandSlug}', function ($brandSlug) {
+    // Convert slug back to brand name
+    $allBrands = PrepaidService::select('brand')
+        ->where('is_active', true)
+        ->where('status', 'available')
+        ->distinct()
+        ->get()
+        ->pluck('brand');
+    
+    $matchedBrand = null;
+    foreach ($allBrands as $brandName) {
+        $brandSlugFromDb = strtolower(str_replace(' ', '-', $brandName));
+        if ($brandSlugFromDb === $brandSlug) {
+            $matchedBrand = $brandName;
+            break;
+        }
+    }
+    
+    // If no match found, abort 404
+    if (!$matchedBrand) {
+        abort(404, 'Produk tidak ditemukan atau tidak tersedia');
+    }
+    
+    // Get prepaid services for this brand
+    $services = PrepaidService::where('brand', $matchedBrand)
+        ->where('is_active', true)
+        ->where('status', 'available')
+        ->orderBy('price_basic')
+        ->get();
+    
+    // Get brand image
+    $brandImage = BrandImage::where('brand_name', $matchedBrand)->first();
+    
+    // Get active payment methods grouped by category
+    $paymentMethods = PaymentMethod::with('paymentGateway')
+        ->where('is_active', true)
+        ->orderBy('sort_order')
+        ->orderBy('name')
+        ->get()
+        ->groupBy(function($item) {
+            $code = strtolower($item->code);
+            $name = strtolower($item->name);
+            
+            if (strpos($code, 'qris') !== false || strpos($name, 'qris') !== false) {
+                return 'qris';
+            } elseif (strpos($name, 'virtual account') !== false || strpos($code, 'va') !== false || 
+                      strpos($name, 'bank') !== false) {
+                return 'virtual_account';
+            } elseif (strpos($name, 'alfamart') !== false || strpos($name, 'indomaret') !== false ||
+                      strpos($name, 'retail') !== false) {
+                return 'retail';
+            } else {
+                return 'ewallet';
+            }
+        });
+
+    return view('order.prepaid', [
+        'brand' => $matchedBrand,
+        'services' => $services,
+        'brandImage' => $brandImage,
+        'paymentMethods' => $paymentMethods,
+    ]);
+})->name('order.prepaid');
