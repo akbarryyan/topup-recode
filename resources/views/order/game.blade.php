@@ -601,6 +601,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle order submission
     document.getElementById('btn-order').addEventListener('click', function() {
         const whatsapp = whatsappInput ? whatsappInput.value.trim() : '';
+        const email = document.getElementById('contact_email').value.trim();
         const accountData = {};
         accountFieldInputs.forEach(input => {
             accountData[input.dataset.fieldKey] = input.value.trim();
@@ -619,30 +620,97 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             return;
         }
-        
-        // TODO: Submit order to backend
-        console.log('Order Data:', {
-            game: '{{ $game }}',
-            account_fields: accountData,
-            item_code: selectedItem.code,
-            item_price: selectedItem.price,
-            payment_method_id: selectedPayment ? selectedPayment.id : null,
-            payment_method_code: selectedPayment ? selectedPayment.code : null,
-            payment_fee: selectedPayment ? selectedPayment.fee : 0,
-            total_amount: selectedItem.price + (selectedPayment ? selectedPayment.fee : 0),
-            whatsapp: whatsapp
-        });
-        
-        if (typeof swal !== 'undefined') {
-            swal({
-                title: 'Coming Soon!',
-                text: 'Fitur checkout sedang dalam pengembangan',
-                icon: 'info',
-                button: 'OK'
-            });
-        } else {
-            alert('Coming Soon! Fitur checkout sedang dalam pengembangan');
+
+        if (!selectedPayment) {
+            if (typeof swal !== 'undefined') {
+                swal({
+                    title: 'Oops!',
+                    text: 'Silakan pilih metode pembayaran',
+                    icon: 'warning',
+                    button: 'OK'
+                });
+            } else {
+                alert('Silakan pilih metode pembayaran');
+            }
+            return;
         }
+        
+        // Show loading state
+        const btnOrder = this;
+        const originalText = btnOrder.innerHTML;
+        btnOrder.disabled = true;
+        btnOrder.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        
+        // Prepare data
+        const formData = {
+            game: '{{ $game }}',
+            service_code: selectedItem.code,
+            account_fields: accountData,
+            whatsapp: whatsapp,
+            email: email,
+            payment_method_id: selectedPayment.id,
+            _token: '{{ csrf_token() }}'
+        };
+        
+        // Submit order
+        fetch('{{ route("order.game.store") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(async response => {
+            const isJson = response.headers.get('content-type')?.includes('application/json');
+            const data = isJson ? await response.json() : null;
+
+            if (!response.ok) {
+                // Handle non-2xx responses
+                const errorMessage = (data && data.message) || response.statusText || 'Terjadi kesalahan pada server';
+                throw new Error(errorMessage);
+            }
+
+            if (data && data.success) {
+                if (typeof swal !== 'undefined') {
+                    swal({
+                        title: 'Berhasil!',
+                        text: 'Pesanan berhasil dibuat. Mengalihkan ke halaman pembayaran...',
+                        icon: 'success',
+                        buttons: false,
+                        timer: 2000
+                    }).then(() => {
+                        window.location.href = data.data.payment_url || data.data.redirect_url;
+                    });
+                } else {
+                    alert('Pesanan berhasil! Mengalihkan...');
+                    window.location.href = data.data.payment_url || data.data.redirect_url;
+                }
+            } else {
+                throw new Error((data && data.message) || 'Terjadi kesalahan saat memproses pesanan');
+            }
+        })
+        .catch(error => {
+            console.error('Order Error:', error);
+            if (typeof swal !== 'undefined') {
+                swal({
+                    title: 'Gagal!',
+                    text: error.message || 'Terjadi kesalahan sistem',
+                    icon: 'error',
+                    button: 'OK'
+                });
+            } else {
+                alert('Gagal: ' + (error.message || 'Terjadi kesalahan sistem'));
+            }
+        })
+        .finally(() => {
+            // Reset button
+            if (btnOrder) {
+                btnOrder.disabled = false;
+                btnOrder.innerHTML = originalText;
+            }
+        });
     });
 });
 </script>

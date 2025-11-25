@@ -42,11 +42,9 @@
                                             <td><span class="badge badge-primary">{{ $transaction->trxid }}</span></td>
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    <div class="avatar avatar-sm mr-2">
-                                                        <span class="avatar-title rounded-circle bg-primary">
-                                                            {{ strtoupper(substr($transaction->user->name, 0, 1)) }}
-                                                        </span>
-                                                    </div>
+                                                    <figure class="avatar avatar-sm mr-2 bg-primary text-white d-flex align-items-center justify-content-center">
+                                                        {{ strtoupper(substr($transaction->user->name, 0, 1)) }}
+                                                    </figure>
                                                     <div>
                                                         <div>{{ $transaction->user->name }}</div>
                                                         <small class="text-muted">{{ $transaction->user->email }}</small>

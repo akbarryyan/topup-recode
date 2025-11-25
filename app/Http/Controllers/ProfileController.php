@@ -44,27 +44,74 @@ class ProfileController extends Controller
             'failed' => $failed,
         ];
 
-        // Fetch latest transactions from both Game and Prepaid
-        $gameTransactions = \App\Models\GameTransaction::where('user_id', $user->id)
-            ->latest()
-            ->take(20)
+        // Fetch transactions from both Game and Prepaid with filters
+        $gameQuery = \App\Models\GameTransaction::where('user_id', $user->id);
+        $prepaidQuery = \App\Models\PrepaidTransaction::where('user_id', $user->id);
+
+        // Apply filters
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $gameQuery->where(function($q) use ($search) {
+                $q->where('trxid', 'like', "%{$search}%")
+                  ->orWhere('service_name', 'like', "%{$search}%")
+                  ->orWhere('data_no', 'like', "%{$search}%");
+            });
+            $prepaidQuery->where(function($q) use ($search) {
+                $q->where('trxid', 'like', "%{$search}%")
+                  ->orWhere('service_name', 'like', "%{$search}%")
+                  ->orWhere('data_no', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('date')) {
+            $dateFilter = $request->date;
+            $now = now();
+            
+            if ($dateFilter === 'today') {
+                $gameQuery->whereDate('created_at', $now->today());
+                $prepaidQuery->whereDate('created_at', $now->today());
+            } elseif ($dateFilter === 'week') {
+                $gameQuery->where('created_at', '>=', $now->subDays(7));
+                $prepaidQuery->where('created_at', '>=', $now->subDays(7));
+            } elseif ($dateFilter === 'month') {
+                $gameQuery->where('created_at', '>=', $now->subDays(30));
+                $prepaidQuery->where('created_at', '>=', $now->subDays(30));
+            } elseif ($dateFilter !== 'all') {
+                // Fallback for specific date if needed, or ignore
+                $gameQuery->whereDate('created_at', $dateFilter);
+                $prepaidQuery->whereDate('created_at', $dateFilter);
+            }
+        }
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            $status = $request->status;
+            $gameQuery->where('status', $status);
+            
+            // Map status for prepaid if needed, or assume same status values
+            // Prepaid has 'pending' which maps to 'waiting' in our UI logic usually, but let's keep it strict for now
+            // or allow multiple statuses if needed. For now, direct match.
+            $prepaidQuery->where('status', $status);
+        }
+
+        $gameTransactions = $gameQuery->latest()
+            ->take(50) // Increase limit for filtered results
             ->get()
             ->map(function ($trx) {
                 return (object) [
                     'invoice' => $trx->trxid,
-                    'game' => 'Game Topup', // Or extract from service_name if possible
+                    'game' => 'Game Topup',
                     'product' => $trx->service_name,
                     'user_input' => $trx->data_no . ($trx->data_zone ? ' (' . $trx->data_zone . ')' : ''),
                     'price' => $trx->price,
                     'date' => $trx->created_at->format('d M Y H:i'),
                     'status' => $trx->status,
+                    'payment_url' => $trx->payment_url,
                     'raw_date' => $trx->created_at,
                 ];
             });
 
-        $prepaidTransactions = \App\Models\PrepaidTransaction::where('user_id', $user->id)
-            ->latest()
-            ->take(20)
+        $prepaidTransactions = $prepaidQuery->latest()
+            ->take(50) // Increase limit for filtered results
             ->get()
             ->map(function ($trx) {
                 // Try to get brand from note if available
@@ -84,15 +131,16 @@ class ProfileController extends Controller
                     'price' => $trx->payment_amount > 0 ? $trx->payment_amount : $trx->price,
                     'date' => $trx->created_at->format('d M Y H:i'),
                     'status' => $trx->status,
+                    'payment_url' => $trx->payment_url,
                     'raw_date' => $trx->created_at,
                 ];
             });
 
-        // Convert to base collection to avoid Eloquent issues with stdClass
+        // Convert to base collection and sort
         $latestTransactions = collect($gameTransactions)->merge($prepaidTransactions)
             ->sortByDesc('raw_date')
             ->values()
-            ->take(20);
+            ->take(50);
         
         // Build mutations query with filters
         $mutationsQuery = Mutation::forUser($user->id);

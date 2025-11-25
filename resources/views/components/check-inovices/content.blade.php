@@ -10,8 +10,8 @@
             <!-- Input Search -->
             <div class="bg-[#080808] px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-6 rounded-lg">
                 <div class="flex justify-center items-center">
-                    <form action="#" method="GET" class="w-full max-w-xl">
-                        <input type="text" name="invoice_number" placeholder="Masukkan nomor invoice" 
+                    <form action="{{ route('invoices') }}" method="GET" class="w-full max-w-xl">
+                        <input type="text" name="invoice_number" value="{{ request('invoice_number') }}" placeholder="Masukkan nomor invoice" 
                             class="w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-[#0E0E10] border border-gray-600 text-white placeholder-gray-400 text-xs sm:text-sm focus:border-gray-400 focus:outline-none transition" 
                             required>
                         <button type="submit" 
@@ -26,8 +26,12 @@
         <!-- Table Transactions -->
         <div class="mt-4 sm:mt-6 lg:mt-8">
             <div class="mb-3 sm:mb-4">
-                <h1 class="text-gray-100 font-semibold text-base sm:text-lg lg:text-xl">Transaksi Real Time</h1>
-                <p class="text-gray-400 text-xs sm:text-sm lg:text-base">Berikut ini Real-Time data pesanan masuk terbaru.</p>
+                <h1 class="text-gray-100 font-semibold text-base sm:text-lg lg:text-xl">
+                    {{ request('invoice_number') ? 'Hasil Pencarian' : 'Transaksi Real Time' }}
+                </h1>
+                <p class="text-gray-400 text-xs sm:text-sm lg:text-base">
+                    {{ request('invoice_number') ? 'Berikut adalah hasil pencarian untuk invoice: ' . request('invoice_number') : 'Berikut ini Real-Time data pesanan masuk terbaru.' }}
+                </p>
             </div>
 
             <!-- Table Container -->
@@ -43,66 +47,55 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Sample Data Row 1 -->
+                            @forelse($transactions as $transaction)
                             <tr class="border-b border-gray-800 hover:bg-[#18181B] transition">
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-400 text-xs sm:text-sm">14 Nov 2025, 10:30</td>
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm font-medium">INV-2025-001234</td>
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm">Rp 150.000</td>
+                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-400 text-xs sm:text-sm">
+                                    {{ $transaction->created_at->format('d M Y, H:i') }}
+                                </td>
+                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm font-medium">
+                                    {{ $transaction->trxid }}
+                                </td>
+                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm">
+                                    Rp {{ number_format($transaction->price, 0, ',', '.') }}
+                                </td>
                                 <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
-                                    <span class="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium bg-green-500/10 text-green-500">
-                                        <i class="ri-checkbox-circle-fill mr-1"></i>
-                                        Berhasil
+                                    @php
+                                        $statusClass = match($transaction->status) {
+                                            'success' => 'bg-green-500/10 text-green-500',
+                                            'pending', 'waiting', 'processing' => 'bg-yellow-500/10 text-yellow-500',
+                                            'failed', 'error' => 'bg-red-500/10 text-red-500',
+                                            default => 'bg-gray-500/10 text-gray-500',
+                                        };
+                                        $statusIcon = match($transaction->status) {
+                                            'success' => 'ri-checkbox-circle-fill',
+                                            'pending', 'waiting', 'processing' => 'ri-time-line',
+                                            'failed', 'error' => 'ri-close-circle-fill',
+                                            default => 'ri-question-line',
+                                        };
+                                        $statusLabel = match($transaction->status) {
+                                            'success' => 'Berhasil',
+                                            'pending', 'waiting' => 'Menunggu',
+                                            'processing' => 'Proses',
+                                            'failed', 'error' => 'Gagal',
+                                            default => ucfirst($transaction->status),
+                                        };
+                                    @endphp
+                                    <span class="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium {{ $statusClass }}">
+                                        <i class="{{ $statusIcon }} mr-1"></i>
+                                        {{ $statusLabel }}
                                     </span>
                                 </td>
                             </tr>
-                            <!-- Sample Data Row 2 -->
-                            <tr class="border-b border-gray-800 hover:bg-[#18181B] transition">
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-400 text-xs sm:text-sm">14 Nov 2025, 10:15</td>
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm font-medium">INV-2025-001233</td>
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm">Rp 75.000</td>
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
-                                    <span class="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium bg-yellow-500/10 text-yellow-500">
-                                        <i class="ri-time-line mr-1"></i>
-                                        Proses
-                                    </span>
+                            @empty
+                            <tr>
+                                <td colspan="4" class="px-3 sm:px-4 lg:px-6 py-8 text-center text-gray-500 text-sm">
+                                    <div class="flex flex-col items-center justify-center gap-2">
+                                        <i class="ri-file-search-line text-3xl mb-2"></i>
+                                        <p>Tidak ada data transaksi ditemukan.</p>
+                                    </div>
                                 </td>
                             </tr>
-                            <!-- Sample Data Row 3 -->
-                            <tr class="border-b border-gray-800 hover:bg-[#18181B] transition">
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-400 text-xs sm:text-sm">14 Nov 2025, 09:45</td>
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm font-medium">INV-2025-001232</td>
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm">Rp 200.000</td>
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
-                                    <span class="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium bg-green-500/10 text-green-500">
-                                        <i class="ri-checkbox-circle-fill mr-1"></i>
-                                        Berhasil
-                                    </span>
-                                </td>
-                            </tr>
-                            <!-- Sample Data Row 4 -->
-                            <tr class="border-b border-gray-800 hover:bg-[#18181B] transition">
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-400 text-xs sm:text-sm">14 Nov 2025, 09:20</td>
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm font-medium">INV-2025-001231</td>
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm">Rp 50.000</td>
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
-                                    <span class="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium bg-red-500/10 text-red-500">
-                                        <i class="ri-close-circle-fill mr-1"></i>
-                                        Gagal
-                                    </span>
-                                </td>
-                            </tr>
-                            <!-- Sample Data Row 5 -->
-                            <tr class="hover:bg-[#18181B] transition">
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-400 text-xs sm:text-sm">14 Nov 2025, 08:55</td>
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm font-medium">INV-2025-001230</td>
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm">Rp 125.000</td>
-                                <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
-                                    <span class="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium bg-green-500/10 text-green-500">
-                                        <i class="ri-checkbox-circle-fill mr-1"></i>
-                                        Berhasil
-                                    </span>
-                                </td>
-                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>

@@ -236,26 +236,34 @@
                         <div class="flex items-center justify-between">
                             <h2 class="text-lg font-semibold">Riwayat Transaksi</h2>
                         </div>
-                        <div class="mt-4 grid gap-3 md:grid-cols-[1fr,200px,200px]">
+                        <form action="{{ route('profile') }}" method="GET" class="mt-4 grid gap-3 md:grid-cols-[1fr,200px,200px]">
+                            <!-- Preserve active tab -->
+                            <input type="hidden" name="tab" value="transactions">
+                            
                             <label class="flex flex-col text-xs uppercase tracking-wide text-gray-400">
                                 <span class="mb-1 text-gray-500 normal-case">Cari transaksi</span>
-                                <input type="text" placeholder="Cari transaksi..." class="rounded-2xl border border-white/10 bg-transparent px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
+                                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari ID, Produk, atau No. HP..." class="rounded-2xl border border-white/10 bg-transparent px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
                             </label>
                             <label class="flex flex-col text-xs uppercase tracking-wide text-gray-400">
                                 <span class="mb-1 text-gray-500 normal-case">Tanggal</span>
-                                <input type="date" value="{{ now()->format('Y-m-d') }}" class="rounded-2xl border border-white/10 bg-transparent px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
+                                <select name="date" onchange="this.form.submit()" class="rounded-2xl border border-white/10 bg-[#050505] px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
+                                    <option value="all" {{ request('date') == 'all' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">Semua</option>
+                                    <option value="today" {{ request('date') == 'today' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">Hari Ini</option>
+                                    <option value="week" {{ request('date') == 'week' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">7 Hari Terakhir</option>
+                                    <option value="month" {{ request('date') == 'month' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">Bulan Ini</option>
+                                </select>
                             </label>
                             <label class="flex flex-col text-xs uppercase tracking-wide text-gray-400">
                                 <span class="mb-1 text-gray-500 normal-case">Status</span>
-                                <select class="rounded-2xl border border-white/10 bg-[#050505] px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
-                                    <option value="all" class="bg-[#050505] text-gray-900">Semua</option>
-                                    <option value="waiting" class="bg-[#050505] text-gray-900">Menunggu</option>
-                                    <option value="processing" class="bg-[#050505] text-gray-900">Dalam Proses</option>
-                                    <option value="success" class="bg-[#050505] text-gray-900">Sukses</option>
-                                    <option value="failed" class="bg-[#050505] text-gray-900">Gagal</option>
+                                <select name="status" onchange="this.form.submit()" class="rounded-2xl border border-white/10 bg-[#050505] px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
+                                    <option value="all" {{ request('status') == 'all' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">Semua</option>
+                                    <option value="waiting" {{ request('status') == 'waiting' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">Menunggu</option>
+                                    <option value="processing" {{ request('status') == 'processing' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">Dalam Proses</option>
+                                    <option value="success" {{ request('status') == 'success' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">Sukses</option>
+                                    <option value="failed" {{ request('status') == 'failed' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">Gagal</option>
                                 </select>
                             </label>
-                        </div>
+                        </form>
     
                         <div class="mt-6 rounded-2xl border border-white/5 overflow-hidden">
                             <table class="min-w-full text-left text-sm text-gray-300">
@@ -268,6 +276,7 @@
                                         <th class="px-4 py-3">Harga</th>
                                         <th class="px-4 py-3">User Input</th>
                                         <th class="px-4 py-3">Status</th>
+                                        <th class="px-4 py-3">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -280,12 +289,28 @@
                                             <td class="px-4 py-3">Rp {{ number_format($transaction->price, 0, ',', '.') }}</td>
                                             <td class="px-4 py-3">{{ $transaction->user_input }}</td>
                                             <td class="px-4 py-3">
-                                                <span class="rounded-full px-3 py-1 text-xs font-semibold bg-white/10">{{ ucfirst($transaction->status) }}</span>
+                                                @php
+                                                    $statusColor = match($transaction->status) {
+                                                        'waiting' => 'bg-yellow-500/10 text-yellow-500',
+                                                        'processing' => 'bg-blue-500/10 text-blue-500',
+                                                        'success' => 'bg-green-500/10 text-green-500',
+                                                        'failed', 'expired', 'canceled' => 'bg-red-500/10 text-red-500',
+                                                        default => 'bg-white/10 text-white',
+                                                    };
+                                                @endphp
+                                                <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $statusColor }}">{{ ucfirst($transaction->status) }}</span>
+                                            </td>
+                                            <td class="px-4 py-3">
+                                                @if($transaction->status === 'waiting' && !empty($transaction->payment_url))
+                                                    <a href="{{ $transaction->payment_url }}" target="_blank" class="rounded-lg bg-yellow-500 px-3 py-1.5 text-xs font-semibold text-black hover:bg-yellow-400 transition-colors">
+                                                        Bayar
+                                                    </a>
+                                                @endif
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="px-4 py-6 text-center text-gray-500">Belum ada transaksi yang ditemukan.</td>
+                                            <td colspan="8" class="px-4 py-6 text-center text-gray-500">Belum ada transaksi yang ditemukan.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>

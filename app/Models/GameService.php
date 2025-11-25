@@ -105,4 +105,16 @@ class GameService extends Model
     {
         return $this->gameImage && $this->gameImage->image;
     }
+
+    /**
+     * Calculate final price based on user role
+     */
+    public function calculateFinalPrice($role = 'member')
+    {
+        return match($role) {
+            'platinum' => $this->price_special > 0 ? $this->price_special : $this->price_basic,
+            'gold' => $this->price_premium > 0 ? $this->price_premium : $this->price_basic,
+            default => $this->price_basic,
+        };
+    }
 }

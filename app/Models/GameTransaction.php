@@ -20,12 +20,38 @@ class GameTransaction extends Model
         'price',
         'balance',
         'note',
+        // Payment Fields
+        'payment_method_id',
+        'payment_method_code',
+        'payment_amount',
+        'payment_fee',
+        'payment_url',
+        'payment_reference',
+        'va_number',
+        'qr_string',
+        'email',
+        'whatsapp',
+        'payment_status',
+        'paid_at',
+        'expired_at',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'balance' => 'decimal:2',
+        'payment_amount' => 'decimal:2',
+        'payment_fee' => 'decimal:2',
+        'paid_at' => 'datetime',
+        'expired_at' => 'datetime',
     ];
+
+    /**
+     * Get the payment method
+     */
+    public function paymentMethod()
+    {
+        return $this->belongsTo(PaymentMethod::class);
+    }
 
     /**
      * Get the user that owns the transaction

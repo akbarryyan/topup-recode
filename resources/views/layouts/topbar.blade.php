@@ -141,33 +141,37 @@
     </div>
 
     <!-- Bottom Section: Navigation Menu (Desktop only) -->
-    <nav class="hidden lg:flex items-center justify-start gap-8 px-8 py-3">
-        <a href="{{ route('invoices') }}" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors group">
+    <nav class="hidden lg:flex items-center justify-start gap-8 px-8">
+        <a href="{{ url('/') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->is('/') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
+            <i class="ri-dashboard-line text-[16px]"></i>
+            <span class="text-sm font-medium">Dashboard</span>
+        </a>
+        <a href="{{ route('invoices') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->routeIs('invoices') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
             <i class="ri-file-list-3-line text-[16px]"></i>
             <span class="text-sm font-medium">Check Invoice</span>
         </a>
-        <a href="{{ route('leaderboard') }}" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors group">
+        <a href="{{ route('leaderboard') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->routeIs('leaderboard') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
             <i class="ri-trophy-line text-[16px]"></i>
             <span class="text-sm font-medium">Leaderboard</span>
         </a>
         
         <!-- Calculator Dropdown (Desktop) -->
-        <div class="relative group">
-            <button class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
+        <div class="relative group h-full flex items-center">
+            <button class="flex items-center gap-2 py-4 border-b-2 border-transparent text-gray-300 hover:text-white transition-colors">
                 <i class="ri-calculator-line text-[16px]"></i>
                 <span class="text-sm font-medium">Calculator</span>
             </button>
-            <div class="absolute top-full left-0 mt-2 w-56 bg-[#18181B] rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-800">
-                <a href="#" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-[#27272A] first:rounded-t-lg transition-colors">ML Diamond Calculator</a>
+            <div class="absolute top-full left-0 w-56 bg-[#18181B] rounded-b-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-800 z-50">
+                <a href="#" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-[#27272A] transition-colors">ML Diamond Calculator</a>
                 <a href="#" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-[#27272A] last:rounded-b-lg transition-colors">FF Diamond Calculator</a>
             </div>
         </div>
 
-        <a href="{{ route('article') }}" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors group">
+        <a href="{{ route('article') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->routeIs('article') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
             <i class="ri-article-line text-[16px]"></i>
             <span class="text-sm font-medium">Articles</span>
         </a>
-        <a href="{{ route('contact-us') }}" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors group">
+        <a href="{{ route('contact-us') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->routeIs('contact-us') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
             <i class="ri-customer-service-2-line text-[16px]"></i>
             <span class="text-sm font-medium">Contact Us</span>
         </a>

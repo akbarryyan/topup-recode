@@ -104,9 +104,7 @@ Route::post('/payment/duitku/callback', [App\Http\Controllers\TopUpController::c
 Route::get('/payment/duitku/redirect', [App\Http\Controllers\TopUpController::class, 'redirect'])
     ->name('topup.redirect');
 
-Route::get('/invoices', function () {
-    return view('check-invoice');
-})->name('invoices');
+Route::get('/invoices', [App\Http\Controllers\InvoiceController::class, 'index'])->name('invoices');
 Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard');
 Route::get('/leaderboard/data/{period}', [LeaderboardController::class, 'getData'])->name('leaderboard.data');
 Route::get('/article', [ArticleController::class, 'index'])->name('article');
