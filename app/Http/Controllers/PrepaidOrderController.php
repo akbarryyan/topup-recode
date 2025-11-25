@@ -9,18 +9,32 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+use App\Models\PaymentMethod;
+use App\Services\DuitkuService;
+
 class PrepaidOrderController extends Controller
 {
+    protected $duitkuService;
+
+    public function __construct(DuitkuService $duitkuService)
+    {
+        $this->duitkuService = $duitkuService;
+    }
+
     /**
      * Process prepaid order
      */
     public function store(Request $request)
     {
+        Log::info('Prepaid Order Request Received', $request->all());
+
         $validated = $request->validate([
             'brand' => 'required|string',
             'service_code' => 'required|string',
             'phone_number' => 'required|string',
             'whatsapp' => 'nullable|string',
+            'email' => 'required|email',
+            'payment_method_id' => 'required|exists:payment_methods,id',
         ]);
 
         $user = $request->user();
@@ -34,21 +48,19 @@ class PrepaidOrderController extends Controller
                 ->where('status', 'available')
                 ->firstOrFail();
 
-            // Calculate final price based on user role
-            $finalPrice = $service->calculateFinalPrice($user->role ?? 'member');
+            // Get payment method
+            $paymentMethod = PaymentMethod::where('id', $validated['payment_method_id'])
+                ->where('is_active', true)
+                ->firstOrFail();
 
-            // Check user balance
-            if ($user->balance < $finalPrice) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Saldo tidak mencukupi. Silakan top up terlebih dahulu.',
-                    'data' => [
-                        'required_balance' => $finalPrice,
-                        'current_balance' => $user->balance,
-                        'shortage' => $finalPrice - $user->balance,
-                    ]
-                ], 400);
-            }
+            // Calculate final price (service price + payment fee)
+            // Note: Prepaid service price is fixed, not based on role for now as per previous logic
+            // But we should respect the previous logic if it was intended
+            $servicePrice = $service->price_basic; // Using price_basic from DB directly as per route logic
+            
+            // Calculate payment fee
+            $paymentFee = $paymentMethod->total_fee;
+            $totalAmount = $servicePrice + $paymentFee;
 
             // Check stock
             if ($service->stock !== null && $service->stock < 1) {
@@ -61,56 +73,59 @@ class PrepaidOrderController extends Controller
             // Generate unique transaction ID
             $trxid = 'PREPAID-' . time() . '-' . rand(1000, 9999);
 
-            // Create transaction
+            // Create transaction with pending status
             $transaction = PrepaidTransaction::create([
                 'trxid' => $trxid,
                 'user_id' => $user->id,
                 'service_code' => $service->code,
                 'service_name' => $service->name,
                 'data_no' => $validated['phone_number'],
-                'status' => 'processing',
-                'price' => $finalPrice,
-                'balance' => $user->balance,
+                'status' => 'waiting', // Waiting for payment
+                'price' => $servicePrice,
+                'balance' => $user->balance, // Snapshot of balance (not used for payment)
                 'note' => json_encode([
                     'brand' => $validated['brand'],
                     'whatsapp' => $validated['whatsapp'] ?? null,
                 ]),
+                // Payment Fields
+                'payment_method_id' => $paymentMethod->id,
+                'payment_method_code' => $paymentMethod->code,
+                'payment_amount' => $totalAmount,
+                'payment_fee' => $paymentFee,
+                'email' => $validated['email'],
+                'whatsapp' => $validated['whatsapp'] ?? null,
+                'payment_status' => 'pending',
             ]);
 
-            // Deduct balance
-            $balanceBefore = $user->balance;
-            $user->balance -= $finalPrice;
-            $balanceAfter = $user->balance;
-            $user->save();
+            // Prepare Duitku parameters
+            $duitkuParams = [
+                'merchantOrderId' => $trxid,
+                'paymentAmount' => (int) $totalAmount,
+                'paymentMethod' => $paymentMethod->code,
+                'productDetails' => "Pembelian {$validated['brand']} - {$service->name}",
+                'email' => $validated['email'],
+                'phoneNumber' => $validated['phone_number'],
+                'customerVaName' => $user->name,
+                'callbackUrl' => route('topup.callback'), // Reuse existing callback or create new one
+                'returnUrl' => route('invoices'), // Redirect to invoices page
+                'expiryPeriod' => 60, // 60 minutes
+            ];
 
-            // Record mutation
-            Mutation::record(
-                userId: $user->id,
-                type: 'debit',
-                amount: (float)$finalPrice,
-                balanceBefore: (float)$balanceBefore,
-                balanceAfter: (float)$balanceAfter,
-                description: $service->name,
-                referenceType: PrepaidTransaction::class,
-                referenceId: $transaction->id,
-                notes: "Pembelian {$validated['brand']} - {$service->name}",
-                metadata: [
-                    'trxid' => $trxid,
-                    'brand' => $validated['brand'],
-                    'service_code' => $service->code,
-                    'phone_number' => $validated['phone_number'],
-                ]
-            );
+            // Call Duitku API
+            $duitkuResponse = $this->duitkuService->createTransaction($duitkuParams);
 
-            // Reduce stock if applicable
-            if ($service->stock !== null) {
-                $service->decrement('stock');
+            if (!$duitkuResponse['success']) {
+                throw new \Exception($duitkuResponse['message']);
             }
 
-            // TODO: Process with prepaid provider API
-            // For now, we'll mark as success immediately
-            // In production, this should be processed with actual prepaid provider
-            $transaction->update(['status' => 'success']);
+            // Update transaction with payment details
+            $paymentData = $duitkuResponse['data'];
+            $transaction->update([
+                'payment_reference' => $paymentData['reference'],
+                'payment_url' => $paymentData['payment_url'],
+                'va_number' => $paymentData['va_number'],
+                'qr_string' => $paymentData['qr_string'],
+            ]);
 
             DB::commit();
 
@@ -118,7 +133,7 @@ class PrepaidOrderController extends Controller
                 'trxid' => $trxid,
                 'user_id' => $user->id,
                 'service' => $service->name,
-                'price' => $finalPrice,
+                'amount' => $totalAmount,
             ]);
 
             return response()->json([
@@ -126,10 +141,8 @@ class PrepaidOrderController extends Controller
                 'message' => 'Pesanan berhasil dibuat',
                 'data' => [
                     'trxid' => $trxid,
-                    'status' => $transaction->status,
-                    'service_name' => $service->name,
-                    'price' => $finalPrice,
-                    'balance_after' => $balanceAfter,
+                    'payment_url' => $paymentData['payment_url'],
+                    'redirect_url' => $paymentData['payment_url'] ?? route('invoices'),
                 ]
             ]);
 

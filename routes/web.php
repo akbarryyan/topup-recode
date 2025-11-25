@@ -90,6 +90,7 @@ Route::middleware('auth')->group(function () {
     
     // Prepaid Order routes
     Route::post('/order/prepaid', [App\Http\Controllers\PrepaidOrderController::class, 'store'])->name('order.prepaid.store');
+
 });
 
 // Duitku Callback - Server to Server (POST)

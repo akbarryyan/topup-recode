@@ -15,17 +15,84 @@ class ProfileController extends Controller
         // Get user balance
         $userBalance = $user->balance ?? 0;
 
+        // Calculate stats
+        $gameStats = \App\Models\GameTransaction::where('user_id', $user->id)
+            ->selectRaw('count(*) as total, sum(price) as amount, status')
+            ->groupBy('status')
+            ->get();
+            
+        $prepaidStats = \App\Models\PrepaidTransaction::where('user_id', $user->id)
+            ->selectRaw('count(*) as total, sum(payment_amount) as amount, status')
+            ->groupBy('status')
+            ->get();
+
+        $totalTransactions = $gameStats->sum('total') + $prepaidStats->sum('total');
+        $totalAmount = $gameStats->sum('amount') + $prepaidStats->sum('amount');
+        
+        $waiting = $gameStats->where('status', 'waiting')->sum('total') + $prepaidStats->whereIn('status', ['waiting', 'pending'])->sum('total');
+        $processing = $gameStats->where('status', 'processing')->sum('total') + $prepaidStats->where('status', 'processing')->sum('total');
+        $success = $gameStats->where('status', 'success')->sum('total') + $prepaidStats->where('status', 'success')->sum('total');
+        $failed = $gameStats->where('status', 'failed')->sum('total') + $prepaidStats->whereIn('status', ['failed', 'expired', 'canceled'])->sum('total');
+
         $stats = [
             'user_balance' => $userBalance,
-            'total_transactions' => 0,
-            'total_revenue' => 0,
-            'waiting' => 0,
-            'processing' => 0,
-            'success' => 0,
-            'failed' => 0,
+            'total_transactions' => $totalTransactions,
+            'total_revenue' => $totalAmount,
+            'waiting' => $waiting,
+            'processing' => $processing,
+            'success' => $success,
+            'failed' => $failed,
         ];
 
-        $latestTransactions = collect();
+        // Fetch latest transactions from both Game and Prepaid
+        $gameTransactions = \App\Models\GameTransaction::where('user_id', $user->id)
+            ->latest()
+            ->take(20)
+            ->get()
+            ->map(function ($trx) {
+                return (object) [
+                    'invoice' => $trx->trxid,
+                    'game' => 'Game Topup', // Or extract from service_name if possible
+                    'product' => $trx->service_name,
+                    'user_input' => $trx->data_no . ($trx->data_zone ? ' (' . $trx->data_zone . ')' : ''),
+                    'price' => $trx->price,
+                    'date' => $trx->created_at->format('d M Y H:i'),
+                    'status' => $trx->status,
+                    'raw_date' => $trx->created_at,
+                ];
+            });
+
+        $prepaidTransactions = \App\Models\PrepaidTransaction::where('user_id', $user->id)
+            ->latest()
+            ->take(20)
+            ->get()
+            ->map(function ($trx) {
+                // Try to get brand from note if available
+                $brand = 'Pulsa & Data';
+                if ($trx->note) {
+                    $note = json_decode($trx->note, true);
+                    if (isset($note['brand'])) {
+                        $brand = $note['brand'];
+                    }
+                }
+
+                return (object) [
+                    'invoice' => $trx->trxid,
+                    'game' => $brand,
+                    'product' => $trx->service_name,
+                    'user_input' => $trx->data_no,
+                    'price' => $trx->payment_amount > 0 ? $trx->payment_amount : $trx->price,
+                    'date' => $trx->created_at->format('d M Y H:i'),
+                    'status' => $trx->status,
+                    'raw_date' => $trx->created_at,
+                ];
+            });
+
+        // Convert to base collection to avoid Eloquent issues with stdClass
+        $latestTransactions = collect($gameTransactions)->merge($prepaidTransactions)
+            ->sortByDesc('raw_date')
+            ->values()
+            ->take(20);
         
         // Build mutations query with filters
         $mutationsQuery = Mutation::forUser($user->id);
