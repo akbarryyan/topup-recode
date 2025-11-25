@@ -100,6 +100,37 @@
                   </div>
                 </div>
               </div>
+            </div>
+            <div class="col-lg-9 col-md-6 col-sm-6 col-12">
+              <div class="card card-statistic-1">
+                <div class="card-icon bg-primary">
+                  <i class="fas fa-exchange-alt"></i>
+                </div>
+                <div class="card-wrap">
+                  <div class="card-header">
+                    <h4>Total Transaksi</h4>
+                  </div>
+                  <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-2 mb-md-0">
+                            <a href="#" class="btn btn-success btn-block btn-icon-split">
+                                <i class="fas fa-check-circle"></i> {{ number_format($transactionStats['success']) }} Sukses
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-2 mb-md-0">
+                            <a href="#" class="btn btn-warning btn-block btn-icon-split">
+                                <i class="fas fa-clock"></i> {{ number_format($transactionStats['pending']) }} Pending
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-2 mb-md-0">
+                            <a href="#" class="btn btn-danger btn-block btn-icon-split">
+                                <i class="fas fa-times-circle"></i> {{ number_format($transactionStats['failed']) }} Gagal
+                            </a>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>                  
           </div>
           <div class="row">
@@ -165,8 +196,8 @@
                 <div class="card-body">             
                   <ul class="list-unstyled list-unstyled-border">
                     @forelse($recentActivities as $activity)
-                      <li class="media">
-                        <div class="mr-3 rounded-circle d-flex align-items-center justify-content-center text-white {{ $activity['icon_bg'] ?? 'bg-secondary' }}" style="width:50px;height:50px;">
+                      <li class="media align-items-center">
+                        <div class="mr-3 rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0 {{ $activity['icon_bg'] ?? 'bg-secondary' }}" style="width:50px;height:50px;">
                           <i class="{{ $activity['icon'] ?? 'fas fa-info-circle' }}"></i>
                         </div>
                         <div class="media-body">

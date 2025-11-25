@@ -196,6 +196,13 @@ class DashboardController extends Controller
             $visitorChartData[] = Visitor::whereBetween('created_at', [$date, $dateEnd])->count();
         }
 
+        // Transaction Status Stats
+        $transactionStats = [
+            'success' => GameTransaction::where('status', 'success')->count() + PrepaidTransaction::where('status', 'success')->count(),
+            'pending' => GameTransaction::where('status', 'waiting')->count() + PrepaidTransaction::where('status', 'waiting')->count(),
+            'failed' => GameTransaction::where('status', 'failed')->count() + PrepaidTransaction::where('status', 'failed')->count(),
+        ];
+
         return view('admin.dashboard', [
             'stats' => $stats,
             'recentActivities' => $recentActivities,
@@ -208,6 +215,7 @@ class DashboardController extends Controller
             'totalVisitors' => $totalVisitors,
             'visitorChartLabels' => $visitorChartLabels,
             'visitorChartData' => $visitorChartData,
+            'transactionStats' => $transactionStats,
         ]);
     }
 }
