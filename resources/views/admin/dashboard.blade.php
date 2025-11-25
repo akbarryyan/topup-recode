@@ -91,35 +91,51 @@
             <div class="col-lg-8 col-md-12 col-12 col-sm-12">
               <div class="card">
                 <div class="card-header">
-                  <h4>Statistics</h4>
-                  <div class="card-header-action">
-                    <div class="btn-group">
-                      <a href="#" class="btn btn-primary">Week</a>
-                      <a href="#" class="btn">Month</a>
-                    </div>
-                  </div>
+                  <h4>Statistics (Last 30 Days)</h4>
                 </div>
                 <div class="card-body">
-                  <canvas id="myChart" height="182"></canvas>
+                  <div style="height: 300px; position: relative;">
+                    <canvas id="myChart"></canvas>
+                  </div>
                   <div class="statistic-details mt-sm-4">
                     <div class="statistic-details-item">
-                      <span class="text-muted"><span class="text-primary"><i class="fas fa-caret-up"></i></span> 7%</span>
-                      <div class="detail-value">$243</div>
+                      <span class="text-muted">
+                        <span class="text-{{ $salesStats['today']['change'] >= 0 ? 'primary' : 'danger' }}">
+                          <i class="fas fa-caret-{{ $salesStats['today']['change'] >= 0 ? 'up' : 'down' }}"></i>
+                        </span> 
+                        {{ abs($salesStats['today']['change']) }}%
+                      </span>
+                      <div class="detail-value">Rp {{ number_format($salesStats['today']['amount'], 0, ',', '.') }}</div>
                       <div class="detail-name">Today's Sales</div>
                     </div>
                     <div class="statistic-details-item">
-                      <span class="text-muted"><span class="text-danger"><i class="fas fa-caret-down"></i></span> 23%</span>
-                      <div class="detail-value">$2,902</div>
+                      <span class="text-muted">
+                        <span class="text-{{ $salesStats['week']['change'] >= 0 ? 'primary' : 'danger' }}">
+                          <i class="fas fa-caret-{{ $salesStats['week']['change'] >= 0 ? 'up' : 'down' }}"></i>
+                        </span> 
+                        {{ abs($salesStats['week']['change']) }}%
+                      </span>
+                      <div class="detail-value">Rp {{ number_format($salesStats['week']['amount'], 0, ',', '.') }}</div>
                       <div class="detail-name">This Week's Sales</div>
                     </div>
                     <div class="statistic-details-item">
-                      <span class="text-muted"><span class="text-primary"><i class="fas fa-caret-up"></i></span>9%</span>
-                      <div class="detail-value">$12,821</div>
+                      <span class="text-muted">
+                        <span class="text-{{ $salesStats['month']['change'] >= 0 ? 'primary' : 'danger' }}">
+                          <i class="fas fa-caret-{{ $salesStats['month']['change'] >= 0 ? 'up' : 'down' }}"></i>
+                        </span>
+                        {{ abs($salesStats['month']['change']) }}%
+                      </span>
+                      <div class="detail-value">Rp {{ number_format($salesStats['month']['amount'], 0, ',', '.') }}</div>
                       <div class="detail-name">This Month's Sales</div>
                     </div>
                     <div class="statistic-details-item">
-                      <span class="text-muted"><span class="text-primary"><i class="fas fa-caret-up"></i></span> 19%</span>
-                      <div class="detail-value">$92,142</div>
+                      <span class="text-muted">
+                        <span class="text-{{ $salesStats['year']['change'] >= 0 ? 'primary' : 'danger' }}">
+                          <i class="fas fa-caret-{{ $salesStats['year']['change'] >= 0 ? 'up' : 'down' }}"></i>
+                        </span> 
+                        {{ abs($salesStats['year']['change']) }}%
+                      </span>
+                      <div class="detail-value">Rp {{ number_format($salesStats['year']['amount'], 0, ',', '.') }}</div>
                       <div class="detail-name">This Year's Sales</div>
                     </div>
                   </div>
@@ -222,4 +238,128 @@
           </div>
         </section>
     </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Debug: Check if data exists
+  var chartLabels = {!! json_encode($chartLabels) !!};
+  var gameData = {!! json_encode($chartGameData) !!};
+  var prepaidData = {!! json_encode($chartPrepaidData) !!};
+  
+  console.log('Chart Labels:', chartLabels);
+  console.log('Game Data:', gameData);
+  console.log('Prepaid Data:', prepaidData);
+  
+  // Check if all values are zero
+  var gameTotalValue = gameData.reduce((a, b) => a + b, 0);
+  var prepaidTotalValue = prepaidData.reduce((a, b) => a + b, 0);
+  console.log('Total Game Sales (30 days):', gameTotalValue);
+  console.log('Total Prepaid Sales (30 days):', prepaidTotalValue);
+  
+  if (gameTotalValue === 0 && prepaidTotalValue === 0) {
+    console.warn('⚠️ No transaction data in the last 30 days!');
+  }
+
+  // Check if Chart.js is loaded
+  if (typeof Chart === 'undefined') {
+    console.error('Chart.js is not loaded!');
+    return;
+  }
+
+  // Chart for Statistics - Last 7 Days Sales
+  var ctx = document.getElementById("myChart");
+  if (!ctx) {
+    console.error('Canvas element not found!');
+    return;
+  }
+
+  var myChart = new Chart(ctx.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: {!! json_encode($chartLabels) !!},
+      datasets: [{
+        label: 'Game',
+        data: {!! json_encode($chartGameData) !!},
+        borderWidth: 2,
+        backgroundColor: 'rgba(99, 179, 237, 0.1)',
+        borderColor: '#63b3ed',
+        pointBackgroundColor: '#63b3ed',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        fill: true
+      }, {
+        label: 'Pulsa & PPOB',
+        data: {!! json_encode($chartPrepaidData) !!},
+        borderWidth: 2,
+        backgroundColor: 'rgba(252, 211, 77, 0.1)',
+        borderColor: '#fcd34d',
+        pointBackgroundColor: '#fcd34d',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      legend: {
+        display: true,
+        position: 'top',
+        labels: {
+          padding: 10,
+          usePointStyle: true
+        }
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true,
+            callback: function(value) {
+              if (value >= 1000000) {
+                return 'Rp ' + (value / 1000000).toFixed(1) + 'jt';
+              } else if (value >= 1000) {
+                return 'Rp ' + (value / 1000).toFixed(0) + 'rb';
+              }
+              return 'Rp ' + value;
+            }
+          },
+          gridLines: {
+            drawBorder: false,
+            color: '#f3f4f6'
+          }
+        }],
+        xAxes: [{
+          gridLines: {
+            display: false
+          }
+        }]
+      },
+      tooltips: {
+        backgroundColor: '#1f2937',
+        titleFontSize: 13,
+        bodyFontSize: 12,
+        xPadding: 10,
+        yPadding: 10,
+        displayColors: true,
+        callbacks: {
+          label: function(tooltipItem, data) {
+            var label = data.datasets[tooltipItem.datasetIndex].label || '';
+            var value = tooltipItem.yLabel;
+            return label + ': Rp ' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+          }
+        }
+      }
+    }
+  });
+
+  console.log('Chart initialized successfully!');
+});
+</script>
+@endpush
+
 @endsection
