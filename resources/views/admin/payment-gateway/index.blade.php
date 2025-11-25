@@ -33,14 +33,14 @@
                     <div class="card">
                         <div class="card-header">
                             <h4>Daftar Payment Gateway</h4>
-                            <div class="card-header-action">
-                        <button type="button" class="btn btn-success mr-2" data-toggle="modal" data-target="#addPaymentGatewayModal">
+                            <div class="card-header-action d-flex flex-wrap">
+                        <button type="button" class="btn btn-success mr-2 mb-2" data-toggle="modal" data-target="#addPaymentGatewayModal">
                             <i class="fas fa-plus"></i> Tambah Payment Gateway
                         </button>
-                        <a href="{{ route('admin.payment-gateways.config') }}" class="btn btn-warning mr-2">
+                        <a href="{{ route('admin.payment-gateways.config') }}" class="btn btn-warning mr-2 mb-2">
                             <i class="fas fa-cog"></i> Konfigurasi
                         </a>
-                        <div class="btn-group mr-2" role="group">
+                        <div class="btn-group mr-2 mb-2" role="group">
                             <button id="btnFetchMethods" type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-download"></i> Lihat Payment Method
                             </button>
@@ -53,7 +53,7 @@
                                 </button>
                             </div>
                         </div>
-                        <form id="sync-form" action="{{ route('admin.payment-gateways.sync') }}" method="POST" class="d-inline">
+                        <form id="sync-form" action="{{ route('admin.payment-gateways.sync') }}" method="POST" class="d-inline mb-2">
                             @csrf
                             <button type="button" id="sync-button" class="btn btn-primary">
                                 <i class="fas fa-sync"></i> Sinkronisasi Payment Gateway
@@ -155,11 +155,11 @@
             <div class="card">
                 <div class="card-header">
                     <h4>Daftar Payment Methods</h4>
-                    <div class="card-header-action">
-                        <button id="deleteSelectedMethods" type="button" class="btn btn-danger mr-2" disabled>
+                    <div class="card-header-action d-flex flex-wrap">
+                        <button id="deleteSelectedMethods" type="button" class="btn btn-danger mr-2 mb-2" disabled>
                             <i class="fas fa-trash"></i> Delete Selected (<span id="selected-count">0</span>)
                         </button>
-                        <div class="btn-group mr-2" role="group">
+                        <div class="btn-group mr-2 mb-2" role="group">
                             <button id="filterPaymentMethods" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-filter"></i> Filter Gateway: <span id="current-filter">Semua</span>
                             </button>
@@ -175,7 +175,7 @@
                                 @endforeach
                             </div>
                         </div>
-                        <div class="btn-group" role="group">
+                        <div class="btn-group mb-2" role="group">
                             <button id="btnAddMethods" type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-download"></i> Tambah Payment Method
                             </button>
