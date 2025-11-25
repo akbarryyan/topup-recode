@@ -120,7 +120,7 @@
                                                 @csrf
                                                 @method('PATCH')
                                                 <label class="custom-switch mt-2">
-                                                    <input type="checkbox" name="is_active" class="custom-switch-input" {{ $pg->is_active ? 'checked' : '' }} onchange="this.form.submit()">
+                                                    <input type="checkbox" name="is_active" class="custom-switch-input" {{ $pg->is_active ? 'checked' : '' }}>
                                                     <span class="custom-switch-indicator"></span>
                                                 </label>
                                             </form>
@@ -156,6 +156,9 @@
                 <div class="card-header">
                     <h4>Daftar Payment Methods</h4>
                     <div class="card-header-action">
+                        <button id="deleteSelectedMethods" type="button" class="btn btn-danger mr-2" disabled>
+                            <i class="fas fa-trash"></i> Delete Selected (<span id="selected-count">0</span>)
+                        </button>
                         <div class="btn-group mr-2" role="group">
                             <button id="filterPaymentMethods" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-filter"></i> Filter Gateway: <span id="current-filter">Semua</span>
@@ -197,6 +200,9 @@
                             <table class="table table-striped" id="payment-methods-table">
                                 <thead>
                                     <tr>
+                                        <th class="text-center" width="30">
+                                            <input type="checkbox" id="select-all-methods">
+                                        </th>
                                         <th class="text-center">#</th>
                                         <th>Gateway</th>
                                         <th>Logo</th>
@@ -211,6 +217,9 @@
                                 <tbody>
                                     @foreach($paymentMethods as $pm)
                                         <tr class="payment-method-row" data-gateway-id="{{ $pm->payment_gateway_id }}">
+                                            <td class="text-center">
+                                                <input type="checkbox" class="method-checkbox" value="{{ $pm->id }}">
+                                            </td>
                                             <td class="text-center">{{ $loop->iteration }}</td>
                                             <td>
                                                 <span class="badge badge-primary">{{ $pm->paymentGateway->name ?? '-' }}</span>
@@ -671,11 +680,10 @@
                 });
             });
 
-            // Handle toggle form submission with confirmation
-            $('.toggle-form').on('submit', function(e) {
-                e.preventDefault();
-                const form = this;
-                const checkbox = $(form).find('input[type="checkbox"]');
+            // Handle toggle checkbox change with confirmation
+            $('.toggle-form .custom-switch-input').on('change', function(e) {
+                const checkbox = $(this);
+                const form = checkbox.closest('.toggle-form');
                 const isChecked = checkbox.is(':checked');
                 const status = isChecked ? 'mengaktifkan' : 'menonaktifkan';
 
@@ -687,6 +695,8 @@
                     dangerMode: true,
                 }).then((willChange) => {
                     if (willChange) {
+                        // Unbind the change event to prevent infinite loop, then submit
+                        checkbox.off('change');
                         form.submit();
                     } else {
                         // Revert checkbox state if user cancels
@@ -695,10 +705,31 @@
                 });
             });
 
-            // Prevent toggle form submission on initial load change
-            $('.custom-switch-input').on('change', function(e) {
-                $(this).closest('form').submit();
+            // Handle payment method toggle checkbox change with confirmation
+            $('.toggle-method-form .custom-switch-input').on('change', function(e) {
+                const checkbox = $(this);
+                const form = checkbox.closest('.toggle-method-form');
+                const isChecked = checkbox.is(':checked');
+                const status = isChecked ? 'mengaktifkan' : 'menonaktifkan';
+
+                swal({
+                    title: 'Ubah Status?',
+                    text: `Anda yakin ingin ${status} payment method ini?`,
+                    icon: 'warning',
+                    buttons: ['Batal', 'Ya, Ubah!'],
+                    dangerMode: true,
+                }).then((willChange) => {
+                    if (willChange) {
+                        // Unbind the change event to prevent infinite loop, then submit
+                        checkbox.off('change');
+                        form.submit();
+                    } else {
+                        // Revert checkbox state if user cancels
+                        checkbox.prop('checked', !isChecked);
+                    }
+                });
             });
+
 
             // Handle Fetch Payment Methods
             let paymentMethodsData = [];
@@ -997,10 +1028,111 @@
                     $(`.payment-method-row[data-gateway-id="${gatewayId}"]`).show();
                 }
                 
-                // Update numbering
+                // Update numbering (skip checkbox column)
                 let visibleIndex = 1;
                 $('.payment-method-row:visible').each(function() {
-                    $(this).find('td:first').text(visibleIndex++);
+                    $(this).find('td:eq(1)').text(visibleIndex++);
+                });
+            });
+
+            // ========== MASS DELETE PAYMENT METHODS ==========
+            // Handle "Select All" checkbox
+            $('#select-all-methods').on('change', function() {
+                const isChecked = $(this).is(':checked');
+                $('.payment-method-row:visible .method-checkbox').prop('checked', isChecked);
+                updateSelectedCount();
+            });
+
+            // Handle individual checkbox changes
+            $(document).on('change', '.method-checkbox', function() {
+                updateSelectedCount();
+                
+                // Update "select all" checkbox state
+                const totalVisible = $('.payment-method-row:visible .method-checkbox').length;
+                const totalChecked = $('.payment-method-row:visible .method-checkbox:checked').length;
+                $('#select-all-methods').prop('checked', totalVisible > 0 && totalVisible === totalChecked);
+            });
+
+            // Update selected count and button state
+            function updateSelectedCount() {
+                const count = $('.method-checkbox:checked').length;
+                $('#selected-count').text(count);
+                $('#deleteSelectedMethods').prop('disabled', count === 0);
+            }
+
+            // Handle Delete Selected button
+            $('#deleteSelectedMethods').on('click', function() {
+                const selectedIds = [];
+                $('.method-checkbox:checked').each(function() {
+                    selectedIds.push($(this).val());
+                });
+
+                if (selectedIds.length === 0) {
+                    swal({
+                        title: 'Peringatan!',
+                        text: 'Pilih minimal 1 payment method untuk dihapus.',
+                        icon: 'warning',
+                        button: 'OK'
+                    });
+                    return;
+                }
+
+                swal({
+                    title: 'Hapus Payment Methods?',
+                    text: `Anda yakin ingin menghapus ${selectedIds.length} payment method yang dipilih? Data yang dihapus tidak dapat dikembalikan!`,
+                    icon: 'warning',
+                    buttons: ['Batal', 'Ya, Hapus!'],
+                    dangerMode: true,
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        // Show loading
+                        $('#deleteSelectedMethods').addClass('btn-progress').prop('disabled', true);
+
+                        $.ajax({
+                            url: '{{ route("admin.payment-methods.mass-destroy") }}',
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            data: {
+                                ids: selectedIds
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    swal({
+                                        title: 'Berhasil!',
+                                        text: response.message,
+                                        icon: 'success',
+                                        timer: 2000,
+                                        buttons: false
+                                    }).then(function() {
+                                        location.reload();
+                                    });
+                                } else {
+                                    $('#deleteSelectedMethods').removeClass('btn-progress').prop('disabled', false);
+                                    swal({
+                                        title: 'Gagal!',
+                                        text: response.message || 'Terjadi kesalahan saat menghapus data.',
+                                        icon: 'error',
+                                        button: 'OK'
+                                    });
+                                }
+                            },
+                            error: function(xhr) {
+                                $('#deleteSelectedMethods').removeClass('btn-progress').prop('disabled', false);
+                                let message = 'Terjadi kesalahan saat menghapus data.';
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    message = xhr.responseJSON.message;
+                                }
+                                swal({
+                                    title: 'Gagal!',
+                                    text: message,
+                                    icon: 'error',
+                                    button: 'OK'
+                                });
+                            }
+                        });
+                    }
                 });
             });
 

@@ -482,6 +482,23 @@ class PaymentGatewayController extends Controller
         return back()->with('success', 'Payment method berhasil dihapus.');
     }
 
+    public function massDestroyMethods(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'required|integer|exists:payment_methods,id'
+        ]);
+
+        $count = PaymentMethod::whereIn('id', $validated['ids'])->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => "{$count} payment method berhasil dihapus.",
+            'count' => $count
+        ]);
+    }
+
+
     public function fetchTripayPaymentChannels()
     {
         // Get Tripay configuration from database

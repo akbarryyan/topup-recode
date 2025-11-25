@@ -44,14 +44,14 @@
             <div class="col-lg-3 col-md-6 col-sm-6 col-12">
               <div class="card card-statistic-1">
                 <div class="card-icon bg-danger">
-                  <i class="far fa-newspaper"></i>
+                  <i class="fas fa-credit-card"></i>
                 </div>
                 <div class="card-wrap">
                   <div class="card-header">
-                    <h4>Total Berita</h4>
+                    <h4>Total Payment Channel</h4>
                   </div>
                   <div class="card-body">
-                    {{ number_format($stats['total_news']) }}
+                    {{ number_format($stats['total_payment_methods']) }}
                   </div>
                 </div>
               </div>

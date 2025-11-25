@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\GameService;
 use App\Models\GameTransaction;
-use App\Models\News;
+use App\Models\PaymentMethod;
 use App\Models\PrepaidService;
 use App\Models\PrepaidTransaction;
 use App\Models\User;
@@ -16,7 +16,7 @@ class DashboardController extends Controller
     {
         $stats = [
             'total_users' => User::where('role', 'user')->count(),
-            'total_news' => News::count(),
+            'total_payment_methods' => PaymentMethod::count(),
             'total_prepaid_services' => PrepaidService::count(),
             'total_game_services' => GameService::count(),
         ];

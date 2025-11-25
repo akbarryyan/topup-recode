@@ -154,6 +154,7 @@ Route::prefix('admin')->middleware('web')->group(function () {
         Route::prefix('payment-methods')->name('admin.payment-methods.')->group(function () {
             Route::patch('/{id}/toggle', [PaymentGatewayController::class, 'toggleMethodStatus'])->name('toggle');
             Route::put('/{id}', [PaymentGatewayController::class, 'updateMethod'])->name('update');
+            Route::delete('/mass-delete', [PaymentGatewayController::class, 'massDestroyMethods'])->name('mass-destroy');
             Route::delete('/{id}', [PaymentGatewayController::class, 'destroyMethod'])->name('destroy');
         });
 
