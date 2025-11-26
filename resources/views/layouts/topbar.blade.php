@@ -66,7 +66,7 @@
                                 <i class="ri-wallet-3-line"></i>
                                 <span>Saldo</span>
                             </div>
-                            <span class="font-semibold">Rp 0</span>
+                            <span class="font-semibold">Rp {{ number_format($currentUser->balance ?? 0, 0, ',', '.') }}</span>
                         </div>
                         <a href="{{ url('/profile') }}" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
                             <i class="ri-user-line"></i>
@@ -112,7 +112,7 @@
                                 <i class="ri-wallet-3-line"></i>
                                 <span>Saldo</span>
                             </div>
-                            <span class="font-semibold">Rp 0</span>
+                            <span class="font-semibold">Rp {{ number_format($currentUser->balance ?? 0, 0, ',', '.') }}</span>
                         </div>
                         <a href="{{ url('/profile') }}" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
                             <i class="ri-user-line"></i>
