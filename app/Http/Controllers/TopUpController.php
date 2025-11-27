@@ -61,8 +61,8 @@ class TopUpController extends Controller
                 'customerVaName' => $user->name,
                 'email' => $user->email,
                 'phoneNumber' => $user->phone ?? '',
-                'callbackUrl' => url('/payment/duitku/callback'), // Use absolute URL for callback
-                'returnUrl' => url('/payment/duitku/redirect'), // Use absolute URL for redirect
+                'callbackUrl' => url('/payment/callback'), // Use absolute URL for callback
+                'returnUrl' => url('/invoices'), // Use absolute URL for redirect
                 'expiryPeriod' => 60, // 60 minutes
                 'itemDetails' => [
                     [

@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Mutation;
-use App\Models\PaymentMethod;
 use Illuminate\Http\Request;
+use App\Models\PaymentMethod;
+use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
@@ -237,7 +238,7 @@ class ProfileController extends Controller
 
             return redirect()->route('profile', ['tab' => 'settings'])->with('success', 'Profile berhasil diperbarui!');
         } catch (\Exception $e) {
-            \Log::error('Profile Update Error', [
+            Log::error('Profile Update Error', [
                 'user_id' => $user->id,
                 'error' => $e->getMessage(),
             ]);

@@ -432,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         // Submit order
-        fetch('{{ route("order.prepaid.store") }}', {
+        fetch('{{ localized_url("/order/prepaid") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -456,36 +456,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 const trxid = data.data.trxid;
                 sessionStorage.setItem('pending_trxid', trxid);
                 
-                if (typeof swal !== 'undefined') {
-                    swal({
-                        title: 'Berhasil!',
-                        text: 'Pesanan berhasil dibuat. Mengalihkan ke halaman pembayaran...',
-                        icon: 'success',
-                        buttons: false,
-                        timer: 2000
-                    }).then(() => {
-                        window.location.href = data.data.payment_url || data.data.redirect_url;
-                    });
-                } else {
-                    alert('Pesanan berhasil! Mengalihkan...');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Pesanan berhasil dibuat. Mengalihkan ke halaman pembayaran...',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true
+                }).then(() => {
                     window.location.href = data.data.payment_url || data.data.redirect_url;
-                }
+                });
             } else {
                 throw new Error((data && data.message) || 'Terjadi kesalahan saat memproses pesanan');
             }
         })
         .catch(error => {
             console.error('Order Error:', error);
-            if (typeof swal !== 'undefined') {
-                swal({
-                    title: 'Gagal!',
-                    text: error.message || 'Terjadi kesalahan sistem',
-                    icon: 'error',
-                    button: 'OK'
-                });
-            } else {
-                alert('Gagal: ' + (error.message || 'Terjadi kesalahan sistem'));
-            }
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: error.message || 'Terjadi kesalahan sistem',
+                confirmButtonColor: '#ef4444'
+            });
         })
         .finally(() => {
             // Reset button
@@ -553,7 +545,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                 // window.location.href = '/invoices';
                             });
                         } else {
-                            alert('Pembayaran Berhasil! Pesanan Anda sedang diproses.');
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Pembayaran Berhasil!',
+                                text: 'Pesanan Anda sedang diproses.',
+                                confirmButtonColor: '#10b981'
+                            });
                         }
                     } else if (status === 'failed') {
                         // Payment failed
@@ -568,7 +565,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                 button: 'OK'
                             });
                         } else {
-                            alert('Pembayaran Gagal atau Dibatalkan');
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Pembayaran Gagal!',
+                                text: 'Pembayaran dibatalkan atau gagal diproses.',
+                                confirmButtonColor: '#ef4444'
+                            });
                         }
                     }
                 }

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('prepaid_transactions', function (Blueprint $table) {
             $table->id();
             $table->string('trxid')->unique()->index();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null'); // Allow guest orders
             $table->string('service_code'); // kode layanan
             $table->string('service_name'); // nama layanan
             $table->string('data_no'); // nomor tujuan

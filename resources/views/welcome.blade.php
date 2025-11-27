@@ -312,7 +312,7 @@
                     if (gameName) {
                         // Convert game name to URL-friendly format (lowercase, replace spaces with hyphens)
                         const gameSlug = gameName.toLowerCase().replace(/\s+/g, '-');
-                        window.location.href = `/order/${gameSlug}`;
+                        window.location.href = `/{{ app()->getLocale() }}/order/${gameSlug}`;
                     }
                 });
             });
@@ -324,7 +324,7 @@
                     if (brandName) {
                         // Convert brand name to URL-friendly format (lowercase, replace spaces with hyphens)
                         const brandSlug = brandName.toLowerCase().replace(/\s+/g, '-');
-                        window.location.href = `/order/prepaid/${brandSlug}`;
+                        window.location.href = `/{{ app()->getLocale() }}/order/prepaid/${brandSlug}`;
                     }
                 });
             });

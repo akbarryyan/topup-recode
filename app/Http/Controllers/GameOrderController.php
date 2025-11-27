@@ -35,7 +35,7 @@ class GameOrderController extends Controller
             'payment_method_id' => 'required|exists:payment_methods,id',
         ]);
 
-        $user = $request->user();
+        $user = $request->user(); // Can be null for guest users
 
         try {
             DB::beginTransaction();
@@ -51,8 +51,9 @@ class GameOrderController extends Controller
                 ->where('is_active', true)
                 ->firstOrFail();
 
-            // Calculate final price based on user role
-            $servicePrice = $service->calculateFinalPrice($user->role ?? 'member');
+            // Calculate final price based on user role (guest = 'member')
+            $userRole = $user ? $user->role : 'member';
+            $servicePrice = $service->calculateFinalPrice($userRole);
             
             // Calculate payment fee
             $paymentFee = $paymentMethod->total_fee;
@@ -77,14 +78,14 @@ class GameOrderController extends Controller
             // Create transaction
             $transaction = GameTransaction::create([
                 'trxid' => $trxid,
-                'user_id' => $user->id,
+                'user_id' => $user ? $user->id : null, // Allow guest orders
                 'service_code' => $service->code,
                 'service_name' => $service->name,
                 'data_no' => $userId,
                 'data_zone' => $zoneId,
                 'status' => 'waiting', // Waiting for payment
                 'price' => $servicePrice,
-                'balance' => $user->balance,
+                'balance' => $user ? $user->balance : 0,
                 'note' => json_encode([
                     'game' => $validated['game'],
                     'whatsapp' => $validated['whatsapp'] ?? null,
@@ -108,9 +109,9 @@ class GameOrderController extends Controller
                 'productDetails' => "Pembelian {$validated['game']} - {$service->name}",
                 'email' => $validated['email'],
                 'phoneNumber' => $validated['whatsapp'] ?? '081234567890', // Default if empty
-                'customerVaName' => $user->name,
-                'callbackUrl' => route('payment.callback'),
-                'returnUrl' => route('invoices'),
+                'customerVaName' => $user ? $user->name : 'Guest',
+                'callbackUrl' => url('/payment/callback'),
+                'returnUrl' => url('/invoices'),
                 'expiryPeriod' => 60, // 60 minutes
             ];
 
@@ -140,7 +141,7 @@ class GameOrderController extends Controller
 
             Log::info('Game Order Created', [
                 'trxid' => $trxid,
-                'user_id' => $user->id,
+                'user_id' => $user ? $user->id : null,
                 'service' => $service->name,
                 'amount' => $totalAmount,
             ]);
@@ -158,7 +159,7 @@ class GameOrderController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Game Order Error', [
-                'user_id' => $user->id,
+                'user_id' => $user ? $user->id : null,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);

@@ -51,11 +51,11 @@
                                 </tr>
                                 <tr>
                                     <th>Saldo Sebelum</th>
-                                    <td>Rp {{ number_format($mutation->balance_before, 0, ',', '.') }}</td>
+                                    <td>Rp {{ number_format((float) $mutation->balance_before, 0, ',', '.') }}</td>
                                 </tr>
                                 <tr>
                                     <th>Saldo Setelah</th>
-                                    <td><strong>Rp {{ number_format($mutation->balance_after, 0, ',', '.') }}</strong></td>
+                                    <td><strong>Rp {{ number_format((float) $mutation->balance_after, 0, ',', '.') }}</strong></td>
                                 </tr>
                                 <tr>
                                     <th>Deskripsi</th>
@@ -107,7 +107,7 @@
                             @if($mutation->metadata)
                                 <hr>
                                 <h6>Metadata</h6>
-                                <pre class="bg-light p-3 rounded">{{ json_encode(is_string($mutation->metadata) ? json_decode($mutation->metadata) : $mutation->metadata, JSON_PRETTY_PRINT) }}</pre>
+                                <pre class="bg-light p-3 rounded">{{ json_encode(is_array($mutation->metadata) ? $mutation->metadata : json_decode($mutation->metadata ?? '{}'), JSON_PRETTY_PRINT) }}</pre>
                             @endif
                         </div>
                     </div>

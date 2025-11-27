@@ -22,7 +22,7 @@
                 
                 @foreach($popularGamesMap as $dbName => $gameInfo)
                     @if(isset($popularGameData[$dbName]))
-                        <div class="carousel-card absolute transition-all duration-700 ease-out w-[200px] h-[280px] rounded-xl overflow-hidden shadow-2xl cursor-pointer" onclick="window.location.href='/order/{{ $gameInfo['slug'] }}'">
+                        <div class="carousel-card absolute transition-all duration-700 ease-out w-[200px] h-[280px] rounded-xl overflow-hidden shadow-2xl cursor-pointer" onclick="window.location.href='/{{ app()->getLocale() }}/order/{{ $gameInfo['slug'] }}'">
                             <div class="relative h-full">
                                 <img src="{{ asset('storage/game-images/' . $popularGameData[$dbName]->image) }}" 
                                      alt="{{ $gameInfo['display'] }}" 

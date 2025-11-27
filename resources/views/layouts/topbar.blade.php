@@ -31,9 +31,34 @@
         <!-- Right Side Actions -->
         <div class="flex items-center gap-4">
             <!-- Language Selector (Desktop only) -->
-            <div class="hidden lg:flex items-center gap-2 text-gray-300">
-                <img src="https://flagcdn.com/w40/id.png" alt="ID" class="w-5 h-5 rounded-full">
-                <span class="text-sm font-medium">EN / IDR</span>
+            <div class="hidden lg:relative lg:block">
+                <button id="languageToggle" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
+                    @if(app()->getLocale() === 'en')
+                        <img src="https://flagcdn.com/w40/gb.png" alt="EN" class="w-5 h-5 rounded-full">
+                        <span class="text-sm font-medium">EN</span>
+                    @else
+                        <img src="https://flagcdn.com/w40/id.png" alt="ID" class="w-5 h-5 rounded-full">
+                        <span class="text-sm font-medium">ID</span>
+                    @endif
+                    <i class="ri-arrow-down-s-line text-sm"></i>
+                </button>
+                
+                <div id="languageDropdown" class="hidden absolute right-0 mt-2 w-40 bg-[#1F1F23] rounded-lg border border-white/10 shadow-2xl py-2 z-50">
+                    <a href="{{ url('/locale/id') }}" class="flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-white/5 hover:text-white transition-colors">
+                        <img src="https://flagcdn.com/w40/id.png" alt="ID" class="w-5 h-5 rounded-full">
+                        <span class="text-sm">Indonesia</span>
+                        @if(app()->getLocale() === 'id')
+                            <i class="ri-check-line ml-auto text-green-500"></i>
+                        @endif
+                    </a>
+                    <a href="{{ url('/locale/en') }}" class="flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-white/5 hover:text-white transition-colors">
+                        <img src="https://flagcdn.com/w40/gb.png" alt="EN" class="w-5 h-5 rounded-full">
+                        <span class="text-sm">English</span>
+                        @if(app()->getLocale() === 'en')
+                            <i class="ri-check-line ml-auto text-green-500"></i>
+                        @endif
+                    </a>
+                </div>
             </div>
 
             <!-- Sign In / Account Button (Desktop only) -->
@@ -68,7 +93,7 @@
                             </div>
                             <span class="font-semibold">Rp {{ number_format($currentUser->balance ?? 0, 0, ',', '.') }}</span>
                         </div>
-                        <a href="{{ url('/profile') }}" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
+                        <a href="{{ localized_url('/profile') }}" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
                             <i class="ri-user-line"></i>
                             <span>Profil</span>
                         </a>
@@ -141,15 +166,15 @@
 
     <!-- Bottom Section: Navigation Menu (Desktop only) -->
     <nav class="hidden lg:flex items-center justify-start gap-8 px-8">
-        <a href="{{ url('/') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->is('/') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
+        <a href="{{ localized_url('/') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->is('/') || request()->is(app()->getLocale()) || request()->is(app()->getLocale() . '/') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
             <i class="ri-dashboard-line text-[16px]"></i>
             <span class="text-sm font-medium">Dashboard</span>
         </a>
-        <a href="{{ route('invoices') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->routeIs('invoices') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
+        <a href="{{ localized_url('/check-invoice') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->is('*/check-invoice') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
             <i class="ri-file-list-3-line text-[16px]"></i>
             <span class="text-sm font-medium">Check Invoice</span>
         </a>
-        <a href="{{ route('leaderboard') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->routeIs('leaderboard') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
+        <a href="{{ localized_url('/leaderboard') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->is('*/leaderboard') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
             <i class="ri-trophy-line text-[16px]"></i>
             <span class="text-sm font-medium">Leaderboard</span>
         </a>
@@ -166,11 +191,11 @@
             </div>
         </div>
 
-        <a href="{{ route('article') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->routeIs('article') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
+        <a href="{{ localized_url('/article') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->is('*/article') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
             <i class="ri-article-line text-[16px]"></i>
             <span class="text-sm font-medium">Articles</span>
         </a>
-        <a href="{{ route('contact-us') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->routeIs('contact-us') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
+        <a href="{{ localized_url('/contact-us') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->is('*/contact-us') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
             <i class="ri-customer-service-2-line text-[16px]"></i>
             <span class="text-sm font-medium">Contact Us</span>
         </a>
@@ -198,19 +223,19 @@
         <!-- Menu Items -->
         <nav class="space-y-0">
             <!-- Home -->
-            <a href="{{ url('/') }}" class="flex items-center gap-4 px-4 py-3 text-white hover:bg-[#27272A] rounded-lg transition-colors group">
+            <a href="{{ localized_url('/') }}" class="flex items-center gap-4 px-4 py-3 text-white hover:bg-[#27272A] rounded-lg transition-colors group">
                 <i class="ri-home-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
                 <span class="font-medium">Beranda</span>
             </a>
 
             <!-- Check Invoice -->
-            <a href="{{ route('invoices') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
+            <a href="{{ localized_url('/invoices') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
                 <i class="ri-file-list-3-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
                 <span class="font-medium">Cek Invoice</span>
             </a>
 
             <!-- Leaderboard -->
-            <a href="{{ route('leaderboard') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
+            <a href="{{ localized_url('/leaderboard') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
                 <i class="ri-trophy-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
                 <span class="font-medium">Leaderboard</span>
             </a>
@@ -231,20 +256,20 @@
             </div>
 
             <!-- Articles -->
-            <a href="{{ route('article') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
+            <a href="{{ localized_url('/article') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
                 <i class="ri-article-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
                 <span class="font-medium">Artikel</span>
             </a>
 
             <!-- Contact Us -->
-            <a href="{{ route('contact-us') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
+            <a href="{{ localized_url('/contact-us') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
                 <i class="ri-customer-service-2-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
                 <span class="font-medium">Hubungi Kami</span>
             </a>
 
             @auth
             <div class="mt-6 mb-2 px-4 text-xs font-semibold tracking-wide text-gray-500">Akun Saya</div>
-            <a href="{{ url('/profile') }}" class="flex items-center gap-4 px-4 py-3 text-white hover:bg-[#27272A] rounded-lg transition-colors group">
+            <a href="{{ localized_url('/profile') }}" class="flex items-center gap-4 px-4 py-3 text-white hover:bg-[#27272A] rounded-lg transition-colors group">
                 <i class="ri-user-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
                 <span class="font-medium">Profile</span>
             </a>
@@ -365,5 +390,32 @@
                 }
             });
         }
+        
+        // Language dropdown toggle
+        const languageToggle = document.getElementById('languageToggle');
+        const languageDropdown = document.getElementById('languageDropdown');
+        
+        if (languageToggle && languageDropdown) {
+            languageToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                languageDropdown.classList.toggle('hidden');
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!languageDropdown.contains(e.target) && !languageToggle.contains(e.target)) {
+                    languageDropdown.classList.add('hidden');
+                }
+            });
+        }
+        
+        // Update ESC key handler to include language dropdown
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeMenuFunc();
+                hideDropdown(accountDropdown);
+                hideDropdown(desktopAccountDropdown);
+                hideDropdown(languageDropdown);
+            }
+        });
     });
 </script>

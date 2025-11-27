@@ -473,8 +473,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to attach click handlers to item cards
     function attachItemClickHandlers() {
-        document.querySelectorAll('.item-card').forEach(card => {
+        const itemCards = document.querySelectorAll('.item-card');
+        console.log('Attaching handlers to', itemCards.length, 'item cards');
+        
+        itemCards.forEach(card => {
             card.addEventListener('click', function() {
+                console.log('Item clicked:', this.dataset.name);
                 // Remove selection from all cards
                 if (isMobileLegends && currentCategory === 'instant') {
                     document.querySelectorAll('.item-card').forEach(c => {
@@ -520,7 +524,10 @@ document.addEventListener('DOMContentLoaded', function() {
         renderItems(currentCategory);
     } else {
         // For non-Mobile Legends games, attach handlers to existing items
-        attachItemClickHandlers();
+        console.log('Initializing handlers for non-ML game');
+        setTimeout(() => {
+            attachItemClickHandlers();
+        }, 100);
     }
     
     // Handle payment method selection
@@ -621,30 +628,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         if (!selectedItem) {
-            if (typeof swal !== 'undefined') {
-                swal({
-                    title: 'Oops!',
-                    text: 'Silakan pilih item terlebih dahulu',
-                    icon: 'warning',
-                    button: 'OK'
-                });
-            } else {
-                alert('Silakan pilih item terlebih dahulu');
-            }
+            Swal.fire({
+                icon: 'warning',
+                title: 'Oops!',
+                text: 'Silakan pilih item terlebih dahulu',
+                confirmButtonColor: '#3b82f6'
+            });
             return;
         }
 
         if (!selectedPayment) {
-            if (typeof swal !== 'undefined') {
-                swal({
-                    title: 'Oops!',
-                    text: 'Silakan pilih metode pembayaran',
-                    icon: 'warning',
-                    button: 'OK'
-                });
-            } else {
-                alert('Silakan pilih metode pembayaran');
-            }
+            Swal.fire({
+                icon: 'warning',
+                title: 'Oops!',
+                text: 'Silakan pilih metode pembayaran',
+                confirmButtonColor: '#3b82f6'
+            });
             return;
         }
         
@@ -666,7 +665,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         // Submit order
-        fetch('{{ route("order.game.store") }}', {
+        fetch('{{ localized_url("/order/game") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -690,36 +689,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 const trxid = data.data.trxid;
                 sessionStorage.setItem('pending_trxid', trxid);
                 
-                if (typeof swal !== 'undefined') {
-                    swal({
-                        title: 'Berhasil!',
-                        text: 'Pesanan berhasil dibuat. Mengalihkan ke halaman pembayaran...',
-                        icon: 'success',
-                        buttons: false,
-                        timer: 2000
-                    }).then(() => {
-                        window.location.href = data.data.payment_url || data.data.redirect_url;
-                    });
-                } else {
-                    alert('Pesanan berhasil! Mengalihkan...');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Pesanan berhasil dibuat. Mengalihkan ke halaman pembayaran...',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true
+                }).then(() => {
                     window.location.href = data.data.payment_url || data.data.redirect_url;
-                }
+                });
             } else {
                 throw new Error((data && data.message) || 'Terjadi kesalahan saat memproses pesanan');
             }
         })
         .catch(error => {
             console.error('Order Error:', error);
-            if (typeof swal !== 'undefined') {
-                swal({
-                    title: 'Gagal!',
-                    text: error.message || 'Terjadi kesalahan sistem',
-                    icon: 'error',
-                    button: 'OK'
-                });
-            } else {
-                alert('Gagal: ' + (error.message || 'Terjadi kesalahan sistem'));
-            }
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: error.message || 'Terjadi kesalahan sistem',
+                confirmButtonColor: '#ef4444'
+            });
         })
         .finally(() => {
             // Reset button
@@ -776,34 +767,26 @@ document.addEventListener('DOMContentLoaded', function() {
                         clearInterval(pollTimer);
                         sessionStorage.removeItem('pending_trxid');
                         
-                        if (typeof swal !== 'undefined') {
-                            swal({
-                                title: 'Pembayaran Berhasil!',
-                                text: `Pesanan ${data.data.service_name} telah dibayar. Pesanan Anda sedang diproses.`,
-                                icon: 'success',
-                                button: 'OK'
-                            }).then(() => {
-                                // Optionally redirect to invoices
-                                // window.location.href = '/invoices';
-                            });
-                        } else {
-                            alert('Pembayaran Berhasil! Pesanan Anda sedang diproses.');
-                        }
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Pembayaran Berhasil!',
+                            text: `Pesanan ${data.data.service_name} telah dibayar. Pesanan Anda sedang diproses.`,
+                            confirmButtonColor: '#10b981'
+                        }).then(() => {
+                            // Optionally redirect to invoices
+                            // window.location.href = '/invoices';
+                        });
                     } else if (status === 'failed') {
                         // Payment failed
                         clearInterval(pollTimer);
                         sessionStorage.removeItem('pending_trxid');
                         
-                        if (typeof swal !== 'undefined') {
-                            swal({
-                                title: 'Pembayaran Gagal',
-                                text: 'Pembayaran Anda gagal atau dibatalkan.',
-                                icon: 'error',
-                                button: 'OK'
-                            });
-                        } else {
-                            alert('Pembayaran Gagal atau Dibatalkan');
-                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Pembayaran Gagal',
+                            text: 'Pembayaran Anda gagal atau dibatalkan.',
+                            confirmButtonColor: '#ef4444'
+                        });
                     }
                 }
             })

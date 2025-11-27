@@ -180,7 +180,7 @@ class DuitkuService
 
             $result = $response->json();
 
-            if ($response->successful() && isset($result['statusCode']) && $result['statusCode'] === '00') {
+            if ($response->successful() && isset($result['statusCode'])) {
                 return [
                     'success' => true,
                     'data' => $result,

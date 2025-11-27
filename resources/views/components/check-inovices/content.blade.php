@@ -10,7 +10,7 @@
             <!-- Input Search -->
             <div class="bg-[#080808] px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-6 rounded-lg">
                 <div class="flex justify-center items-center">
-                    <form action="{{ route('invoices') }}" method="GET" class="w-full max-w-xl">
+                    <form action="{{ route('check-invoice') }}" method="GET" class="w-full max-w-xl">
                         <input type="text" name="invoice_number" value="{{ request('invoice_number') }}" placeholder="Masukkan nomor invoice" 
                             class="w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-[#0E0E10] border border-gray-600 text-white placeholder-gray-400 text-xs sm:text-sm focus:border-gray-400 focus:outline-none transition" 
                             required>

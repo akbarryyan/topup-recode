@@ -9,6 +9,7 @@ use App\Models\PaymentMethod;
 use App\Models\PrepaidService;
 use App\Models\WebsiteSetting;
 use App\Models\GameAccountField;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ArticleController;
@@ -25,6 +26,40 @@ View::composer('*', function ($view) {
     $view->with('websitePhone', WebsiteSetting::get('website_phone', '6282227113307'));
     $view->with('websiteAddress', WebsiteSetting::get('website_address', 'Medan Sunggal, Kota Medan, Sumatera Utara 20122'));
 });
+
+// Locale switching route (outside locale group)
+Route::get('/locale/{locale}', [App\Http\Controllers\LocaleController::class, 'switch'])->name('locale.switch');
+
+// Payment Callback Routes (MUST be outside locale group - no /id or /en prefix)
+// Duitku Callback - Server to Server (POST)
+Route::post('/payment/duitku/callback', [App\Http\Controllers\TopUpController::class, 'callback'])
+    ->middleware('duitku.ip')
+    ->name('topup.callback');
+
+// Unified Payment Callback - Handles TopUp, Game, and Prepaid transactions
+Route::post('/payment/callback', [App\Http\Controllers\PaymentCallbackController::class, 'handle'])
+    ->middleware('duitku.ip')
+    ->name('payment.callback');
+
+// Duitku Redirect - User Return URL (GET)
+Route::get('/payment/duitku/redirect', [App\Http\Controllers\TopUpController::class, 'redirect'])
+    ->name('topup.redirect');
+
+// Invoices route (outside locale group for direct access from payment gateway)
+Route::any('/invoices', function () {
+    if (!Auth::check()) {
+        // Detect locale from session or default to 'id'
+        $locale = session('locale', 'id');
+        return redirect()->to('/' . $locale . '/auth/login');
+    }
+    
+    // Redirect to profile with locale
+    $locale = session('locale', 'id');
+    return redirect()->to('/' . $locale . '/profile?' . http_build_query(array_merge(['tab' => 'transactions'], request()->query())));
+})->name('invoices');
+
+// Routes with optional locale prefix (supports both /id and /en)
+Route::group(['prefix' => '{locale?}', 'where' => ['locale' => 'id|en']], function () {
 
 Route::get('/', function () {
     // Get active game services grouped by game
@@ -78,44 +113,26 @@ Route::middleware('guest')->group(function () {
 Route::post('/auth/logout', [AuthenticatedSessionController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
-    
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     
     // Top Up routes
     Route::post('/topup/create', [App\Http\Controllers\TopUpController::class, 'create'])->name('topup.create');
-    
-    // Game Order routes
-    Route::post('/order/game', [App\Http\Controllers\GameOrderController::class, 'store'])->name('order.game.store');
-    
-    // Prepaid Order routes
-    Route::post('/order/prepaid', [App\Http\Controllers\PrepaidOrderController::class, 'store'])->name('order.prepaid.store');
 
 });
 
-// Duitku Callback - Server to Server (POST)
-// Protected by IP whitelist middleware
-Route::post('/payment/duitku/callback', [App\Http\Controllers\TopUpController::class, 'callback'])
-    ->middleware('duitku.ip')
-    ->name('topup.callback');
-
-// Unified Payment Callback - Handles TopUp, Game, and Prepaid transactions
-Route::post('/payment/callback', [App\Http\Controllers\PaymentCallbackController::class, 'handle'])
-    ->middleware('duitku.ip')
-    ->name('payment.callback');
-
-// Duitku Redirect - User Return URL (GET)
-// No authentication required as user may be redirected from external payment page
-Route::get('/payment/duitku/redirect', [App\Http\Controllers\TopUpController::class, 'redirect'])
-    ->name('topup.redirect');
+// Order routes - No authentication required (guest checkout)
+Route::post('/order/game', [App\Http\Controllers\GameOrderController::class, 'store'])->name('order.game.store');
+Route::post('/order/prepaid', [App\Http\Controllers\PrepaidOrderController::class, 'store'])->name('order.prepaid.store');
 
 // Transaction Status Check - For frontend polling
 Route::get('/api/transaction/status/{trxid}', [App\Http\Controllers\TransactionStatusController::class, 'check'])
     ->middleware('auth')
     ->name('transaction.status');
 
-Route::get('/invoices', [App\Http\Controllers\InvoiceController::class, 'index'])->name('invoices');
+Route::get('/check-invoice', [App\Http\Controllers\InvoiceController::class, 'index'])->name('check-invoice');
 Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard');
 Route::get('/leaderboard/data/{period}', [LeaderboardController::class, 'getData'])->name('leaderboard.data');
 Route::get('/article', [ArticleController::class, 'index'])->name('article');
@@ -123,7 +140,7 @@ Route::get('/contact-us', [ContactController::class, 'index'])->name('contact-us
 Route::post('/contact-us', [ContactController::class, 'store'])->name('contact-us.store');
 
 // Order Game Route
-Route::get('/order/{gameSlug}', function ($gameSlug) {
+Route::get('/order/{gameSlug}', function ($locale = null, $gameSlug) {
     // Convert slug back to game name (e.g., 'free-fire' -> 'Free Fire')
     // Try to find game by matching slug pattern
     $allGames = GameService::select('game')
@@ -208,7 +225,7 @@ Route::get('/order/{gameSlug}', function ($gameSlug) {
 })->name('order.game');
 
 // Order Prepaid Route (Pulsa & Data)
-Route::get('/order/prepaid/{brandSlug}', function ($brandSlug) {
+Route::get('/order/prepaid/{brandSlug}', function ($locale = null, $brandSlug) {
     // Convert slug back to brand name
     $allBrands = PrepaidService::select('brand')
         ->where('is_active', true)
@@ -271,3 +288,5 @@ Route::get('/order/prepaid/{brandSlug}', function ($brandSlug) {
         'paymentMethods' => $paymentMethods,
     ]);
 })->name('order.prepaid');
+
+}); // End of locale route group

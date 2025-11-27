@@ -37,7 +37,7 @@ class PrepaidOrderController extends Controller
             'payment_method_id' => 'required|exists:payment_methods,id',
         ]);
 
-        $user = $request->user();
+        $user = $request->user(); // Can be null for guest users
 
         try {
             DB::beginTransaction();
@@ -53,10 +53,9 @@ class PrepaidOrderController extends Controller
                 ->where('is_active', true)
                 ->firstOrFail();
 
-            // Calculate final price (service price + payment fee)
-            // Note: Prepaid service price is fixed, not based on role for now as per previous logic
-            // But we should respect the previous logic if it was intended
-            $servicePrice = $service->price_basic; // Using price_basic from DB directly as per route logic
+            // Calculate final price based on user role (guest = 'member')
+            $userRole = $user ? $user->role : 'member';
+            $servicePrice = $service->calculateFinalPrice($userRole);
             
             // Calculate payment fee
             $paymentFee = $paymentMethod->total_fee;
@@ -76,13 +75,13 @@ class PrepaidOrderController extends Controller
             // Create transaction with pending status
             $transaction = PrepaidTransaction::create([
                 'trxid' => $trxid,
-                'user_id' => $user->id,
+                'user_id' => $user ? $user->id : null, // Allow guest orders
                 'service_code' => $service->code,
                 'service_name' => $service->name,
                 'data_no' => $validated['phone_number'],
                 'status' => 'waiting', // Waiting for payment
                 'price' => $servicePrice,
-                'balance' => $user->balance, // Snapshot of balance (not used for payment)
+                'balance' => $user ? $user->balance : 0, // Snapshot of balance (not used for payment)
                 'note' => json_encode([
                     'brand' => $validated['brand'],
                     'whatsapp' => $validated['whatsapp'] ?? null,
@@ -105,9 +104,9 @@ class PrepaidOrderController extends Controller
                 'productDetails' => "Pembelian {$validated['brand']} - {$service->name}",
                 'email' => $validated['email'],
                 'phoneNumber' => $validated['phone_number'],
-                'customerVaName' => $user->name,
-                'callbackUrl' => route('payment.callback'),
-                'returnUrl' => route('invoices'), // Redirect to invoices page
+                'customerVaName' => $user ? $user->name : 'Guest',
+                'callbackUrl' => url('/payment/callback'),
+                'returnUrl' => url('/invoices'), // Redirect to invoices page
                 'expiryPeriod' => 60, // 60 minutes
             ];
 
@@ -131,7 +130,7 @@ class PrepaidOrderController extends Controller
 
             Log::info('Prepaid Order Created', [
                 'trxid' => $trxid,
-                'user_id' => $user->id,
+                'user_id' => $user ? $user->id : null,
                 'service' => $service->name,
                 'amount' => $totalAmount,
             ]);
@@ -149,7 +148,7 @@ class PrepaidOrderController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Prepaid Order Error', [
-                'user_id' => $user->id,
+                'user_id' => $user ? $user->id : null,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);

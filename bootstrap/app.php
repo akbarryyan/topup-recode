@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(CheckMaintenanceMode::class);
         $middleware->web(append: [
             \App\Http\Middleware\TrackVisitor::class,
+            \App\Http\Middleware\SetLocale::class,
         ]);
 
         $middleware->alias([
