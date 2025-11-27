@@ -9,13 +9,13 @@
                     <i class="ri-menu-3-fill text-[22px]"></i>
                 </button>
             @endauth
-            <div class="shrink-0">
+            <a href="{{ url('/') }}" class="shrink-0 hover:opacity-80 transition-opacity">
                 @if($websiteLogo)
                     <img src="{{ $websiteLogo }}" alt="{{ $websiteName }}" class="h-7 lg:h-8 w-auto">
                 @else
                     <span class="text-xl font-bold text-white">{{ $websiteName }}</span>
                 @endif
-            </div>
+            </a>
         </div>
 
         <!-- Search Bar (Desktop only) -->

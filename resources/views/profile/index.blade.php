@@ -123,20 +123,20 @@
                         </div>
                     </div>
                     <div class="mt-3 lg:mt-4 grid gap-3 lg:gap-4 grid-cols-2 lg:grid-cols-4">
-                        <div class="rounded-xl lg:rounded-2xl border border-white/5 bg-[#111114] p-3 lg:p-4 text-white">
-                            <p class="text-xs lg:text-sm text-gray-400">Menunggu</p>
+                        <div class="rounded-xl lg:rounded-2xl border border-yellow-500/20 bg-linear-to-br from-yellow-500/10 to-yellow-600/5 p-3 lg:p-4 text-white">
+                            <p class="text-xs lg:text-sm text-yellow-200/80">Menunggu</p>
                             <p class="mt-1 lg:mt-2 text-xl lg:text-3xl font-semibold text-yellow-400">{{ $stats['waiting'] }}</p>
                         </div>
-                        <div class="rounded-xl lg:rounded-2xl border border-white/5 bg-[#111114] p-3 lg:p-4 text-white">
-                            <p class="text-xs lg:text-sm text-gray-400">Dalam Proses</p>
+                        <div class="rounded-xl lg:rounded-2xl border border-blue-500/20 bg-linear-to-br from-blue-500/10 to-blue-600/5 p-3 lg:p-4 text-white">
+                            <p class="text-xs lg:text-sm text-blue-200/80">Dalam Proses</p>
                             <p class="mt-1 lg:mt-2 text-xl lg:text-3xl font-semibold text-blue-400">{{ $stats['processing'] }}</p>
                         </div>
-                        <div class="rounded-xl lg:rounded-2xl border border-white/5 bg-[#111114] p-3 lg:p-4 text-white">
-                            <p class="text-xs lg:text-sm text-gray-400">Sukses</p>
+                        <div class="rounded-xl lg:rounded-2xl border border-emerald-500/20 bg-linear-to-br from-emerald-500/10 to-emerald-600/5 p-3 lg:p-4 text-white">
+                            <p class="text-xs lg:text-sm text-emerald-200/80">Sukses</p>
                             <p class="mt-1 lg:mt-2 text-xl lg:text-3xl font-semibold text-emerald-400">{{ $stats['success'] }}</p>
                         </div>
-                        <div class="rounded-xl lg:rounded-2xl border border-white/5 bg-[#111114] p-3 lg:p-4 text-white">
-                            <p class="text-xs lg:text-sm text-gray-400">Gagal</p>
+                        <div class="rounded-xl lg:rounded-2xl border border-rose-500/20 bg-linear-to-br from-rose-500/10 to-rose-600/5 p-3 lg:p-4 text-white">
+                            <p class="text-xs lg:text-sm text-rose-200/80">Gagal</p>
                             <p class="mt-1 lg:mt-2 text-xl lg:text-3xl font-semibold text-rose-500">{{ $stats['failed'] }}</p>
                         </div>
                     </div>
@@ -175,7 +175,16 @@
                                         <td class="px-2">Rp {{ number_format($transaction->price, 0, ',', '.') }}</td>
                                         <td class="px-2">{{ $transaction->date }}</td>
                                         <td class="px-2">
-                                            <span class="rounded-full px-3 py-1 text-xs font-semibold bg-white/10">{{ ucfirst($transaction->status) }}</span>
+                                            @php
+                                                $statusColor = match($transaction->status) {
+                                                    'waiting' => 'bg-linear-to-br from-yellow-500/20 to-yellow-600/10 border-yellow-500/30 text-yellow-400',
+                                                    'processing' => 'bg-linear-to-br from-blue-500/20 to-blue-600/10 border-blue-500/30 text-blue-400',
+                                                    'success' => 'bg-linear-to-br from-emerald-500/20 to-emerald-600/10 border-emerald-500/30 text-emerald-400',
+                                                    'failed', 'expired', 'canceled' => 'bg-linear-to-br from-rose-500/20 to-rose-600/10 border-rose-500/30 text-rose-400',
+                                                    default => 'bg-white/10 border-white/10 text-white',
+                                                };
+                                            @endphp
+                                            <span class="rounded-full px-3 py-1 text-xs font-semibold border {{ $statusColor }}">{{ ucfirst($transaction->status) }}</span>
                                         </td>
                                     </tr>
                                 @empty
@@ -196,7 +205,16 @@
                                         <p class="text-xs text-gray-500">Invoice</p>
                                         <p class="text-sm font-semibold text-white truncate">{{ $transaction->invoice }}</p>
                                     </div>
-                                    <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold bg-white/10 text-white shrink-0">{{ ucfirst($transaction->status) }}</span>
+                                    @php
+                                        $statusColor = match($transaction->status) {
+                                            'waiting' => 'bg-linear-to-br from-yellow-500/20 to-yellow-600/10 border-yellow-500/30 text-yellow-400',
+                                            'processing' => 'bg-linear-to-br from-blue-500/20 to-blue-600/10 border-blue-500/30 text-blue-400',
+                                            'success' => 'bg-linear-to-br from-emerald-500/20 to-emerald-600/10 border-emerald-500/30 text-emerald-400',
+                                            'failed', 'expired', 'canceled' => 'bg-linear-to-br from-rose-500/20 to-rose-600/10 border-rose-500/30 text-rose-400',
+                                            default => 'bg-white/10 border-white/10 text-white',
+                                        };
+                                    @endphp
+                                    <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold border shrink-0 {{ $statusColor }}">{{ ucfirst($transaction->status) }}</span>
                                 </div>
                                 <div class="grid grid-cols-2 gap-2 text-xs">
                                     <div>
@@ -317,11 +335,7 @@
                             </table>
                         </div>
     
-                        <div class="mt-4 flex items-center justify-between text-sm text-gray-400">
-                            <button class="rounded-2xl bg-rose-900/50 px-4 py-2 text-white">Previous</button>
-                            <span>Halaman 1 dari {{ $latestTransactions->count() ? 1 : 0 }}</span>
-                            <button class="rounded-2xl bg-rose-900/50 px-4 py-2 text-white">Next</button>
-                        </div>
+
                     </div>
                 </section>
     
@@ -453,7 +467,7 @@
                             </table>
                         </div>
     
-                        @if($mutations->total() > 0)
+                        @if($mutations->total() > 0 && $mutations->lastPage() > 1)
                             <div class="mt-4 flex flex-col gap-3 text-sm text-gray-400 md:flex-row md:items-center md:justify-between">
                                 <p>Menampilkan {{ $mutations->firstItem() }} - {{ $mutations->lastItem() }} dari {{ $mutations->total() }} data</p>
                                 <div class="flex items-center gap-3">
