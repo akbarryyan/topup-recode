@@ -106,7 +106,7 @@ class PrepaidOrderController extends Controller
                 'email' => $validated['email'],
                 'phoneNumber' => $validated['phone_number'],
                 'customerVaName' => $user->name,
-                'callbackUrl' => route('topup.callback'), // Reuse existing callback or create new one
+                'callbackUrl' => route('payment.callback'),
                 'returnUrl' => route('invoices'), // Redirect to invoices page
                 'expiryPeriod' => 60, // 60 minutes
             ];

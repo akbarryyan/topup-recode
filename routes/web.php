@@ -99,10 +99,20 @@ Route::post('/payment/duitku/callback', [App\Http\Controllers\TopUpController::c
     ->middleware('duitku.ip')
     ->name('topup.callback');
 
+// Unified Payment Callback - Handles TopUp, Game, and Prepaid transactions
+Route::post('/payment/callback', [App\Http\Controllers\PaymentCallbackController::class, 'handle'])
+    ->middleware('duitku.ip')
+    ->name('payment.callback');
+
 // Duitku Redirect - User Return URL (GET)
 // No authentication required as user may be redirected from external payment page
 Route::get('/payment/duitku/redirect', [App\Http\Controllers\TopUpController::class, 'redirect'])
     ->name('topup.redirect');
+
+// Transaction Status Check - For frontend polling
+Route::get('/api/transaction/status/{trxid}', [App\Http\Controllers\TransactionStatusController::class, 'check'])
+    ->middleware('auth')
+    ->name('transaction.status');
 
 Route::get('/invoices', [App\Http\Controllers\InvoiceController::class, 'index'])->name('invoices');
 Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard');

@@ -46,7 +46,7 @@ class DuitkuIpWhitelist
     public function handle(Request $request, Closure $next): Response
     {
         // Skip IP validation in local environment for testing
-        if (app()->environment('local')) {
+        if (app()->environment(['local', 'testing'])) {
             Log::info('Duitku Callback - Local Environment, IP check skipped', [
                 'ip' => $request->ip(),
             ]);

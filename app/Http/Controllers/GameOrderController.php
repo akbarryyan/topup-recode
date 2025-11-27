@@ -109,7 +109,7 @@ class GameOrderController extends Controller
                 'email' => $validated['email'],
                 'phoneNumber' => $validated['whatsapp'] ?? '081234567890', // Default if empty
                 'customerVaName' => $user->name,
-                'callbackUrl' => route('topup.callback'),
+                'callbackUrl' => route('payment.callback'),
                 'returnUrl' => route('invoices'),
                 'expiryPeriod' => 60, // 60 minutes
             ];

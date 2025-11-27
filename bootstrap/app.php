@@ -33,6 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Exclude Duitku callback from CSRF verification (external request)
         $middleware->validateCsrfTokens(except: [
             'payment/duitku/callback',
+            'payment/callback',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
