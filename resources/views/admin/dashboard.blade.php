@@ -197,7 +197,7 @@
                   <ul class="list-unstyled list-unstyled-border">
                     @forelse($recentActivities as $activity)
                       <li class="media align-items-center">
-                        <div class="mr-3 rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0 {{ $activity['icon_bg'] ?? 'bg-secondary' }}" style="width:50px;height:50px;">
+                        <div class="mr-3 rounded-circle d-flex align-items-center justify-content-center text-white shrink-0 {{ $activity['icon_bg'] ?? 'bg-secondary' }}" style="width:50px;height:50px;">
                           <i class="{{ $activity['icon'] ?? 'fas fa-info-circle' }}"></i>
                         </div>
                         <div class="media-body">

@@ -193,4 +193,56 @@ class ProfileController extends Controller
 
         return view('profile.index', compact('user', 'stats', 'latestTransactions', 'mutations', 'paymentMethods'));
     }
+
+    /**
+     * Update user profile
+     */
+    public function update(Request $request)
+    {
+        $user = $request->user();
+
+        // Validate input
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'current_password' => ['nullable', 'required_with:new_password', 'current_password'],
+            'new_password' => ['nullable', 'min:8', 'confirmed'],
+        ], [
+            'name.required' => 'Nama harus diisi',
+            'email.required' => 'Email harus diisi',
+            'email.email' => 'Format email tidak valid',
+            'email.unique' => 'Email sudah digunakan',
+            'current_password.required_with' => 'Password lama harus diisi jika ingin mengubah password',
+            'current_password.current_password' => 'Password lama tidak sesuai',
+            'new_password.min' => 'Password baru minimal 8 karakter',
+            'new_password.confirmed' => 'Konfirmasi password tidak sesuai',
+        ]);
+
+        try {
+            // Update basic info
+            $user->name = $validated['name'];
+            $user->email = $validated['email'];
+            
+            if (isset($validated['phone'])) {
+                $user->phone = $validated['phone'];
+            }
+
+            // Update password if provided
+            if (!empty($validated['new_password'])) {
+                $user->password = bcrypt($validated['new_password']);
+            }
+
+            $user->save();
+
+            return redirect()->route('profile', ['tab' => 'settings'])->with('success', 'Profile berhasil diperbarui!');
+        } catch (\Exception $e) {
+            \Log::error('Profile Update Error', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return redirect()->back()->withInput()->with('error', 'Gagal memperbarui profile. Silakan coba lagi.');
+        }
+    }
 }

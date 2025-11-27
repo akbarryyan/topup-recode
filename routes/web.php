@@ -81,6 +81,7 @@ Route::post('/auth/logout', [AuthenticatedSessionController::class, 'logout'])
     
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     
     // Top Up routes
     Route::post('/topup/create', [App\Http\Controllers\TopUpController::class, 'create'])->name('topup.create');

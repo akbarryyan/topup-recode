@@ -433,7 +433,7 @@
                                             <td class="px-4 py-3 font-semibold">Rp {{ number_format((float)$mutation->balance_after, 0, ',', '.') }}</td>
                                             <td class="px-4 py-3 text-gray-400">
                                                 <div>
-                                                    <p>{{ $mutation->created_at->format('d M Y') }}</p>
+                                                    <p>{{ $mutation->created_at->locale('id')->isoFormat('D MMM Y') }}</p>
                                                     <p class="text-xs text-gray-500">{{ $mutation->created_at->format('H:i') }}</p>
                                                 </div>
                                             </td>
@@ -478,79 +478,71 @@
     
                 <section class="space-y-4 lg:space-y-6 flex-1 hidden" data-tab-content="settings">
                     <div class="rounded-2xl bg-[#0f0f12] border border-white/5 p-4 lg:p-6 text-white space-y-6">
+                        @if(session('success'))
+                            <div class="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200 flex items-start gap-3">
+                                <i class="ri-checkbox-circle-line text-base"></i>
+                                <span>{{ session('success') }}</span>
+                            </div>
+                        @endif
+                        
+                        @if(session('error'))
+                            <div class="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200 flex items-start gap-3">
+                                <i class="ri-error-warning-line text-base"></i>
+                                <span>{{ session('error') }}</span>
+                            </div>
+                        @endif
+                        
+                        @if($errors->any())
+                            <div class="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                                <div class="flex items-start gap-3">
+                                    <i class="ri-error-warning-line text-base"></i>
+                                    <div class="flex-1">
+                                        <p class="font-semibold mb-1">Terdapat kesalahan:</p>
+                                        <ul class="list-disc list-inside space-y-0.5">
+                                            @foreach($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
                         <div>
                             <h2 class="text-lg font-semibold">Profil</h2>
                             <p class="text-sm text-gray-400">Informasi ini bersifat rahasia, jadi berhati-hatilah dengan apa yang kamu bagikan.</p>
-                            <div class="mt-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200 flex items-start gap-3">
-                                <i class="ri-error-warning-line text-base"></i>
-                                <span>Mohon lengkapi WhatsApp terlebih dahulu.</span>
-                            </div>
                         </div>
     
-                        <form class="space-y-4">
+                        <form method="POST" action="{{ route('profile.update') }}" class="space-y-4">
+                            @csrf
                             <div class="grid gap-4 md:grid-cols-2">
                                 <label class="space-y-2 text-sm text-gray-400">
                                     <span>Nama kamu</span>
-                                    <input type="text" value="{{ old('name', $user->name) }}" class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" />
+                                    <input type="text" name="name" value="{{ old('name', $user->name) }}" required class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" />
                                 </label>
                                 <label class="space-y-2 text-sm text-gray-400">
                                     <span>Alamat Email</span>
-                                    <input type="email" value="{{ old('email', $user->email) }}" class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" />
+                                    <input type="email" name="email" value="{{ old('email', $user->email) }}" required class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" />
                                 </label>
                                 <label class="space-y-2 text-sm text-gray-400">
                                     <span>No. Handphone</span>
-                                    <div class="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
-                                        <span class="flex items-center gap-2 text-white text-sm">
-                                            <img src="https://flagcdn.com/w20/id.png" alt="ID" class="h-4 w-6 object-cover rounded-sm" />
-                                            +62
-                                        </span>
-                                        <input type="text" value="{{ old('phone', $user->phone) }}" class="flex-1 bg-transparent text-white text-sm focus:outline-none" placeholder="628XXXXXXXXXX" />
-                                    </div>
+                                    <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" placeholder="081234567890" class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" />
                                 </label>
                                 <label class="space-y-2 text-sm text-gray-400">
-                                    <span>Password (opsional)</span>
-                                    <input type="password" class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" placeholder="********" />
+                                    <span>Password Lama (jika ingin ubah password)</span>
+                                    <input type="password" name="current_password" class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" placeholder="Kosongkan jika tidak ingin ubah password" />
+                                </label>
+                                <label class="space-y-2 text-sm text-gray-400">
+                                    <span>Password Baru</span>
+                                    <input type="password" name="new_password" class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" placeholder="Minimal 8 karakter" />
+                                </label>
+                                <label class="space-y-2 text-sm text-gray-400">
+                                    <span>Konfirmasi Password Baru</span>
+                                    <input type="password" name="new_password_confirmation" class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" placeholder="Ulangi password baru" />
                                 </label>
                             </div>
-                            <button type="submit" class="rounded-2xl bg-rose-700 px-6 py-3 text-sm font-semibold">Simpan Profil</button>
+                            <button type="submit" class="rounded-2xl bg-rose-700 px-6 py-3 text-sm font-semibold hover:bg-rose-600 transition">Simpan Profil</button>
                         </form>
-    
-                        <div class="border-t border-white/10 pt-4">
-                            <h3 class="text-lg font-semibold">Ubah Kata Sandi</h3>
-                            <p class="text-sm text-gray-400">Pastikan kamu mengingat kata sandi baru sebelum mengubahnya.</p>
-                            <form class="mt-4 grid gap-4 md:grid-cols-2">
-                                <label class="space-y-2 text-sm text-gray-400">
-                                    <span>Kata Sandi Saat Ini</span>
-                                    <div class="relative">
-                                        <input type="password" placeholder="Kata Sandi Saat Ini" class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" />
-                                        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                            <i class="ri-eye-line"></i>
-                                        </button>
-                                    </div>
-                                </label>
-                                <label class="space-y-2 text-sm text-gray-400">
-                                    <span>Kata Sandi Baru</span>
-                                    <div class="relative">
-                                        <input type="password" placeholder="Kata Sandi Baru" class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" />
-                                        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                            <i class="ri-eye-line"></i>
-                                        </button>
-                                    </div>
-                                </label>
-                                <label class="space-y-2 text-sm text-gray-400">
-                                    <span>Konfirmasi Kata Sandi Baru</span>
-                                    <div class="relative">
-                                        <input type="password" placeholder="Konfirmasi Kata Sandi Baru" class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" />
-                                        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                            <i class="ri-eye-line"></i>
-                                        </button>
-                                    </div>
-                                </label>
-                                <div class="flex items-end">
-                                    <button type="submit" class="w-full rounded-2xl bg-rose-700 px-6 py-3 text-sm font-semibold">Simpan Kata Sandi</button>
-                                </div>
-                            </form>
-                        </div>
                     </div>
                 </section>
     

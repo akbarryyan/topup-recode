@@ -143,8 +143,22 @@ class PaymentCallbackController extends Controller
 
             // Add balance to user
             $user = $transaction->user;
+            $previousBalance = $user->balance;
             $user->balance += $transaction->amount;
             $user->save();
+
+            // Create mutation record
+            \App\Models\Mutation::create([
+                'user_id' => $user->id,
+                'type' => 'credit',
+                'amount' => $transaction->amount,
+                'balance_before' => $previousBalance,
+                'balance_after' => $user->balance,
+                'description' => 'Top Up Saldo',
+                'notes' => 'Top up via ' . ($transaction->paymentMethod->name ?? 'Payment Gateway') . ' - ' . $transaction->merchant_order_id,
+                'reference_type' => 'App\Models\TopUpTransaction',
+                'reference_id' => $transaction->id,
+            ]);
 
             Log::info('TopUp Payment Success', [
                 'trxid' => $trxid,
