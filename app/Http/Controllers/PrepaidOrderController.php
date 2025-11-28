@@ -106,7 +106,7 @@ class PrepaidOrderController extends Controller
                 'phoneNumber' => $validated['phone_number'],
                 'customerVaName' => $user ? $user->name : 'Guest',
                 'callbackUrl' => url('/payment/callback'),
-                'returnUrl' => url('/invoices'), // Redirect to invoices page
+                'returnUrl' => url('/payment/success/' . $trxid),
                 'expiryPeriod' => 60, // 60 minutes
             ];
 

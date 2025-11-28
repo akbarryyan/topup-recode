@@ -17,6 +17,10 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PaymentSuccessController;
+use App\Http\Controllers\GameOrderController;
+use App\Http\Controllers\PrepaidOrderController;
+
 
 // Share website settings with all views
 View::composer('*', function ($view) {
@@ -57,6 +61,10 @@ Route::any('/invoices', function () {
     $locale = session('locale', 'id');
     return redirect()->to('/' . $locale . '/profile?' . http_build_query(array_merge(['tab' => 'transactions'], request()->query())));
 })->name('invoices');
+
+// Payment Success Routes (outside locale group - NO /id or /en prefix)
+Route::get('/payment/success/{trxid}', [PaymentSuccessController::class, 'show'])->name('payment.success');
+Route::get('/payment/invoice/{trxid}/pdf', [PaymentSuccessController::class, 'downloadPdf'])->name('payment.invoice.pdf');
 
 // Routes with optional locale prefix (supports both /id and /en)
 Route::group(['prefix' => '{locale?}', 'where' => ['locale' => 'id|en']], function () {
@@ -124,8 +132,8 @@ Route::middleware('auth')->group(function () {
 });
 
 // Order routes - No authentication required (guest checkout)
-Route::post('/order/game', [App\Http\Controllers\GameOrderController::class, 'store'])->name('order.game.store');
-Route::post('/order/prepaid', [App\Http\Controllers\PrepaidOrderController::class, 'store'])->name('order.prepaid.store');
+Route::post('/order/game', [GameOrderController::class, 'store'])->name('order.game.store');
+Route::post('/order/prepaid', [PrepaidOrderController::class, 'store'])->name('order.prepaid.store');
 
 // Transaction Status Check - For frontend polling
 Route::get('/api/transaction/status/{trxid}', [App\Http\Controllers\TransactionStatusController::class, 'check'])

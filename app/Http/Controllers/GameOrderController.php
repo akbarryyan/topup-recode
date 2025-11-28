@@ -111,7 +111,7 @@ class GameOrderController extends Controller
                 'phoneNumber' => $validated['whatsapp'] ?? '081234567890', // Default if empty
                 'customerVaName' => $user ? $user->name : 'Guest',
                 'callbackUrl' => url('/payment/callback'),
-                'returnUrl' => url('/invoices'),
+                'returnUrl' => url('/payment/success/' . $trxid),
                 'expiryPeriod' => 60, // 60 minutes
             ];
 

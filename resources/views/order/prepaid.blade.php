@@ -452,10 +452,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             if (data && data.success) {
-                // Store transaction ID for status polling
-                const trxid = data.data.trxid;
-                sessionStorage.setItem('pending_trxid', trxid);
-                
                 Swal.fire({
                     icon: 'success',
                     title: 'Berhasil!',
@@ -464,6 +460,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     timer: 2000,
                     timerProgressBar: true
                 }).then(() => {
+                    // Redirect to Duitku payment page
                     window.location.href = data.data.payment_url || data.data.redirect_url;
                 });
             } else {
@@ -487,99 +484,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
-    // Check for pending transaction on page load
-    const pendingTrxid = sessionStorage.getItem('pending_trxid');
-    if (pendingTrxid) {
-        startStatusPolling(pendingTrxid);
-    }
-    
-    /**
-     * Start polling transaction status
-     */
-    function startStatusPolling(trxid) {
-        let pollCount = 0;
-        const maxPolls = 60; // 60 attempts x 3 seconds = 3 minutes
-        const pollInterval = 3000; // 3 seconds
-        
-        console.log('Starting status polling for:', trxid);
-        
-        const pollTimer = setInterval(() => {
-            pollCount++;
-            
-            // Stop polling after max attempts
-            if (pollCount > maxPolls) {
-                clearInterval(pollTimer);
-                sessionStorage.removeItem('pending_trxid');
-                console.log('Polling stopped: max attempts reached');
-                return;
-            }
-            
-            // Check transaction status
-            fetch(`/api/transaction/status/${trxid}`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.data) {
-                    const status = data.data.payment_status;
-                    console.log('Transaction status:', status);
-                    
-                    if (status === 'paid') {
-                        // Payment successful!
-                        clearInterval(pollTimer);
-                        sessionStorage.removeItem('pending_trxid');
-                        
-                        if (typeof swal !== 'undefined') {
-                            swal({
-                                title: 'Pembayaran Berhasil!',
-                                text: `Pesanan ${data.data.service_name} telah dibayar. Pesanan Anda sedang diproses.`,
-                                icon: 'success',
-                                button: 'OK'
-                            }).then(() => {
-                                // Optionally redirect to invoices
-                                // window.location.href = '/invoices';
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Pembayaran Berhasil!',
-                                text: 'Pesanan Anda sedang diproses.',
-                                confirmButtonColor: '#10b981'
-                            });
-                        }
-                    } else if (status === 'failed') {
-                        // Payment failed
-                        clearInterval(pollTimer);
-                        sessionStorage.removeItem('pending_trxid');
-                        
-                        if (typeof swal !== 'undefined') {
-                            swal({
-                                title: 'Pembayaran Gagal',
-                                text: 'Pembayaran Anda gagal atau dibatalkan.',
-                                icon: 'error',
-                                button: 'OK'
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Pembayaran Gagal!',
-                                text: 'Pembayaran dibatalkan atau gagal diproses.',
-                                confirmButtonColor: '#ef4444'
-                            });
-                        }
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Status polling error:', error);
-            });
-        }, pollInterval);
-    }
 });
 </script>
 

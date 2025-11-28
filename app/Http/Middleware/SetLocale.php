@@ -27,7 +27,6 @@ class SetLocale
         // Paths that should NOT use locale prefix
         $excludedPaths = [
             'admin',           // Admin panel
-            'payment',         // Payment callbacks
             'locale',          // Locale switching
             'invoices',        // Invoice redirect
             'api',             // API endpoints
@@ -35,6 +34,13 @@ class SetLocale
         
         // Check if current path should be excluded from locale handling
         $firstSegment = $request->segment(1);
+        
+        // Special handling for payment routes
+        if ($firstSegment === 'payment') {
+            // Exclude all payment routes from locale handling
+            return $next($request);
+        }
+        
         if (in_array($firstSegment, $excludedPaths)) {
             // Don't apply locale for these paths
             return $next($request);
