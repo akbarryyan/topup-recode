@@ -22,6 +22,7 @@ class WebsiteSettingController extends Controller
     {
         $request->validate([
             'website_name' => 'required|string|max:255',
+            'slogan' => 'nullable|string|max:255',
             'website_description' => 'nullable|string',
             'website_phone' => 'nullable|string|max:20',
             'website_address' => 'nullable|string|max:500',
@@ -31,6 +32,9 @@ class WebsiteSettingController extends Controller
         try {
             // Update website name
             WebsiteSetting::set('website_name', $request->website_name, 'text');
+
+            // Update slogan
+            WebsiteSetting::set('slogan', $request->slogan, 'text');
 
             // Update website description
             WebsiteSetting::set('website_description', $request->website_description, 'textarea');

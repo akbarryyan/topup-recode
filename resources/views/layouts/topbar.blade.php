@@ -23,7 +23,7 @@
             <div class="relative w-full">
                 <i class="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
                 <input type="text" 
-                       placeholder="Cari game..." 
+                       placeholder="{{ app()->getLocale() === 'en' ? 'Search Game...' : 'Cari Game...' }}" 
                        class="w-full bg-[#1a1a1a] border border-gray-800 rounded-2xl pl-12 pr-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-colors">
             </div>
         </div>
@@ -64,7 +64,7 @@
             <!-- Sign In / Account Button (Desktop only) -->
             @guest
             <a href="{{ route('login') }}" class="hidden lg:flex items-center gap-2 px-6 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-2xl transition-all">
-                <span class="font-medium">Sign In</span>
+                <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Sign In' : 'Masuk' }}</span>
             </a>
             @else
             <div class="hidden lg:block relative">

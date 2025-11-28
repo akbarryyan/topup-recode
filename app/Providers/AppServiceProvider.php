@@ -19,6 +19,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register morph map for polymorphic relationships
+        \Illuminate\Database\Eloquent\Relations\Relation::morphMap([
+            'prepaid_transaction' => \App\Models\PrepaidTransaction::class,
+            'game_transaction' => \App\Models\GameTransaction::class,
+            'topup_transaction' => \App\Models\TopupTransaction::class,
+        ]);
     }
 }

@@ -5,7 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    @php
+        $websiteName = \App\Models\WebsiteSetting::get('website_name', config('app.name', 'Laravel'));
+        $slogan = \App\Models\WebsiteSetting::get('slogan');
+        $pageTitle = $slogan ? "$websiteName - $slogan" : $websiteName;
+    @endphp
+
+    <title>{{ $pageTitle }}</title>
 
     <!-- Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

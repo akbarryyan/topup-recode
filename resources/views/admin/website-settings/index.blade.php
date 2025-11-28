@@ -95,6 +95,19 @@
                                     @enderror
                                 </div>
     
+                                <!-- Slogan -->
+                                <div class="form-group">
+                                    <label for="slogan">Slogan</label>
+                                    <input type="text" name="slogan" id="slogan" 
+                                        class="form-control @error('slogan') is-invalid @enderror" 
+                                        value="{{ old('slogan', $settings['slogan']->value ?? '') }}" 
+                                        placeholder="Contoh: Top Up Game Termurah dan Terpercaya">
+                                    <small class="form-text text-muted">Slogan akan ditampilkan di title halaman (Website Name - Slogan)</small>
+                                    @error('slogan')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+    
                                 <!-- Deskripsi Website -->
                                 <div class="form-group">
                                     <label for="website_description">Deskripsi Website</label>
