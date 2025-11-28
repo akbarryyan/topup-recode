@@ -1,82 +1,154 @@
 <!-- Footer -->
-<footer class="bg-black text-white py-8 px-6">
-    <div class="max-w-6xl mx-auto">
-        <!-- Logo & Description -->
-        <div class="mb-6">
-            <div class="flex items-center gap-2 mb-3">
-                @if($websiteLogo)
-                    <img src="{{ $websiteLogo }}" alt="{{ $websiteName }}" class="h-8">
-                @else
-                    <span class="text-2xl font-bold text-white">{{ $websiteName }}</span>
-                @endif
-            </div>
-        </div>
+<footer class="bg-black text-white py-12 px-6">
+    <div class="max-w-7xl mx-auto">
+        <!-- Main Footer Content - Responsive Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-10">
+            
+            <!-- Column 1: Logo & Contact Info -->
+            <div class="lg:col-span-1">
+                <!-- Logo -->
+                <div class="mb-6">
+                    <div class="flex items-center gap-2 mb-4">
+                        @if($websiteLogo)
+                            <img src="{{ $websiteLogo }}" alt="{{ $websiteName }}" class="h-10">
+                        @else
+                            <span class="text-2xl font-bold text-white">{{ $websiteName }}</span>
+                        @endif
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Platform top-up game terpercaya dan termurah di Indonesia.
+                    </p>
+                </div>
 
-        <!-- Contact Info -->
-        <div class="space-y-3 mb-8">
-            <!-- Phone -->
-            <div class="flex items-center gap-3">
-                <i class="ri-phone-fill text-yellow-500 text-xl"></i>
-                <span class="text-gray-300 text-sm">{{ $websitePhone }}</span>
+                <!-- Contact Info -->
+                <div class="space-y-3">
+                    <!-- Phone -->
+                    <div class="flex items-center gap-3">
+                        <i class="ri-phone-fill text-yellow-500 text-lg"></i>
+                        <span class="text-gray-300 text-sm">{{ $websitePhone }}</span>
+                    </div>
+                    <!-- Address -->
+                    <div class="flex items-start gap-3">
+                        <i class="ri-map-pin-fill text-yellow-500 text-lg shrink-0 mt-0.5"></i>
+                        <span class="text-gray-300 text-sm leading-relaxed">{{ $websiteAddress }}</span>
+                    </div>
+                </div>
             </div>
-            <!-- Address -->
-            <div class="flex items-start gap-3">
-                <i class="ri-map-pin-fill text-yellow-500 text-xl mt-0.5"></i>
-                <span class="text-gray-300 text-sm">{{ $websiteAddress }}</span>
-            </div>
-        </div>
 
-        <!-- Footer Links -->
-        <div class="grid grid-cols-2 gap-8 mb-8">
-            <!-- Site Map -->
+            <!-- Column 2: Site Map -->
             <div>
-                <h3 class="text-white font-semibold text-base mb-4">Site Map</h3>
-                <ul class="space-y-2">
-                    <li><a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Home</a></li>
-                    <li><a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Reviews</a></li>
-                    <li><a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Check Transaction</a></li>
-                    <li><a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Price List</a></li>
-                    <li><a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Articles</a></li>
-                    <li><a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Contact Us</a></li>
+                <h3 class="text-white font-bold text-lg mb-5 relative inline-block">
+                    Site Map
+                    <span class="absolute bottom-0 left-0 w-12 h-0.5 bg-yellow-500 -mb-2"></span>
+                </h3>
+                <ul class="space-y-3">
+                    <li>
+                        <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
+                            <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+                            <span>{{ app()->getLocale() === 'en' ? 'Dashboard' : 'Dashboard' }}</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
+                            <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+                            <span>{{ app()->getLocale() === 'en' ? 'Reviews' : 'Reviews' }}</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
+                            <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+                            <span>{{ app()->getLocale() === 'en' ? 'Check Transactions' : 'Cek Transaksi' }}</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
+                            <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+                            <span>{{ app()->getLocale() === 'en' ? 'Price List' : 'Daftar Harga' }}</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
+                            <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+                            <span>{{ app()->getLocale() === 'en' ? 'Articles' : 'Artikel' }}</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
+                            <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+                            <span>{{ app()->getLocale() === 'en' ? 'Contact Us' : 'Hubungi Kami' }}</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
 
-            <!-- Information -->
+            <!-- Column 3: Information -->
             <div>
-                <h3 class="text-white font-semibold text-base mb-4">Information</h3>
-                <ul class="space-y-2">
-                    <li><a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Privacy Policy</a></li>
-                    <li><a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Top-Up Website Service</a></li>
-                    <li><a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">API Documentation</a></li>
+                <h3 class="text-white font-bold text-lg mb-5 relative inline-block">
+                    {{ app()->getLocale() === 'en' ? 'Information' : 'Informasi' }}
+                    <span class="absolute bottom-0 left-0 w-12 h-0.5 bg-yellow-500 -mb-2"></span>
+                </h3>
+                <ul class="space-y-3">
+                    <li>
+                        <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
+                            <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+                            <span>{{ app()->getLocale() === 'en' ? 'Privacy Policy' : 'Kebijakan Privasi' }}</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
+                            <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+                            <span>{{ app()->getLocale() === 'en' ? 'Top-Up Website Service' : 'Layanan Top-Up Website' }}</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
+                            <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+                            <span>{{ app()->getLocale() === 'en' ? 'API Documentation' : 'Dokumentasi API' }}</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
-        </div>
 
-        <!-- Social Media -->
-        <div class="mb-8">
-            <h3 class="text-white font-semibold text-base mb-4">Follow Us</h3>
-            <div class="flex items-center gap-4">
-                <a href="#" class="text-white hover:text-green-500 transition-colors">
-                    <i class="ri-facebook-fill text-2xl"></i>
-                </a>
-                <a href="#" class="text-white hover:text-green-500 transition-colors">
-                    <i class="ri-instagram-fill text-2xl"></i>
-                </a>
+            <!-- Column 4: Social Media & Payment Methods -->
+            <div>
+                <h3 class="text-white font-bold text-lg mb-5 relative inline-block">
+                    {{ app()->getLocale() === 'en' ? 'Follow Us' : 'Ikuti Kami' }}
+                    <span class="absolute bottom-0 left-0 w-12 h-0.5 bg-yellow-500 -mb-2"></span>
+                </h3>
+                <div class="flex items-center gap-3 mb-6">
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center text-white hover:bg-yellow-500 hover:scale-110 transition-all duration-200">
+                        <i class="ri-facebook-fill text-xl"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center text-white hover:bg-yellow-500 hover:scale-110 transition-all duration-200">
+                        <i class="ri-instagram-fill text-xl"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center text-white hover:bg-yellow-500 hover:scale-110 transition-all duration-200">
+                        <i class="ri-twitter-fill text-xl"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center text-white hover:bg-yellow-500 hover:scale-110 transition-all duration-200">
+                        <i class="ri-whatsapp-fill text-xl"></i>
+                    </a>
+                </div>
+
+                <!-- Payment Methods Badge -->
+                <div class="mt-6">
+                    <p class="text-gray-400 text-xs mb-3">{{ app()->getLocale() === 'en' ? 'Payment Methods' : 'Metode Pembayaran' }}</p>
+                    <div class="flex flex-wrap gap-2">
+                        <div class="bg-gray-800 px-3 py-1.5 rounded text-xs text-gray-300">QRIS</div>
+                        <div class="bg-gray-800 px-3 py-1.5 rounded text-xs text-gray-300">E-Wallet</div>
+                        <div class="bg-gray-800 px-3 py-1.5 rounded text-xs text-gray-300">Bank</div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Divider -->
         <div class="border-t border-gray-800 pt-6">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                 <!-- Copyright -->
-                <div class="text-gray-400 text-xs">
-                    <p>© {{ date('Y') }} {{ strtoupper($websiteName) }}</p>
-                    <p>#TOPUPTANPARAGU. All rights reserved.</p>
+                <div class="text-gray-400 text-sm text-center md:text-left">
+                    <p>© {{ date('Y') }} {{ strtoupper($websiteName) }} - Dibuat oleh {{ $websiteName }} Team.</p>
                 </div>
-                <!-- Theme Toggle (Optional) -->
-                <button class="text-gray-400 hover:text-white transition-colors">
-                    <i class="ri-sun-line text-xl"></i>
-                </button>
             </div>
         </div>
     </div>

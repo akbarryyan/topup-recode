@@ -115,6 +115,42 @@
                 </h2>
                 
                 <div class="space-y-3">
+                    <!-- Credits (Only for Logged-in Users) -->
+                    @auth
+                    <div class="bg-[#27272A] rounded-lg p-3">
+                        <div class="flex items-center justify-between cursor-pointer" onclick="togglePaymentCategory('credits')">
+                            <span class="text-white font-medium">Credits / Saldo</span>
+                            <i class="ri-arrow-down-s-line text-gray-400" id="credits-icon"></i>
+                        </div>
+                        <div id="credits-content" class="max-h-0 overflow-hidden opacity-0 transition-all duration-300 ease-in-out mt-0 space-y-2">
+                            <div class="payment-method-card bg-[#1a1a1a] rounded-lg p-3 cursor-pointer hover:border hover:border-blue-500 transition-all"
+                                 data-payment-id="credits"
+                                 data-payment-code="CREDITS"
+                                 data-payment-name="Credits / Saldo"
+                                 data-payment-fee="0">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center">
+                                            <i class="ri-wallet-3-fill text-white text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <span class="text-white font-medium block">Credits / Saldo</span>
+                                            <span class="text-gray-400 text-xs">Saldo Anda: <span class="text-green-400 font-semibold">Rp {{ number_format(auth()->user()->balance, 0, ',', '.') }}</span></span>
+                                        </div>
+                                    </div>
+                                    <span class="text-green-400 text-xs font-medium">Gratis Biaya Admin</span>
+                                </div>
+                                <div id="insufficient-balance-warning" class="hidden bg-red-500/10 border border-red-500/30 rounded p-2 mt-2">
+                                    <p class="text-red-400 text-xs flex items-center gap-1">
+                                        <i class="ri-error-warning-line"></i>
+                                        Saldo tidak mencukupi untuk transaksi ini
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endauth
+
                     <!-- QRIS Payment Methods -->
                     @if(isset($paymentMethods['qris']) && $paymentMethods['qris']->count() > 0)
                     <div class="bg-[#27272A] rounded-lg p-3">
@@ -347,10 +383,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update summary
     function updateSummary() {
         const summaryText = document.getElementById('summary-text');
+        const insufficientWarning = document.getElementById('insufficient-balance-warning');
+        
         if (selectedItem) {
             const itemPrice = selectedItem.price;
             const paymentFee = selectedPayment ? selectedPayment.fee : 0;
             const total = itemPrice + paymentFee;
+            
+            // Check if Credits is selected and balance is insufficient
+            const userBalance = {{ auth()->check() ? auth()->user()->balance : 0 }};
+            const isCreditsSelected = selectedPayment && selectedPayment.code === 'CREDITS';
+            const hasInsufficientBalance = isCreditsSelected && userBalance < total;
+            
+            // Show/hide insufficient balance warning
+            if (insufficientWarning) {
+                if (hasInsufficientBalance) {
+                    insufficientWarning.classList.remove('hidden');
+                } else {
+                    insufficientWarning.classList.add('hidden');
+                }
+            }
             
             let summaryHTML = '<div class="text-left">';
             summaryHTML += '<div class="flex justify-between mb-1">';
@@ -374,6 +426,9 @@ document.addEventListener('DOMContentLoaded', function() {
             summaryText.innerHTML = summaryHTML;
         } else {
             summaryText.textContent = 'No product selected yet.';
+            if (insufficientWarning) {
+                insufficientWarning.classList.add('hidden');
+            }
         }
     }
     
@@ -385,8 +440,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const hasSelectedItem = selectedItem !== null;
         const hasSelectedPayment = selectedPayment !== null;
         
+        // Check balance if Credits is selected
+        let hasSufficientBalance = true;
+        if (selectedPayment && selectedPayment.code === 'CREDITS' && selectedItem) {
+            const userBalance = {{ auth()->check() ? auth()->user()->balance : 0 }};
+            const total = selectedItem.price + (selectedPayment.fee || 0);
+            hasSufficientBalance = userBalance >= total;
+        }
+        
         const btnOrder = document.getElementById('btn-order');
-        if (phoneValue && whatsappValue && emailValue && hasSelectedItem && hasSelectedPayment) {
+        if (phoneValue && whatsappValue && emailValue && hasSelectedItem && hasSelectedPayment && hasSufficientBalance) {
             btnOrder.disabled = false;
         } else {
             btnOrder.disabled = true;

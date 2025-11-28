@@ -21,12 +21,38 @@
                             <h4>Daftar Transaksi Game</h4>
                         </div>
                         <div class="card-body">
+                            <!-- Filter Section -->
+                            <div class="mb-4">
+                                <form method="GET" action="{{ route('admin.game-transactions.index') }}" class="form-inline">
+                                    <div class="form-group mr-2">
+                                        <label for="gameFilter" class="mr-2">Filter Nama Game:</label>
+                                        <select name="game" id="gameFilter" class="form-control" style="min-width: 250px;">
+                                            <option value="">-- Semua Game --</option>
+                                            @foreach($gameNames as $gameName)
+                                                <option value="{{ $gameName }}" {{ request('game') == $gameName ? 'selected' : '' }}>
+                                                    {{ $gameName }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mr-2">
+                                        <i class="fas fa-filter"></i> Filter
+                                    </button>
+                                    @if(request('game'))
+                                        <a href="{{ route('admin.game-transactions.index') }}" class="btn btn-secondary">
+                                            <i class="fas fa-redo"></i> Reset
+                                        </a>
+                                    @endif
+                                </form>
+                            </div>
+
                             <div class="table-responsive">
                                 <table class="table table-striped table-hover" id="transactionTable">
                                     <thead>
                                         <tr>
                                             <th>ID Transaksi</th>
                                             <th>User</th>
+                                            <th>Nama Game</th>
                                             <th>Layanan</th>
                                             <th>ID Tujuan</th>
                                             <th>Zone</th>
@@ -64,6 +90,13 @@
                                                 @endif
                                             </td>
                                             <td>
+                                                @if($transaction->gameService)
+                                                    <span class="badge badge-info">{{ $transaction->gameService->game }}</span>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td>
                                                 <div><strong>{{ $transaction->service_name }}</strong></div>
                                                 <small class="text-muted">{{ $transaction->service_code }}</small>
                                             </td>
@@ -95,7 +128,7 @@
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="9" class="text-center">Belum ada transaksi</td>
+                                            <td colspan="10" class="text-center">Belum ada transaksi</td>
                                         </tr>
                                         @endforelse
                                     </tbody>
@@ -114,7 +147,7 @@
 <script>
 $(document).ready(function() {
     $('#transactionTable').DataTable({
-        "order": [[7, 'desc']], // Sort by date column
+        "order": [[8, 'desc']], // Sort by date column (updated index due to new column)
         "pageLength": 25,
         "language": {
             "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Indonesian.json"

@@ -59,7 +59,8 @@ class DashboardController extends Controller
                 return [
                     'type' => 'game_transaction',
                     'title' => 'Transaksi Game #' . $trx->trxid,
-                    'subtitle' => ($trx->user->name ?? 'Pengguna') . ' • ' . ($trx->service_name ?? '-') . ' • ' . ucfirst($trx->status),
+                    'subtitle' => ($trx->user->name ?? 'Pengguna') . ' • ' . ($trx->service_name ?? '-'),
+                    'status' => $trx->status,
                     'icon' => 'fas fa-gamepad',
                     'icon_bg' => 'bg-success',
                     'timestamp' => $trx->created_at,
@@ -69,7 +70,8 @@ class DashboardController extends Controller
                 return [
                     'type' => 'prepaid_transaction',
                     'title' => 'Transaksi Pulsa #' . $trx->trxid,
-                    'subtitle' => ($trx->user->name ?? 'Pengguna') . ' • ' . ($trx->service_name ?? '-') . ' • ' . ucfirst($trx->status),
+                    'subtitle' => ($trx->user->name ?? 'Pengguna') . ' • ' . ($trx->service_name ?? '-'),
+                    'status' => $trx->status,
                     'icon' => 'fas fa-mobile-alt',
                     'icon_bg' => 'bg-warning',
                     'timestamp' => $trx->created_at,
@@ -79,7 +81,8 @@ class DashboardController extends Controller
                 return [
                     'type' => 'deposit',
                     'title' => 'Deposit Saldo #' . $deposit->reference,
-                    'subtitle' => ($deposit->user->name ?? 'Pengguna') . ' • Rp ' . number_format($deposit->amount, 0, ',', '.') . ' • ' . ucfirst($deposit->status),
+                    'subtitle' => ($deposit->user->name ?? 'Pengguna') . ' • Rp ' . number_format($deposit->amount, 0, ',', '.'),
+                    'status' => $deposit->status,
                     'icon' => 'fas fa-wallet',
                     'icon_bg' => 'bg-info',
                     'timestamp' => $deposit->created_at,

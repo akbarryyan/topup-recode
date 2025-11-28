@@ -193,8 +193,26 @@
                 <div class="card-header">
                   <h4>Recent Activities</h4>
                 </div>
-                <div class="card-body">             
-                  <ul class="list-unstyled list-unstyled-border">
+                <div class="card-body">
+                  <div style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">
+                    <style>
+                      /* Custom scrollbar styling for Recent Activities */
+                      .card-body > div::-webkit-scrollbar {
+                        width: 6px;
+                      }
+                      .card-body > div::-webkit-scrollbar-track {
+                        background: #f1f1f1;
+                        border-radius: 10px;
+                      }
+                      .card-body > div::-webkit-scrollbar-thumb {
+                        background: #888;
+                        border-radius: 10px;
+                      }
+                      .card-body > div::-webkit-scrollbar-thumb:hover {
+                        background: #555;
+                      }
+                    </style>
+                    <ul class="list-unstyled list-unstyled-border">
                     @forelse($recentActivities as $activity)
                       <li class="media align-items-center">
                         <div class="mr-3 rounded-circle d-flex align-items-center justify-content-center text-white shrink-0 {{ $activity['icon_bg'] ?? 'bg-secondary' }}" style="width:50px;height:50px;">
@@ -204,6 +222,26 @@
                           <div class="float-right text-muted">{{ optional($activity['timestamp'])->diffForHumans() }}</div>
                           <div class="media-title">{{ $activity['title'] }}</div>
                           <span class="text-small text-muted">{{ $activity['subtitle'] }}</span>
+                          @if(isset($activity['status']))
+                            @php
+                              $statusBadgeClass = match($activity['status']) {
+                                'success' => 'badge-success',
+                                'waiting', 'pending' => 'badge-warning',
+                                'failed' => 'badge-danger',
+                                default => 'badge-secondary'
+                              };
+                              $statusLabel = match($activity['status']) {
+                                'success' => 'Sukses',
+                                'waiting' => 'Menunggu',
+                                'pending' => 'Pending',
+                                'failed' => 'Gagal',
+                                default => ucfirst($activity['status'])
+                              };
+                            @endphp
+                            <div class="mt-1">
+                              <span class="badge {{ $statusBadgeClass }}">{{ $statusLabel }}</span>
+                            </div>
+                          @endif
                         </div>
                       </li>
                     @empty
@@ -214,6 +252,7 @@
                       </li>
                     @endforelse
                   </ul>
+                  </div>
                 </div>
               </div>
             </div>

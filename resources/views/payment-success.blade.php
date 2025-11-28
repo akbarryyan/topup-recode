@@ -124,7 +124,7 @@
                     <p class="font-semibold mb-1">{{ app()->getLocale() === 'en' ? 'Important Information:' : 'Informasi Penting:' }}</p>
                     <ul class="list-disc list-inside space-y-1 text-blue-300">
                         <li>{{ app()->getLocale() === 'en' ? 'Your order will be processed within 1-5 minutes' : 'Pesanan Anda akan diproses dalam 1-5 menit' }}</li>
-                        <li>{{ app()->getLocale() === 'en' ? 'You will receive a confirmation email at {{ $data['email'] }}' : 'Anda akan menerima email konfirmasi di {{ $data['email'] }}' }}</li>
+                        <li>{{ app()->getLocale() === 'en' ? 'You will receive a confirmation email at ' . $data['email'] : 'Anda akan menerima email konfirmasi di ' . $data['email'] }}</li>
                         <li>{{ app()->getLocale() === 'en' ? 'Save the invoice PDF as proof of payment' : 'Simpan invoice PDF sebagai bukti pembayaran' }}</li>
                     </ul>
                 </div>

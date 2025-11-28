@@ -62,6 +62,14 @@ class GameTransaction extends Model
     }
 
     /**
+     * Get the game service for this transaction
+     */
+    public function gameService()
+    {
+        return $this->belongsTo(GameService::class, 'service_code', 'code');
+    }
+
+    /**
      * Get status badge color
      */
     public function getStatusBadgeAttribute()
