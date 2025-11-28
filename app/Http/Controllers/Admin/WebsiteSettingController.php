@@ -22,7 +22,7 @@ class WebsiteSettingController extends Controller
     {
         $request->validate([
             'website_name' => 'required|string|max:255',
-            'website_description' => 'nullable|string|max:500',
+            'website_description' => 'nullable|string',
             'website_phone' => 'nullable|string|max:20',
             'website_address' => 'nullable|string|max:500',
             'website_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',

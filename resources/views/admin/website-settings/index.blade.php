@@ -101,7 +101,6 @@
                                     <textarea name="website_description" id="website_description" 
                                         class="form-control @error('website_description') is-invalid @enderror" 
                                         rows="4">{{ old('website_description', $settings['website_description']->value ?? '') }}</textarea>
-                                    <small class="form-text text-muted">Maksimal 500 karakter</small>
                                     @error('website_description')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror

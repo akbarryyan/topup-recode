@@ -2,7 +2,7 @@
 <div class="bg-[#000000] px-3 lg:px-8 pt-10 lg:pt-12 pb-12 lg:pb-16">
     <div class="flex items-center gap-2 lg:gap-3 mb-4 lg:mb-6 max-w-7xl mx-auto">
         <i class="ri-fire-fill text-[24px] lg:text-[32px] text-yellow-500"></i>
-        <h2 class="text-white text-xl lg:text-2xl font-bold">PALING POPULER!</h2>
+        <h2 class="text-white text-xl lg:text-2xl font-bold">{{ app()->getLocale() === 'en' ? 'MOST POPULAR!' : 'PALING POPULER!' }}</h2>
     </div>
 
     <!-- Carousel Container -->

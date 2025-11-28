@@ -49,8 +49,8 @@
         </button>
 
         <div class="flex-1 flex flex-col justify-center max-w-md mx-auto w-full mt-6">
-            <h1 class="font-bold mb-1 text-[22px]">Daftar</h1>
-            <p class="text-gray-200 mb-6 text-[13px]">Masukkan informasi pendaftaran yang valid.</p>
+            <h1 class="font-bold mb-1 text-[22px]">{{ app()->getLocale() === 'en' ? 'Register' : 'Daftar' }}</h1>
+            <p class="text-gray-200 mb-6 text-[13px]">{{ app()->getLocale() === 'en' ? 'Enter registration information that is valid.' : 'Masukkan informasi pendaftaran yang valid.' }}</p>
 
             @if ($errors->any())
                 <div class="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/40 text-red-300 text-sm">
@@ -64,8 +64,8 @@
                 <!-- Nama Lengkap & Username -->
                 <div class="grid grid-cols-2 gap-4 mb-2">
                     <div>
-                        <label class="block text-[13px] mb-2">Nama lengkap</label>
-                        <input type="text" name="name" placeholder="Nama lengkap" 
+                        <label class="block text-[13px] mb-2">{{ app()->getLocale() === 'en' ? 'Full Name' : 'Nama lengkap' }}</label>
+                        <input type="text" name="name" placeholder="{{ app()->getLocale() === 'en' ? 'Full Name' : 'Nama lengkap' }}" 
                             value="{{ old('name') }}"
                             class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition @error('name') border-red-500 focus:border-red-500 @enderror" 
                             required>
@@ -74,8 +74,8 @@
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-[13px] mb-2">Username</label>
-                        <input type="text" name="username" placeholder="Username" 
+                        <label class="block text-[13px] mb-2">{{ app()->getLocale() === 'en' ? 'Username' : 'Username' }}</label>
+                        <input type="text" name="username" placeholder="{{ app()->getLocale() === 'en' ? 'Username' : 'Username' }}" 
                             value="{{ old('username') }}"
                             class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition @error('username') border-red-500 focus:border-red-500 @enderror" 
                             required>
@@ -87,8 +87,8 @@
 
                 <!-- Alamat Email -->
                 <div class="mb-2">
-                    <label class="block text-[13px] mb-2">Alamat email</label>
-                    <input type="email" name="email" placeholder="Alamat email" 
+                    <label class="block text-[13px] mb-2">{{ app()->getLocale() === 'en' ? 'Email Address' : 'Alamat email' }}</label>
+                    <input type="email" name="email" placeholder="{{ app()->getLocale() === 'en' ? 'Email Address' : 'Alamat email' }}" 
                         value="{{ old('email') }}"
                         class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition @error('email') border-red-500 focus:border-red-500 @enderror" 
                         required>
@@ -99,7 +99,7 @@
 
                 <!-- Nomor WhatsApp -->
                 <div class="mb-2">
-                    <label class="block text-[13px] mb-2">Nomor whatsapp</label>
+                    <label class="block text-[13px] mb-2">{{ app()->getLocale() === 'en' ? 'WhatsApp Number' : 'Nomor whatsapp' }}</label>
                     <div class="flex gap-2">
                         <select name="country_code" 
                             class="country-select px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white w-24 focus:border-gray-400 transition">
@@ -122,9 +122,9 @@
                 <!-- Kata Sandi & Konfirmasi -->
                 <div class="grid grid-cols-2 gap-4 mb-2">
                     <div>
-                        <label class="block text-[13px] mb-2">Kata sandi</label>
+                        <label class="block text-[13px] mb-2">{{ app()->getLocale() === 'en' ? 'Password' : 'Kata sandi' }}</label>
                         <div class="relative">
-                            <input type="password" id="password" name="password" placeholder="Kata sandi" 
+                            <input type="password" id="password" name="password" placeholder="{{ app()->getLocale() === 'en' ? 'Password' : 'Kata sandi' }}" 
                                 class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition @error('password') border-red-500 focus:border-red-500 @enderror" 
                                 required>
                             <button type="button" onclick="togglePassword('password', 'togglePassword1')" 
@@ -137,9 +137,9 @@
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-[13px] mb-2">Konfirmasi kata sandi</label>
+                        <label class="block text-[13px] mb-2">{{ app()->getLocale() === 'en' ? 'Confirm Password' : 'Konfirmasi kata sandi' }}</label>
                         <div class="relative">
-                            <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Konfirmasi kata sandi" 
+                            <input type="password" id="password_confirmation" name="password_confirmation" placeholder="{{ app()->getLocale() === 'en' ? 'Confirm Password' : 'Konfirmasi kata sandi' }}" 
                                 class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition" 
                                 required>
                             <button type="button" onclick="togglePassword('password_confirmation', 'togglePassword2')" 
@@ -155,10 +155,10 @@
                     <input type="checkbox" id="terms" name="terms" 
                         class="mt-1 w-4 h-4 rounded border-gray-600 bg-gray-600/50" required {{ old('terms') ? 'checked' : '' }}>
                     <label for="terms" class="text-sm text-gray-300">
-                        Saya setuju dengan 
-                        <a href="#" class="text-amber-500 hover:text-amber-400">Syarat dan Ketentuan</a> 
+                        {{ app()->getLocale() === 'en' ? 'I agree to the' : 'Saya setuju dengan' }} 
+                        <a href="#" class="text-amber-500 hover:text-amber-400">{{ app()->getLocale() === 'en' ? 'Terms and Conditions' : 'Syarat dan Ketentuan' }}</a> 
                         dan 
-                        <a href="#" class="text-amber-500 hover:text-amber-400">Kebijakan Pribadi</a>.
+                        <a href="#" class="text-amber-500 hover:text-amber-400">{{ app()->getLocale() === 'en' ? 'Privacy Policy' : 'Kebijakan Pribadi' }}</a>.
                     </label>
                 </div>
                 @error('terms')
@@ -177,13 +177,13 @@
                 <button type="submit" 
                     class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition mb-4 text-[13px]">
                     <i class="ri-user-add-line text-[14px]"></i>
-                    Daftar
+                    {{ app()->getLocale() === 'en' ? 'Register' : 'Daftar' }}
                 </button>
 
                 <!-- Link Login -->
                 <p class="text-center text-gray-400 text-[13px]">
-                    Sudah memiliki akun? 
-                    <a href="{{ route('login') }}" class="text-amber-500 hover:text-amber-400 font-semibold">Masuk</a>
+                    {{ app()->getLocale() === 'en' ? 'Already have an account?' : 'Sudah memiliki akun?' }}
+                    <a href="{{ route('login') }}" class="text-amber-500 hover:text-amber-400 font-semibold">{{ app()->getLocale() === 'en' ? 'Login' : 'Masuk' }}</a>
                 </p>
             </form>
         </div>
@@ -195,7 +195,7 @@
     <!-- Chat CS Button -->
     <button class="fixed bottom-6 right-6 bg-amber-600 hover:bg-amber-700 text-white px-4 py-3 rounded-lg flex items-center gap-2 shadow-lg transition">
         <i class="ri-headphone-line text-xl"></i>
-        CHAT CS
+        {{ app()->getLocale() === 'en' ? 'CHAT CS' : 'HUBUNGI CS' }}
     </button>
 
     <script>

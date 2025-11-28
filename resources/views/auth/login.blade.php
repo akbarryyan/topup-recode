@@ -42,14 +42,14 @@
         </button>
 
         <div class="flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
-            <h1 class="text-[22px] font-bold mb-1">Masuk</h1>
-            <p class="text-gray-200 mb-6 text-[13px]">Masuk dengan akun yang telah Kamu daftarkan.</p>
+            <h1 class="text-[22px] font-bold mb-1">{{ app()->getLocale() === 'en' ? 'Login' : 'Masuk' }}</h1>
+            <p class="text-gray-200 mb-6 text-[13px]">{{ app()->getLocale() === 'en' ? 'Login with the account you have registered.' : 'Masuk dengan akun yang telah Kamu daftarkan.' }}</p>
 
             @if ($errors->any())
                 <div class="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/40 text-red-300 text-sm">
                     {{ $errors->first() }}
                     @if ($errors->has('username'))
-                        <p class="mt-2 text-xs text-red-300">Hubungi CS jika kamu butuh bantuan membuka akses.</p>
+                        <p class="mt-2 text-xs text-red-300">{{ app()->getLocale() === 'en' ? 'Contact CS if you need help opening access.' : 'Hubungi CS jika kamu butuh bantuan membuka akses.' }}</p>
                     @endif
                 </div>
             @endif
@@ -59,8 +59,8 @@
                 
                 <!-- Username -->
                 <div class="mb-4">
-                    <label class="block text-[13px] mb-2">Email atau Username</label>
-                    <input type="text" name="username" placeholder="Email atau username" 
+                    <label class="block text-[13px] mb-2">{{ app()->getLocale() === 'en' ? 'Email or Username' : 'Email atau Username' }}</label>
+                    <input type="text" name="username" placeholder="{{ app()->getLocale() === 'en' ? 'Email or username' : 'Email atau username' }}" 
                         value="{{ old('username') }}"
                         class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition @error('username') border-red-500 focus:border-red-500 @enderror" 
                         required>
@@ -71,9 +71,9 @@
 
                 <!-- Kata Sandi -->
                 <div class="mb-4">
-                    <label class="block text-[13px] mb-2">Kata sandi</label>
+                    <label class="block text-[13px] mb-2">{{ app()->getLocale() === 'en' ? 'Password' : 'Kata sandi' }}</label>
                     <div class="relative">
-                        <input type="password" id="password" name="password" placeholder="Kata sandi" 
+                        <input type="password" id="password" name="password" placeholder="{{ app()->getLocale() === 'en' ? 'Password' : 'Kata sandi' }}" 
                             class="w-full px-4 py-2 rounded-lg bg-gray-600/50 border border-gray-600 text-white placeholder-gray-400 placeholder:text-[13px] focus:border-gray-400 transition @error('password') border-red-500 focus:border-red-500 @enderror" 
                             required>
                         <button type="button" onclick="togglePassword('password', 'togglePasswordIcon')" 
@@ -92,9 +92,9 @@
                         <input type="checkbox" name="remember" 
                             class="w-4 h-4 rounded border-gray-600 bg-gray-600/50"
                             {{ old('remember') ? 'checked' : '' }}>
-                        <span class="text-[13px] text-gray-300">Ingat akun ku</span>
+                        <span class="text-[13px] text-gray-300">{{ app()->getLocale() === 'en' ? 'Remember my account' : 'Ingat akun ku' }}</span>
                     </label>
-                    <a href="#" class="text-[13px] text-amber-500 hover:text-amber-400">Lupa kata sandi mu?</a>
+                    <a href="#" class="text-[13px] text-amber-500 hover:text-amber-400">{{ app()->getLocale() === 'en' ? 'Forgot password?' : 'Lupa kata sandi mu?' }}</a>
                 </div>
 
                 <!-- reCAPTCHA -->
@@ -109,13 +109,13 @@
                 <button type="submit" 
                     class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition mb-4 text-[13px]">
                     <i class="ri-lock-line text-[14px]"></i>
-                    Masuk
+                    {{ app()->getLocale() === 'en' ? 'Login' : 'Masuk' }}
                 </button>
 
                 <!-- Link Register -->
                 <p class="text-center text-gray-400 text-[13px]">
-                    Belum memiliki akun? 
-                    <a href="{{ route('register') }}" class="text-amber-500 hover:text-amber-400 font-semibold">Daftar</a>
+                    {{ app()->getLocale() === 'en' ? 'Don\'t have an account?' : 'Belum memiliki akun?' }} 
+                    <a href="{{ route('register') }}" class="text-amber-500 hover:text-amber-400 font-semibold">{{ app()->getLocale() === 'en' ? 'Register' : 'Daftar' }}</a>
                 </p>
             </form>
         </div>
@@ -127,7 +127,7 @@
     <!-- Chat CS Button -->
     <button class="fixed bottom-6 right-6 bg-amber-600 hover:bg-amber-700 text-white px-4 py-3 rounded-lg flex items-center gap-2 shadow-lg transition">
         <i class="ri-headphone-line text-xl"></i>
-        CHAT CS
+        {{ app()->getLocale() === 'en' ? 'CHAT CS' : 'HUBUNGI CS' }}
     </button>
 
     <script>

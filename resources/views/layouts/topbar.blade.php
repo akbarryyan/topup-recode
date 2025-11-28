@@ -89,21 +89,18 @@
                         <div class="flex items-center justify-between text-gray-300">
                             <div class="flex items-center gap-2">
                                 <i class="ri-wallet-3-line"></i>
-                                <span>Saldo</span>
+                                <span>{{ app()->getLocale() === 'en' ? 'Balance' : 'Saldo' }}</span>
                             </div>
                             <span class="font-semibold">Rp {{ number_format($currentUser->balance ?? 0, 0, ',', '.') }}</span>
                         </div>
                         <a href="{{ localized_url('/profile') }}" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
                             <i class="ri-user-line"></i>
-                            <span>Profil</span>
+                            <span>{{ app()->getLocale() === 'en' ? 'Profile' : 'Profil' }}</span>
                         </a>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="w-full flex items-center gap-2 text-left text-gray-300 hover:text-white transition-colors">
-                                <i class="ri-logout-circle-r-line"></i>
-                                <span>Keluar</span>
-                            </button>
-                        </form>
+                        <button type="button" onclick="confirmLogout()" class="w-full flex items-center gap-2 text-left text-gray-300 hover:text-white transition-colors">
+                            <i class="ri-logout-circle-r-line"></i>
+                            <span>{{ app()->getLocale() === 'en' ? 'Logout' : 'Keluar' }}</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -135,21 +132,18 @@
                         <div class="flex items-center justify-between text-gray-300">
                             <div class="flex items-center gap-2">
                                 <i class="ri-wallet-3-line"></i>
-                                <span>Saldo</span>
+                                <span>{{ app()->getLocale() === 'en' ? 'Balance' : 'Saldo' }}</span>
                             </div>
                             <span class="font-semibold">Rp {{ number_format($currentUser->balance ?? 0, 0, ',', '.') }}</span>
                         </div>
                         <a href="{{ url('/profile') }}" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
                             <i class="ri-user-line"></i>
-                            <span>Profil</span>
+                            <span>{{ app()->getLocale() === 'en' ? 'Profile' : 'Profil' }}</span>
                         </a>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="w-full flex items-center gap-2 text-left text-gray-300 hover:text-white transition-colors">
-                                <i class="ri-logout-circle-r-line"></i>
-                                <span>Keluar</span>
-                            </button>
-                        </form>
+                        <button type="button" onclick="confirmLogout()" class="w-full flex items-center gap-2 text-left text-gray-300 hover:text-white transition-colors">
+                            <i class="ri-logout-circle-r-line"></i>
+                            <span>{{ app()->getLocale() === 'en' ? 'Logout' : 'Keluar' }}</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -168,36 +162,36 @@
     <nav class="hidden lg:flex items-center justify-start gap-8 px-8">
         <a href="{{ localized_url('/') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->is('/') || request()->is(app()->getLocale()) || request()->is(app()->getLocale() . '/') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
             <i class="ri-dashboard-line text-[16px]"></i>
-            <span class="text-sm font-medium">Dashboard</span>
+            <span class="text-sm font-medium">{{ app()->getLocale() === 'en' ? 'Dashboard' : 'Dashboard' }}</span>
         </a>
         <a href="{{ localized_url('/check-invoice') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->is('*/check-invoice') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
             <i class="ri-file-list-3-line text-[16px]"></i>
-            <span class="text-sm font-medium">Check Invoice</span>
+            <span class="text-sm font-medium">{{ app()->getLocale() === 'en' ? 'Check Invoice' : 'Cek Invoice' }}</span>
         </a>
         <a href="{{ localized_url('/leaderboard') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->is('*/leaderboard') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
             <i class="ri-trophy-line text-[16px]"></i>
-            <span class="text-sm font-medium">Leaderboard</span>
+            <span class="text-sm font-medium">{{ app()->getLocale() === 'en' ? 'Leaderboard' : 'Leaderboard' }}</span>
         </a>
         
         <!-- Calculator Dropdown (Desktop) -->
         <div class="relative group h-full flex items-center">
             <button class="flex items-center gap-2 py-4 border-b-2 border-transparent text-gray-300 hover:text-white transition-colors">
                 <i class="ri-calculator-line text-[16px]"></i>
-                <span class="text-sm font-medium">Calculator</span>
+                <span class="text-sm font-medium">{{ app()->getLocale() === 'en' ? 'Calculator' : 'Kalkulator' }}</span>
             </button>
             <div class="absolute top-full left-0 w-56 bg-[#18181B] rounded-b-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-800 z-50">
-                <a href="#" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-[#27272A] transition-colors">ML Diamond Calculator</a>
-                <a href="#" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-[#27272A] last:rounded-b-lg transition-colors">FF Diamond Calculator</a>
+                <a href="#" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-[#27272A] transition-colors">{{ app()->getLocale() === 'en' ? 'ML Diamond Calculator' : 'Kalkulator Diamond ML' }}</a>
+                <a href="#" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-[#27272A] last:rounded-b-lg transition-colors">{{ app()->getLocale() === 'en' ? 'FF Diamond Calculator' : 'Kalkulator Diamond FF' }}</a>
             </div>
         </div>
 
         <a href="{{ localized_url('/article') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->is('*/article') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
             <i class="ri-article-line text-[16px]"></i>
-            <span class="text-sm font-medium">Articles</span>
+            <span class="text-sm font-medium">{{ app()->getLocale() === 'en' ? 'Articles' : 'Artikel' }}</span>
         </a>
         <a href="{{ localized_url('/contact-us') }}" class="flex items-center gap-2 py-4 border-b-2 {{ request()->is('*/contact-us') ? 'border-rose-600 text-white' : 'border-transparent text-gray-300 hover:text-white' }} transition-colors group">
             <i class="ri-customer-service-2-line text-[16px]"></i>
-            <span class="text-sm font-medium">Contact Us</span>
+            <span class="text-sm font-medium">{{ app()->getLocale() === 'en' ? 'Contact Us' : 'Hubungi Kami' }}</span>
         </a>
     </nav>
 </div>
@@ -225,69 +219,66 @@
             <!-- Home -->
             <a href="{{ localized_url('/') }}" class="flex items-center gap-4 px-4 py-3 text-white hover:bg-[#27272A] rounded-lg transition-colors group">
                 <i class="ri-home-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
-                <span class="font-medium">Beranda</span>
+                <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Home' : 'Beranda' }}</span>
             </a>
 
             <!-- Check Invoice -->
             <a href="{{ localized_url('/invoices') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
                 <i class="ri-file-list-3-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
-                <span class="font-medium">Cek Invoice</span>
+                <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Check Invoice' : 'Cek Invoice' }}</span>
             </a>
 
             <!-- Leaderboard -->
             <a href="{{ localized_url('/leaderboard') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
                 <i class="ri-trophy-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
-                <span class="font-medium">Leaderboard</span>
+                <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Leaderboard' : 'Leaderboard' }}</span>
             </a>
 
             <!-- Calculator -->
             <button class="flex items-center justify-between w-full px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group" id="calculatorToggle">
                 <div class="flex items-center gap-4">
                     <i class="ri-calculator-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
-                    <span class="font-medium">Kalkulator</span>
+                    <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Calculator' : 'Kalkulator' }}</span>
                 </div>
                 <i class="ri-arrow-down-s-line text-[18px] transition-transform duration-200" id="calculatorArrow"></i>
             </button>
 
             <!-- Calculator Submenu (Hidden by default) -->
             <div id="calculatorSubmenu" class="ml-12 space-y-1 hidden overflow-hidden transition-all duration-300">
-                <a href="#" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-[#27272A] rounded-lg transition-colors">ML Diamond Calculator</a>
-                <a href="#" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-[#27272A] rounded-lg transition-colors">FF Diamond Calculator</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-[#27272A] rounded-lg transition-colors">{{ app()->getLocale() === 'en' ? 'ML Diamond Calculator' : 'Kalkulator Diamond ML' }}</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-[#27272A] rounded-lg transition-colors">{{ app()->getLocale() === 'en' ? 'FF Diamond Calculator' : 'Kalkulator Diamond FF' }}</a>
             </div>
 
             <!-- Articles -->
             <a href="{{ localized_url('/article') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
                 <i class="ri-article-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
-                <span class="font-medium">Artikel</span>
+                <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Articles' : 'Artikel' }}</span>
             </a>
 
             <!-- Contact Us -->
             <a href="{{ localized_url('/contact-us') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
                 <i class="ri-customer-service-2-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
-                <span class="font-medium">Hubungi Kami</span>
+                <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Contact Us' : 'Hubungi Kami' }}</span>
             </a>
 
             @auth
-            <div class="mt-6 mb-2 px-4 text-xs font-semibold tracking-wide text-gray-500">Akun Saya</div>
+            <div class="mt-6 mb-2 px-4 text-xs font-semibold tracking-wide text-gray-500">{{ app()->getLocale() === 'en' ? 'My Account' : 'Akun Saya' }}</div>
             <a href="{{ localized_url('/profile') }}" class="flex items-center gap-4 px-4 py-3 text-white hover:bg-[#27272A] rounded-lg transition-colors group">
                 <i class="ri-user-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
-                <span class="font-medium">Profile</span>
+                <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Profile' : 'Profil' }}</span>
             </a>
             <a href="{{ url('/saldo') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
                 <i class="ri-wallet-3-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
-                <span class="font-medium">Saldo</span>
+                <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Balance' : 'Saldo' }}</span>
             </a>
             <a href="{{ url('/transactions') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
                 <i class="ri-file-list-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
-                <span class="font-medium">Transaksi</span>
+                <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Transactions' : 'Transaksi' }}</span>
             </a>
-            <form method="POST" action="{{ route('logout') }}" class="mt-4">
-                @csrf
-                <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors">
-                    <i class="ri-logout-circle-r-line text-[18px]"></i>
-                    <span class="font-medium">Keluar</span>
-                </button>
-            </form>
+            <button type="button" onclick="confirmLogout()" class="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors">
+                <i class="ri-logout-circle-r-line text-[18px]"></i>
+                <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Logout' : 'Keluar' }}</span>
+            </button>
             @endauth
         </nav>
 
@@ -296,7 +287,7 @@
         <div class="mt-8 pt-6 border-t border-gray-800">
             <a href="{{ route('login') }}" class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-transparent border border-gray-700 text-white hover:bg-[#27272A] hover:border-gray-500 rounded-lg transition-all">
                 <i class="ri-login-box-line text-[18px]"></i>
-                <span class="font-medium">Sign In</span>
+                <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Sign In' : 'Masuk' }}</span>
             </a>
         </div>
         @endguest
@@ -418,4 +409,34 @@
             }
         });
     });
+    
+    // Logout confirmation function
+    function confirmLogout() {
+        const locale = '{{ app()->getLocale() }}';
+        const title = locale === 'en' ? 'Logout Confirmation' : 'Konfirmasi Keluar';
+        const text = locale === 'en' ? 'Are you sure you want to logout?' : 'Apakah Anda yakin ingin keluar?';
+        const confirmText = locale === 'en' ? 'Yes, Logout' : 'Ya, Keluar';
+        const cancelText = locale === 'en' ? 'Cancel' : 'Batal';
+        
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: confirmText,
+            cancelButtonText: cancelText
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Submit hidden logout form
+                document.getElementById('logoutForm').submit();
+            }
+        });
+    }
 </script>
+
+<!-- Hidden Logout Form -->
+<form id="logoutForm" method="POST" action="{{ localized_url('/auth/logout') }}" style="display: none;">
+    @csrf
+</form>

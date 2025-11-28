@@ -10,9 +10,6 @@
                     <span class="text-2xl font-bold text-white">{{ $websiteName }}</span>
                 @endif
             </div>
-            <p class="text-gray-400 text-sm leading-relaxed max-w-xl">
-                {{ $websiteDescription }}
-            </p>
         </div>
 
         <!-- Contact Info -->

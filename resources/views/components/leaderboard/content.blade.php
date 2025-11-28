@@ -3,8 +3,8 @@
         <div class="max-w-4xl mx-auto">
             <!-- Header Title-->
             <div class="text-center text-gray-200 mb-6 lg:mb-8">
-                <h1 class="text-2xl lg:text-3xl xl:text-3xl font-semibold mb-2">Leaderboard</h1>
-                <p class="text-xs lg:text-sm text-gray-400 px-4">Top 10 Pembelian Terbanyak di {{ $websiteName ?? 'NVD STORE' }}, Data ini diperbarui otomatis dari sistem kami</p>
+                <h1 class="text-2xl lg:text-3xl xl:text-3xl font-semibold mb-2">{{ app()->getLocale() === 'en' ? 'Leaderboard' : 'Leaderboard' }}</h1>
+                <p class="text-xs lg:text-sm text-gray-400 px-4">{{ app()->getLocale() === 'en' ? 'Top 10 Purchase Most' : 'Top 10 Pembelian Terbanyak' }} di {{ $websiteName ?? 'NVD STORE' }}, {{ app()->getLocale() === 'en' ? 'this data is automatically updated from our system' : 'Data ini diperbarui otomatis dari sistem kami' }}</p>
             </div>
     
             <!-- Tab Navigation -->
@@ -12,7 +12,7 @@
                 <!-- Tab 1: Hari Ini -->
                 <div class="bg-[#0E0E10] rounded-xl lg:rounded-2xl overflow-hidden shadow-lg">
                     <button onclick="toggleTab('daily')" class="w-full px-4 lg:px-6 py-3 lg:py-4 bg-[#18181B] text-white text-left font-medium text-sm lg:text-base flex items-center justify-between hover:bg-[#1f1f23] transition">
-                        <span>Top 10 - Hari ini</span>
+                        <span>{{ app()->getLocale() === 'en' ? 'Top 10 - Today' : 'Top 10 - Hari ini' }}</span>
                         <i id="icon-daily" class="ri-arrow-down-s-line text-xl lg:text-2xl transition-transform"></i>
                     </button>
                     <div id="content-daily" class="p-3 lg:p-4">
@@ -37,7 +37,7 @@
                         </div>
                         @else
                         <div class="bg-[#18181B] rounded-lg lg:rounded-xl p-4 lg:p-6 text-center text-gray-400 text-xs lg:text-sm">
-                            Belum ada transaksi hari ini
+                            {{ app()->getLocale() === 'en' ? 'No transactions today' : 'Belum ada transaksi hari ini' }}
                         </div>
                         @endif
                     </div>
@@ -46,7 +46,7 @@
                 <!-- Tab 2: Minggu Ini -->
                 <div class="bg-[#0E0E10] rounded-xl lg:rounded-2xl overflow-hidden shadow-lg">
                     <button onclick="toggleTab('weekly')" class="w-full px-4 lg:px-6 py-3 lg:py-4 bg-[#18181B] text-white text-left font-medium text-sm lg:text-base flex items-center justify-between hover:bg-[#1f1f23] transition">
-                        <span>Top 10 - Minggu ini</span>
+                        <span>{{ app()->getLocale() === 'en' ? 'Top 10 - This Week' : 'Top 10 - Minggu ini' }}</span>
                         <i id="icon-weekly" class="ri-arrow-down-s-line text-xl lg:text-2xl transition-transform"></i>
                     </button>
                     <div id="content-weekly" class="p-3 lg:p-4">
@@ -71,7 +71,7 @@
                         </div>
                         @else
                         <div class="bg-[#18181B] rounded-lg lg:rounded-xl p-4 lg:p-6 text-center text-gray-400 text-xs lg:text-sm">
-                            Belum ada transaksi minggu ini
+                            {{ app()->getLocale() === 'en' ? 'No transactions this week' : 'Belum ada transaksi minggu ini' }}
                         </div>
                         @endif
                     </div>
@@ -80,7 +80,7 @@
                 <!-- Tab 3: Bulan Ini -->
                 <div class="bg-[#0E0E10] rounded-xl lg:rounded-2xl overflow-hidden shadow-lg">
                     <button onclick="toggleTab('monthly')" class="w-full px-4 lg:px-6 py-3 lg:py-4 bg-[#18181B] text-white text-left font-medium text-sm lg:text-base flex items-center justify-between hover:bg-[#1f1f23] transition">
-                        <span>Top 10 - Bulan ini</span>
+                        <span>{{ app()->getLocale() === 'en' ? 'Top 10 - This Month' : 'Top 10 - Bulan ini' }}</span>
                         <i id="icon-monthly" class="ri-arrow-down-s-line text-xl lg:text-2xl transition-transform"></i>
                     </button>
                     <div id="content-monthly" class="p-3 lg:p-4">
@@ -106,7 +106,7 @@
                         </div>
                         @else
                         <div class="bg-[#18181B] rounded-lg lg:rounded-xl p-4 lg:p-6 text-center text-gray-400 text-xs lg:text-sm">
-                            Belum ada transaksi bulan ini
+                            {{ app()->getLocale() === 'en' ? 'No transactions this month' : 'Belum ada transaksi bulan ini' }}
                         </div>
                         @endif
                     </div>

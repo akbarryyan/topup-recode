@@ -40,6 +40,7 @@
                                         <tr>
                                             <td><span class="badge badge-primary">{{ $transaction->trxid }}</span></td>
                                             <td>
+                                                @if($transaction->user)
                                                 <div class="d-flex align-items-center">
                                                     <figure class="avatar avatar-sm mr-2 bg-primary text-white d-flex align-items-center justify-content-center">
                                                         {{ strtoupper(substr($transaction->user->name, 0, 1)) }}
@@ -49,6 +50,17 @@
                                                         <small class="text-muted">{{ $transaction->user->email }}</small>
                                                     </div>
                                                 </div>
+                                                @else
+                                                <div class="d-flex align-items-center">
+                                                    <figure class="avatar avatar-sm mr-2 bg-secondary text-white d-flex align-items-center justify-content-center">
+                                                        G
+                                                    </figure>
+                                                    <div>
+                                                        <div><span class="badge badge-secondary">Guest</span></div>
+                                                        <small class="text-muted">{{ $transaction->email ?? '-' }}</small>
+                                                    </div>
+                                                </div>
+                                                @endif
                                             </td>
                                             <td>
                                                 <div><strong>{{ $transaction->service_name }}</strong></div>

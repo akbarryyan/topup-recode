@@ -93,4 +93,25 @@ class PrepaidService extends Model
         }
         return $originalPrice + $marginValue;
     }
+
+    /**
+     * Calculate final price based on user role
+     * 
+     * @param string $role User role: 'member', 'premium', 'vip', 'reseller', etc.
+     * @return int Final price
+     */
+    public function calculateFinalPrice($role = 'member')
+    {
+        switch ($role) {
+            case 'premium':
+                return $this->price_premium ?? $this->price_basic;
+            case 'vip':
+            case 'reseller':
+            case 'special':
+                return $this->price_special ?? $this->price_premium ?? $this->price_basic;
+            case 'member':
+            default:
+                return $this->price_basic;
+        }
+    }
 }

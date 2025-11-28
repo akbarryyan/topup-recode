@@ -1,7 +1,7 @@
 <div class="mt-16 lg:mt-32">
 <div class="bg-[#000000] px-3 lg:px-8 py-6 lg:py-8">
     <div class="max-w-7xl mx-auto">
-        <h1 class="text-gray-100 font-semibold text-xl lg:text-2xl mb-4 lg:mb-6">Artikel & Berita</h1>
+        <h1 class="text-gray-100 font-semibold text-xl lg:text-2xl mb-4 lg:mb-6">{{ app()->getLocale() === 'en' ? 'Article & News' : 'Artikel & Berita' }}</h1>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
             @forelse($news as $item)
             <a href="{{ route('article') }}" class="bg-[#27272A] w-full flex md:flex-col items-stretch gap-0 rounded-xl lg:rounded-2xl overflow-hidden hover:ring-2 hover:ring-yellow-500 transition-all group cursor-pointer">
@@ -17,7 +17,7 @@
             </a>
             @empty
             <div class="col-span-full text-center py-8">
-                <p class="text-gray-400 text-sm lg:text-base">Belum ada artikel tersedia</p>
+                <p class="text-gray-400 text-sm lg:text-base">{{ app()->getLocale() === 'en' ? 'No articles available' : 'Belum ada artikel tersedia' }}</p>
             </div>
             @endforelse
         </div>

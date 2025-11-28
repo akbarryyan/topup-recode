@@ -55,12 +55,12 @@
         <!-- Categories Tab -->
         <div class="overflow-x-auto scrollbar-hide max-w-7xl mx-auto">
             <div class="flex items-center justify-center lg:justify-center gap-2 lg:gap-4 min-w-max">
-                <button class="category-tab bg-[#141214] active text-white text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-yellow-500 transition-all rounded-t-lg">Topup Game</button>
-                <button class="category-tab bg-[#141214] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg">Pulsa & Data</button>
-                <button class="category-tab bg-[#141214] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg">Voucher</button>
-                <button class="category-tab bg-[#141214] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg">PLN</button>
-                <button class="category-tab bg-[#141214] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg">E-Wallet</button>
-                <button class="category-tab bg-[#141214] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg">Streaming</button>
+                <button class="category-tab bg-[#141214] active text-white text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-yellow-500 transition-all rounded-t-lg">{{ app()->getLocale() === 'en' ? 'Game Topup' : 'Topup Game' }}</button>
+                <button class="category-tab bg-[#141214] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg">{{ app()->getLocale() === 'en' ? 'Credit & Data' : 'Pulsa & Data' }}</button>
+                <button class="category-tab bg-[#141214] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg">{{ app()->getLocale() === 'en' ? 'Voucher' : 'Voucher' }}</button>
+                <button class="category-tab bg-[#141214] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg">{{ app()->getLocale() === 'en' ? 'Electricity' : 'PLN' }}</button>
+                <button class="category-tab bg-[#141214] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg">{{ app()->getLocale() === 'en' ? 'E-Wallet' : 'E-Wallet' }}</button>
+                <button class="category-tab bg-[#141214] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg">{{ app()->getLocale() === 'en' ? 'Streaming' : 'Streaming' }}</button>
             </div>
         </div>
 
@@ -94,10 +94,10 @@
                 @if($gameServices->count() > 6)
                     <div class="mt-4 lg:mt-6 text-center">
                         <button class="show-more-btn bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 lg:px-8 py-2 lg:py-3 rounded-lg lg:rounded-xl transition-colors duration-300 text-sm lg:text-base">
-                            Show More
+                            {{ app()->getLocale() === 'en' ? 'Show More' : 'Tampilkan Lebih Banyak' }}
                         </button>
                         <button class="show-less-btn hidden bg-gray-700 hover:bg-gray-600 text-white font-semibold px-6 lg:px-8 py-2 lg:py-3 rounded-lg lg:rounded-xl transition-colors duration-300 text-sm lg:text-base">
-                            Show Less
+                            {{ app()->getLocale() === 'en' ? 'Show Less' : 'Tampilkan Lebih Sedikit' }}
                         </button>
                     </div>
                 @endif
@@ -131,10 +131,10 @@
                 @if($prepaidServices->count() > 6)
                     <div class="mt-4 lg:mt-6 text-center">
                         <button class="show-more-btn bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 lg:px-8 py-2 lg:py-3 rounded-lg lg:rounded-xl transition-colors duration-300 text-sm lg:text-base">
-                            Show More
+                            {{ app()->getLocale() === 'en' ? 'Show More' : 'Tampilkan Lebih Banyak' }}
                         </button>
                         <button class="show-less-btn hidden bg-gray-700 hover:bg-gray-600 text-white font-semibold px-6 lg:px-8 py-2 lg:py-3 rounded-lg lg:rounded-xl transition-colors duration-300 text-sm lg:text-base">
-                            Show Less
+                            {{ app()->getLocale() === 'en' ? 'Show Less' : 'Tampilkan Lebih Sedikit' }}
                         </button>
                     </div>
                 @endif
@@ -269,7 +269,11 @@
             const productsContainer = document.getElementById('products-container');
             
             // Tab to content mapping
-            const tabContentMap = {
+            const locale = '{{ app()->getLocale() }}';
+            const tabContentMap = locale === 'en' ? {
+                'Game Topup': 'topup-game-products',
+                'Credit & Data': 'pulsa-data-products'
+            } : {
                 'Topup Game': 'topup-game-products',
                 'Pulsa & Data': 'pulsa-data-products'
             };
