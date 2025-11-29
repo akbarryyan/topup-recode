@@ -172,6 +172,18 @@ Route::get('/article', [ArticleController::class, 'index'])->name('article');
 Route::get('/contact-us', [ContactController::class, 'index'])->name('contact-us');
 Route::post('/contact-us', [ContactController::class, 'store'])->name('contact-us.store');
 
+// Win Rate Calculator Routes
+Route::get('/calculator/win-rate', [App\Http\Controllers\WinRateController::class, 'index'])->name('calculator.win-rate');
+Route::post('/calculator/win-rate/calculate', [App\Http\Controllers\WinRateController::class, 'calculate'])->name('calculator.win-rate.calculate');
+
+// Magic Wheel Calculator Routes
+Route::get('/calculator/magic-wheel', [App\Http\Controllers\MagicWheelController::class, 'index'])->name('calculator.magic-wheel');
+Route::post('/calculator/magic-wheel/calculate', [App\Http\Controllers\MagicWheelController::class, 'calculate'])->name('calculator.magic-wheel.calculate');
+
+// Zodiac Calculator Routes
+Route::get('/calculator/zodiac', [App\Http\Controllers\ZodiacController::class, 'index'])->name('calculator.zodiac');
+Route::post('/calculator/zodiac/calculate', [App\Http\Controllers\ZodiacController::class, 'calculate'])->name('calculator.zodiac.calculate');
+
 // Order Game Route
 Route::get('/order/{gameSlug}', function ($locale = null, $gameSlug) {
     // Convert slug back to game name (e.g., 'free-fire' -> 'Free Fire')

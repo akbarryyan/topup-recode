@@ -165,7 +165,7 @@
                                  data-payment-fee="0">
                                 <div class="flex items-center justify-between mb-3">
                                     <div class="flex items-center gap-2">
-                                        <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center">
+                                        <div class="w-10 h-10 bg-linear-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center">
                                             <i class="ri-wallet-3-fill text-white text-lg"></i>
                                         </div>
                                         <div>

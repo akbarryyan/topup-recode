@@ -184,11 +184,36 @@
         <div class="relative group h-full flex items-center">
             <button class="flex items-center gap-2 py-4 border-b-2 border-transparent text-gray-300 hover:text-white transition-colors">
                 <i class="ri-calculator-line text-[16px]"></i>
-                <span class="text-sm font-medium">{{ app()->getLocale() === 'en' ? 'Calculator' : 'Kalkulator' }}</span>
+                <span class="text-sm font-medium">{{ app()->getLocale() === 'en' ? 'ML Calculator' : 'Kalkulator ML' }}</span>
             </button>
-            <div class="absolute top-full left-0 w-56 bg-[#18181B] rounded-b-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-800 z-50">
-                <a href="#" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-[#27272A] transition-colors">{{ app()->getLocale() === 'en' ? 'ML Diamond Calculator' : 'Kalkulator Diamond ML' }}</a>
-                <a href="#" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-[#27272A] last:rounded-b-lg transition-colors">{{ app()->getLocale() === 'en' ? 'FF Diamond Calculator' : 'Kalkulator Diamond FF' }}</a>
+            <div class="absolute top-full left-0 w-96 bg-[#18181B] rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-700 z-50 overflow-hidden">
+                <a href="{{ localized_url('/calculator/win-rate') }}" class="flex items-start gap-3 px-4 py-3 text-gray-300 hover:bg-[#27272A] transition-colors border-b border-gray-800">
+                    <div class="w-6 h-6 shrink-0 flex items-center justify-center">
+                        <i class="ri-trophy-line text-[20px]"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="text-white font-semibold text-sm mb-1">{{ app()->getLocale() === 'en' ? 'Win Rate' : 'Win Rate' }}</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">{{ app()->getLocale() === 'en' ? 'Used to calculate the total number of matches that must be won to achieve the target win rate you want.' : 'Digunakan untuk menghitung total jumlah match yang harus ditempuh untuk mencapai target win rate yang diinginkan.' }}</p>
+                    </div>
+                </a>
+                <a href="{{ localized_url('/calculator/magic-wheel') }}" class="flex items-start gap-3 px-4 py-3 text-gray-300 hover:bg-[#27272A] transition-colors border-b border-gray-800">
+                    <div class="w-6 h-6 shrink-0 flex items-center justify-center">
+                        <i class="ri-magic-line text-[20px]"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="text-white font-semibold text-sm mb-1">{{ app()->getLocale() === 'en' ? 'Magic Wheel' : 'Magic Wheel' }}</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">{{ app()->getLocale() === 'en' ? 'Used to find out the maximum total diamonds needed to get Legends skin.' : 'Digunakan untuk mengetahui total maksimal diamond yang dibutuhkan untuk mendapatkan skin Legends.' }}</p>
+                    </div>
+                </a>
+                <a href="{{ localized_url('/calculator/zodiac') }}" class="flex items-start gap-3 px-4 py-3 text-gray-300 hover:bg-[#27272A] transition-colors">
+                    <div class="w-6 h-6 shrink-0 flex items-center justify-center">
+                        <i class="ri-contrast-2-line text-[20px]"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="text-white font-semibold text-sm mb-1">{{ app()->getLocale() === 'en' ? 'Zodiac' : 'Zodiac' }}</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">{{ app()->getLocale() === 'en' ? 'Used to find out the maximum total diamonds needed to get Zodiac skin.' : 'Digunakan untuk mengetahui total diamond maksimal yang dibutuhkan untuk mendapatkan skin Zodiacs.' }}</p>
+                    </div>
+                </a>
             </div>
         </div>
 
@@ -252,8 +277,9 @@
 
             <!-- Calculator Submenu (Hidden by default) -->
             <div id="calculatorSubmenu" class="ml-12 space-y-1 hidden overflow-hidden transition-all duration-300">
-                <a href="#" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-[#27272A] rounded-lg transition-colors">{{ app()->getLocale() === 'en' ? 'ML Diamond Calculator' : 'Kalkulator Diamond ML' }}</a>
-                <a href="#" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-[#27272A] rounded-lg transition-colors">{{ app()->getLocale() === 'en' ? 'FF Diamond Calculator' : 'Kalkulator Diamond FF' }}</a>
+                <a href="{{ localized_url('/calculator/win-rate') }}" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-[#27272A] rounded-lg transition-colors">{{ app()->getLocale() === 'en' ? 'Win Rate' : 'Win Rate' }}</a>
+                <a href="{{ localized_url('/calculator/magic-wheel') }}" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-[#27272A] rounded-lg transition-colors">{{ app()->getLocale() === 'en' ? 'Magic Wheel' : 'Magic Wheel' }}</a>
+                <a href="{{ localized_url('/calculator/zodiac') }}" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-[#27272A] rounded-lg transition-colors">{{ app()->getLocale() === 'en' ? 'Zodiac' : 'Zodiac' }}</a>
             </div>
 
             <!-- Articles -->
@@ -561,10 +587,10 @@
 </script>
 
 <!-- Logout Modal Backdrop -->
-<div id="modalBackdrop" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] opacity-0 transition-opacity duration-300"></div>
+<div id="modalBackdrop" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-200 opacity-0 transition-opacity duration-300"></div>
 
 <!-- Logout Confirmation Modal -->
-<div id="logoutModal" class="hidden fixed inset-0 z-[201] flex items-center justify-center p-4 opacity-0 scale-95 transition-all duration-300">
+<div id="logoutModal" class="hidden fixed inset-0 z-201 flex items-center justify-center p-4 opacity-0 scale-95 transition-all duration-300">
     <div class="bg-[#1F1F23] rounded-2xl border border-white/10 shadow-2xl max-w-md w-full p-6 relative">
         <!-- Close Button -->
         <button onclick="closeLogoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
@@ -593,7 +619,7 @@
             <button onclick="closeLogoutModal()" class="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-medium transition-colors border border-white/10">
                 {{ app()->getLocale() === 'en' ? 'Cancel' : 'Batal' }}
             </button>
-            <button onclick="proceedLogout()" class="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-medium transition-all shadow-lg shadow-red-500/30">
+            <button onclick="proceedLogout()" class="flex-1 px-4 py-3 bg-linear-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-medium transition-all shadow-lg shadow-red-500/30">
                 {{ app()->getLocale() === 'en' ? 'Yes, Logout' : 'Ya, Keluar' }}
             </button>
         </div>
