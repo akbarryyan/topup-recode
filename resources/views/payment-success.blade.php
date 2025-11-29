@@ -63,10 +63,25 @@
                     <span class="text-white font-medium">{{ strtoupper($data['payment_method_code']) }}</span>
                 </div>
 
-                <!-- Amount -->
-                <div class="flex justify-between items-start pt-4 border-t border-white/5">
-                    <span class="text-gray-400 text-sm">{{ app()->getLocale() === 'en' ? 'Total Payment' : 'Total Pembayaran' }}</span>
-                    <span class="text-emerald-500 font-bold text-lg">Rp {{ number_format($data['payment_amount'], 0, ',', '.') }}</span>
+                <!-- Price Breakdown -->
+                <div class="pt-4 border-t border-white/5 space-y-2">
+                    <!-- Product Price -->
+                    <div class="flex justify-between items-start">
+                        <span class="text-gray-400 text-sm">{{ app()->getLocale() === 'en' ? 'Product Price' : 'Harga Produk' }}</span>
+                        <span class="text-white font-medium">Rp {{ number_format($data['price'], 0, ',', '.') }}</span>
+                    </div>
+                    
+                    <!-- Payment Fee -->
+                    <div class="flex justify-between items-start">
+                        <span class="text-gray-400 text-sm">{{ app()->getLocale() === 'en' ? 'Payment Fee' : 'Biaya Admin' }}</span>
+                        <span class="text-white font-medium">Rp {{ number_format($data['payment_fee'], 0, ',', '.') }}</span>
+                    </div>
+                    
+                    <!-- Total -->
+                    <div class="flex justify-between items-start pt-2 border-t border-white/5">
+                        <span class="text-gray-400 font-semibold">{{ app()->getLocale() === 'en' ? 'Total Payment' : 'Total Pembayaran' }}</span>
+                        <span class="text-emerald-500 font-bold text-lg">Rp {{ number_format($data['price'] + $data['payment_fee'], 0, ',', '.') }}</span>
+                    </div>
                 </div>
 
                 <!-- Status -->

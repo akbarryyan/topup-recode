@@ -119,7 +119,7 @@ class GameOrderController extends Controller
                 // Payment Fields
                 'payment_method_id' => $isCreditsPayment ? null : $paymentMethod->id,
                 'payment_method_code' => $isCreditsPayment ? 'CREDITS' : $paymentMethod->code,
-                'payment_amount' => $totalAmount,
+                'payment_amount' => $isCreditsPayment ? $totalAmount : $servicePrice, // For gateway: base price only, Duitku adds fee
                 'payment_fee' => $paymentFee,
                 'email' => $validated['email'],
                 'whatsapp' => $validated['whatsapp'] ?? null,
@@ -172,9 +172,11 @@ class GameOrderController extends Controller
 
             // Handle Payment Gateway (existing logic)
             // Prepare Duitku parameters
+            // IMPORTANT: Send only service price to Duitku (without fee)
+            // Duitku will automatically add the payment method fee
             $duitkuParams = [
                 'merchantOrderId' => $trxid,
-                'paymentAmount' => (int) $totalAmount,
+                'paymentAmount' => (int) $servicePrice, // Send base price only, Duitku adds fee
                 'paymentMethod' => $paymentMethod->code,
                 'productDetails' => "Pembelian {$validated['game']} - {$service->name}",
                 'email' => $validated['email'],

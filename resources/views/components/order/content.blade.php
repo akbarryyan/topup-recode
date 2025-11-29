@@ -60,11 +60,11 @@
             <div class="flex items-center justify-around py-4 px-2">
                 <div class="flex items-center text-[10px]">
                     <img src="{{ asset('petir.gif') }}" alt="Petir" class="w-6 h-6">
-                    <span class="text-gray-300">    tLocale() === 'en' ? 'Fast Process' : 'Proses cepat' }}</span>
+                    <span class="text-gray-300">{{ app()->getLocale() === 'en' ? 'Fast Process' : 'Proses cepat' }}</span>
                 </div>
                 <div class="flex items-center text-[10px]">
                     <img src="{{ asset('contact-support.gif') }}" alt="Contact Support" class="w-6 h-6">
-                    <span class="text-gray-300">{{ app()->getLocale() === 'en' ? 'Contact Support 24/7' : 'Contact Support 24/7' }}</span>
+                    <span class="text-gray-300">{{ app()->getLocale() === 'en' ? 'Contact Support 24/7' : 'Support 24/7' }}</span>
                 </div>
                 <div class="flex items-center text-[10px]">
                     <img src="{{ asset('secure.gif') }}" alt="Secure Payment" class="w-6 h-6">

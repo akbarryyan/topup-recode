@@ -62,6 +62,31 @@ Route::any('/invoices', function () {
     return redirect()->to('/' . $locale . '/profile?' . http_build_query(array_merge(['tab' => 'transactions'], request()->query())));
 })->name('invoices');
 
+// API route for game search (outside locale group)
+Route::get('/api/games/search', function () {
+    $gameServices = GameService::where('is_active', true)
+        ->where('status', 'available')
+        ->select('game')
+        ->distinct()
+        ->get()
+        ->pluck('game');
+    
+    $gameImages = GameImage::all()->keyBy('game_name');
+    
+    $games = $gameServices->map(function($gameName) use ($gameImages) {
+        return [
+            'name' => $gameName,
+            'slug' => strtolower(str_replace(' ', '-', $gameName)),
+            'image' => isset($gameImages[$gameName]) 
+                ? asset('storage/game-images/' . $gameImages[$gameName]->image)
+                : asset('storage/game-images/game-placeholder.svg'),
+            'category' => 'Game'
+        ];
+    })->values();
+    
+    return response()->json($games);
+})->name('api.games.search');
+
 // Payment Success Routes (outside locale group - NO /id or /en prefix)
 Route::get('/payment/success/{trxid}', [PaymentSuccessController::class, 'show'])->name('payment.success');
 Route::get('/payment/invoice/{trxid}/pdf', [PaymentSuccessController::class, 'downloadPdf'])->name('payment.invoice.pdf');
@@ -195,8 +220,11 @@ Route::get('/order/{gameSlug}', function ($locale = null, $gameSlug) {
             
             if (strpos($code, 'qris') !== false || strpos($name, 'qris') !== false) {
                 return 'qris';
-            } elseif (strpos($name, 'virtual account') !== false || strpos($code, 'va') !== false || 
-                      strpos($name, 'bank') !== false) {
+            } elseif (strpos($name, 'virtual account') !== false || 
+                      strpos($code, 'va') !== false || 
+                      strpos($name, 'bank') !== false ||
+                      // Common VA codes from Duitku: BC (BCA), BN (BNI), BR (BRI), etc.
+                      in_array($code, ['bc', 'bn', 'br', 'bni', 'bri', 'bca', 'mandiri', 'permata', 'cimb', 'danamon', 'atm'])) {
                 return 'virtual_account';
             } elseif (strpos($name, 'alfamart') !== false || strpos($name, 'indomaret') !== false ||
                       strpos($name, 'retail') !== false) {
@@ -278,8 +306,11 @@ Route::get('/order/prepaid/{brandSlug}', function ($locale = null, $brandSlug) {
             
             if (strpos($code, 'qris') !== false || strpos($name, 'qris') !== false) {
                 return 'qris';
-            } elseif (strpos($name, 'virtual account') !== false || strpos($code, 'va') !== false || 
-                      strpos($name, 'bank') !== false) {
+            } elseif (strpos($name, 'virtual account') !== false || 
+                      strpos($code, 'va') !== false || 
+                      strpos($name, 'bank') !== false ||
+                      // Common VA codes from Duitku: BC (BCA), BN (BNI), BR (BRI), etc.
+                      in_array($code, ['bc', 'bn', 'br', 'bni', 'bri', 'bca', 'mandiri', 'permata', 'cimb', 'danamon', 'atm'])) {
                 return 'virtual_account';
             } elseif (strpos($name, 'alfamart') !== false || strpos($name, 'indomaret') !== false ||
                       strpos($name, 'retail') !== false) {

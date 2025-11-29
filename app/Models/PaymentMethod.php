@@ -62,21 +62,12 @@ class PaymentMethod extends Model
      */
     public function getFormattedCustomerFeeAttribute()
     {
-        $parts = [];
-        
-        if ($this->fee_customer_flat > 0) {
-            $parts[] = 'Rp ' . number_format((float)$this->fee_customer_flat, 0, ',', '.');
+        // Use total_fee directly as it contains the actual fee from payment gateway
+        if ($this->total_fee > 0) {
+            return 'Rp ' . number_format((float)$this->total_fee, 0, ',', '.');
         }
         
-        if ($this->fee_customer_percent > 0) {
-            $parts[] = $this->fee_customer_percent . '%';
-        }
-        
-        if (empty($parts)) {
-            return 'Gratis';
-        }
-        
-        return implode(' + ', $parts);
+        return 'Gratis';
     }
 
     /**

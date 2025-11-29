@@ -245,7 +245,7 @@
                     @if(isset($paymentMethods['virtual_account']) && $paymentMethods['virtual_account']->count() > 0)
                     <div class="bg-[#27272A] rounded-lg p-3">
                         <div class="flex items-center justify-between cursor-pointer" onclick="togglePaymentCategory('va')">
-                            <span class="text-white font-medium">Virtual Account</span>
+                            <span class="text-white font-medium">Bank Transfer</span>
                             <i class="ri-arrow-down-s-line text-gray-400" id="va-icon"></i>
                         </div>
                         <div id="va-content" class="max-h-0 overflow-hidden opacity-0 transition-all duration-300 ease-in-out mt-0 space-y-2">

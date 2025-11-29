@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk - Top Up Game</title>
+
+     @php
+        $websiteName = \App\Models\WebsiteSetting::get('website_name', config('app.name', 'Laravel'));
+        $slogan = \App\Models\WebsiteSetting::get('slogan');
+        $pageTitle = $slogan ? "$websiteName - $slogan" : $websiteName;
+    @endphp
+
+    <title>{{ app()->getLocale() === 'en' ? 'Sign In' : 'Masuk' }} {{ $pageTitle }}</title>
 
     <!-- Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -115,7 +122,7 @@
                 <!-- Link Register -->
                 <p class="text-center text-gray-400 text-[13px]">
                     {{ app()->getLocale() === 'en' ? 'Don\'t have an account?' : 'Belum memiliki akun?' }} 
-                    <a href="{{ route('register') }}" class="text-amber-500 hover:text-amber-400 font-semibold">{{ app()->getLocale() === 'en' ? 'Register' : 'Daftar' }}</a>
+                    <a href="{{ localized_url('/auth/register') }}" class="text-amber-500 hover:text-amber-400 font-semibold">{{ app()->getLocale() === 'en' ? 'Register' : 'Daftar' }}</a>
                 </p>
             </form>
         </div>

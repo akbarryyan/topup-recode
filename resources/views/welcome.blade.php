@@ -360,18 +360,20 @@
                     const showMoreBtn = parentContent.querySelector('.show-more-btn');
                     
                     const allProducts = productsGrid.querySelectorAll('.product-item');
-                    const isDesktop = window.innerWidth >= 1024; // lg breakpoint
-                    const visibleCount = isDesktop ? 16 : 6;
                     
                     allProducts.forEach((product, index) => {
-                        if (index >= visibleCount) {
-                            if (index >= 6 && index < 16 && isDesktop) {
-                                product.classList.remove('hidden');
-                                product.classList.add('lg:hidden');
-                            } else if (index >= 6) {
-                                product.classList.add('hidden');
-                            }
+                        // Reset all products first
+                        product.classList.remove('hidden', 'lg:hidden');
+                        
+                        // Apply initial state based on index
+                        if (index >= 6 && index < 16) {
+                            // Items 6-15: hidden on mobile, visible on desktop
+                            product.classList.add('hidden', 'lg:block');
+                        } else if (index >= 16) {
+                            // Items 16+: hidden on both mobile and desktop
+                            product.classList.add('hidden', 'lg:hidden');
                         }
+                        // Items 0-5: visible on both (no classes needed)
                     });
                     
                     this.classList.add('hidden');
