@@ -43,37 +43,31 @@
                 </h3>
                 <ul class="space-y-3">
                     <li>
-                        <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
+                        <a href="{{ localized_url('/') }}" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
                             <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
                             <span>{{ app()->getLocale() === 'en' ? 'Dashboard' : 'Dashboard' }}</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
-                            <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
-                            <span>{{ app()->getLocale() === 'en' ? 'Reviews' : 'Reviews' }}</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
+                        <a href="{{ localized_url('/check-invoice') }}" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
                             <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
                             <span>{{ app()->getLocale() === 'en' ? 'Check Transactions' : 'Cek Transaksi' }}</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
+                        <a href="{{ localized_url('/price-list') }}" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
                             <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
                             <span>{{ app()->getLocale() === 'en' ? 'Price List' : 'Daftar Harga' }}</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
+                        <a href="{{ localized_url('/article') }}" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
                             <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
                             <span>{{ app()->getLocale() === 'en' ? 'Articles' : 'Artikel' }}</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
+                        <a href="{{ localized_url('/contact-us') }}" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
                             <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
                             <span>{{ app()->getLocale() === 'en' ? 'Contact Us' : 'Hubungi Kami' }}</span>
                         </a>
@@ -88,12 +82,6 @@
                     <span class="absolute bottom-0 left-0 w-12 h-0.5 bg-yellow-500 -mb-2"></span>
                 </h3>
                 <ul class="space-y-3">
-                    <li>
-                        <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
-                            <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
-                            <span>{{ app()->getLocale() === 'en' ? 'Privacy Policy' : 'Kebijakan Privasi' }}</span>
-                        </a>
-                    </li>
                     <li>
                         <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
                             <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>

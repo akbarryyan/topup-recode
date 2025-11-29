@@ -184,6 +184,9 @@ Route::post('/calculator/magic-wheel/calculate', [App\Http\Controllers\MagicWhee
 Route::get('/calculator/zodiac', [App\Http\Controllers\ZodiacController::class, 'index'])->name('calculator.zodiac');
 Route::post('/calculator/zodiac/calculate', [App\Http\Controllers\ZodiacController::class, 'calculate'])->name('calculator.zodiac.calculate');
 
+// Price List Route
+Route::get('/price-list', [App\Http\Controllers\PriceListController::class, 'index'])->name('price-list');
+
 // Order Game Route
 Route::get('/order/{gameSlug}', function ($locale = null, $gameSlug) {
     // Convert slug back to game name (e.g., 'free-fire' -> 'Free Fire')
