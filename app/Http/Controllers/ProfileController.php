@@ -138,10 +138,31 @@ class ProfileController extends Controller
             });
 
         // Convert to base collection and sort
-        $latestTransactions = collect($gameTransactions)->merge($prepaidTransactions)
+        $allTransactions = collect($gameTransactions)->merge($prepaidTransactions)
             ->sortByDesc('raw_date')
-            ->values()
-            ->take(50);
+            ->values();
+        
+        // Check if we're on the transactions tab and need pagination
+        $currentTab = $request->get('tab', 'dashboard');
+        
+        if ($currentTab === 'transactions') {
+            // Use pagination for transactions tab
+            $perPage = 5;
+            $currentPage = $request->get('page', 1);
+            $offset = ($currentPage - 1) * $perPage;
+            
+            // Create a manual paginator
+            $latestTransactions = new \Illuminate\Pagination\LengthAwarePaginator(
+                $allTransactions->slice($offset, $perPage)->values(),
+                $allTransactions->count(),
+                $perPage,
+                $currentPage,
+                ['path' => $request->url(), 'query' => $request->query()]
+            );
+        } else {
+            // Use collection for dashboard tab (show latest 10)
+            $latestTransactions = $allTransactions->take(10);
+        }
         
         // Build mutations query with filters
         $mutationsQuery = Mutation::forUser($user->id);

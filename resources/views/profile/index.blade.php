@@ -11,7 +11,7 @@
                 <!-- Sidebar summary - Mobile & Desktop -->
                 <aside class="bg-[#111114] rounded-3xl border border-white/5 shadow-2xl p-4 md:p-6 space-y-4 md:space-y-6 h-fit md:sticky md:top-6 md:w-64 lg:w-72 shrink-0">
                     <div>
-                        <p class="text-xs uppercase tracking-[0.2em] text-gray-500">Credits</p>
+                        <p class="text-xs uppercase tracking-[0.2em] text-gray-500">{{ app()->getLocale() === 'en' ? 'Profile' : 'Profil' }}</p>
                         <div class="mt-2 md:mt-3 flex items-center gap-2 md:gap-3 text-white">
                             <span class="inline-flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-2xl bg-linear-to-br from-rose-600 to-fuchsia-600 text-xl md:text-2xl font-bold">
                                 {{ strtoupper(substr($user->name, 0, 1)) }}
@@ -26,19 +26,19 @@
                     <nav class="grid grid-cols-2 md:grid-cols-1 gap-2 md:space-y-1">
                         <a href="#" data-tab-target="dashboard" data-tab-default="true" class="tab-trigger flex flex-col md:flex-row items-center md:gap-3 rounded-2xl px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm font-semibold text-gray-400 transition hover:text-white hover:bg-white/5">
                             <i class="ri-dashboard-line text-lg md:text-lg"></i>
-                            <span class="mt-1 md:mt-0">Dashboard</span>
+                            <span class="mt-1 md:mt-0">{{ app()->getLocale() === 'en' ? 'Dashboard' : 'Dashboard' }}</span>
                         </a>
                         <a href="#" data-tab-target="transactions" class="tab-trigger flex flex-col md:flex-row items-center md:gap-3 rounded-2xl px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm font-semibold text-gray-400 transition hover:text-white hover:bg-white/5">
                             <i class="ri-file-list-3-line text-lg md:text-lg"></i>
-                            <span class="mt-1 md:mt-0">Transaksi</span>
+                            <span class="mt-1 md:mt-0">{{ app()->getLocale() === 'en' ? 'Transactions' : 'Transaksi' }}</span>
                         </a>
                         <a href="#" data-tab-target="mutations" class="tab-trigger flex flex-col md:flex-row items-center md:gap-3 rounded-2xl px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm font-semibold text-gray-400 transition hover:text-white hover:bg-white/5">
                             <i class="ri-shuffle-line text-lg md:text-lg"></i>
-                            <span class="mt-1 md:mt-0">Mutasi</span>
+                            <span class="mt-1 md:mt-0">{{ app()->getLocale() === 'en' ? 'Mutations' : 'Mutasi' }}</span>
                         </a>
                         <a href="#" data-tab-target="settings" class="tab-trigger flex flex-col md:flex-row items-center md:gap-3 rounded-2xl px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm font-semibold text-gray-400 transition hover:text-white hover:bg-white/5">
                             <i class="ri-settings-3-line text-lg md:text-lg"></i>
-                            <span class="mt-1 md:mt-0">Pengaturan</span>
+                            <span class="mt-1 md:mt-0">{{ app()->getLocale() === 'en' ? 'Settings' : 'Pengaturan' }}</span>
                         </a>
                     </nav>
     
@@ -46,7 +46,7 @@
                         @csrf
                         <button type="submit" class="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-red-500 hover:bg-red-500/10">
                             <i class="ri-logout-circle-r-line text-lg"></i>
-                            Keluar
+                            {{ app()->getLocale() === 'en' ? 'Logout' : 'Keluar' }}
                         </button>
                     </form>
                 </aside>
@@ -60,19 +60,19 @@
                                 <h2 class="mt-1 text-lg lg:text-2xl font-semibold truncate">{{ $user->name }}</h2>
                                 <p class="text-xs lg:text-sm text-gray-400 truncate">{{ $user->email }}</p>
                             </div>
-                            <button class="rounded-full border border-white/10 px-3 lg:px-4 py-1.5 lg:py-2 text-xs lg:text-sm hover:bg-white/10 shrink-0">Edit</button>
+                            <button type="button" data-switch-tab="settings" class="rounded-full border border-white/10 px-3 lg:px-4 py-1.5 lg:py-2 text-xs lg:text-sm hover:bg-white/10 shrink-0">{{ app()->getLocale() === 'en' ? 'Update' : 'Ubah' }}</button>
                         </div>
                         <div class="mt-4 lg:mt-6 grid grid-cols-3 gap-3 lg:gap-4 text-center">
                             <div>
-                                <p class="text-[10px] lg:text-xs uppercase tracking-wide text-gray-400">Level</p>
+                                <p class="text-[10px] lg:text-xs uppercase tracking-wide text-gray-400">{{ app()->getLocale() === 'en' ? 'Level' : 'Level' }}</p>
                                 <p class="mt-1 text-sm lg:text-lg font-semibold">Silver</p>
                             </div>
                             <div>
-                                <p class="text-[10px] lg:text-xs uppercase tracking-wide text-gray-400">Nomor</p>
+                                <p class="text-[10px] lg:text-xs uppercase tracking-wide text-gray-400">{{ app()->getLocale() === 'en' ? 'Phone' : 'Nomor' }}</p>
                                 <p class="mt-1 text-sm lg:text-lg font-semibold truncate">{{ $user->phone ?? '-' }}</p>
                             </div>
                             <div>
-                                <p class="text-[10px] lg:text-xs uppercase tracking-wide text-gray-400">Username</p>
+                                <p class="text-[10px] lg:text-xs uppercase tracking-wide text-gray-400">{{ app()->getLocale() === 'en' ? 'Username' : 'Username' }}</p>
                                 <p class="mt-1 text-sm lg:text-lg font-semibold truncate">{{ $user->username ?? '-' }}</p>
                             </div>
                         </div>
@@ -80,29 +80,29 @@
                     <div class="rounded-2xl lg:rounded-3xl bg-[#111114] border border-white/5 p-4 lg:p-6 text-white">
                         <div class="flex items-start justify-between gap-3">
                             <div class="min-w-0 flex-1">
-                                <p class="text-xs lg:text-sm text-gray-400">Saldo Anda</p>
+                                <p class="text-xs lg:text-sm text-gray-400">{{ app()->getLocale() === 'en' ? 'Balance' : 'Saldo Anda' }}</p>
                                 <h2 class="mt-1 lg:mt-2 text-xl lg:text-3xl font-semibold wrap-break-word">Rp {{ number_format($stats['user_balance'] ?? 0, 0, ',', '.') }}</h2>
-                                <p class="text-[10px] lg:text-xs text-gray-500 mt-1">Saldo akun Anda saat ini</p>
+                                <p class="text-[10px] lg:text-xs text-gray-500 mt-1">{{ app()->getLocale() === 'en' ? 'Your account balance' : 'Saldo akun Anda saat ini' }}</p>
                             </div>
-                            <button type="button" data-switch-tab="topup" class="rounded-full bg-rose-600 px-3 lg:px-4 py-1 lg:py-1.5 text-xs lg:text-sm font-semibold hover:bg-rose-500 shrink-0">Top Up</button>
+                            <button type="button" data-switch-tab="topup" class="rounded-full bg-rose-600 px-3 lg:px-4 py-1 lg:py-1.5 text-xs lg:text-sm font-semibold hover:bg-rose-500 shrink-0">{{ app()->getLocale() === 'en' ? 'Top Up' : 'Isi Saldo' }}</button>
                         </div>
                         <div class="mt-4 lg:mt-6 rounded-xl lg:rounded-2xl bg-[#1b1b1f] p-3 lg:p-4">
-                            <p class="text-[10px] lg:text-xs uppercase tracking-[0.2em] text-gray-500">Ringkasan</p>
+                            <p class="text-[10px] lg:text-xs uppercase tracking-[0.2em] text-gray-500">{{ app()->getLocale() === 'en' ? 'Summary' : 'Ringkasan' }}</p>
                             <div class="mt-2 lg:mt-3 grid grid-cols-2 gap-3 lg:gap-4 text-xs lg:text-sm">
                                 <div>
-                                    <p class="text-gray-400">Total Transaksi</p>
+                                    <p class="text-gray-400">{{ app()->getLocale() === 'en' ? 'Total Transactions' : 'Total Transaksi' }}</p>
                                     <p class="text-lg lg:text-xl font-semibold">{{ $stats['total_transactions'] }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-gray-400">Menunggu</p>
+                                    <p class="text-gray-400">{{ app()->getLocale() === 'en' ? 'Waiting' : 'Menunggu' }}</p>
                                     <p class="text-lg lg:text-xl font-semibold">{{ $stats['waiting'] }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-gray-400">Dalam Proses</p>
+                                    <p class="text-gray-400">{{ app()->getLocale() === 'en' ? 'Processing' : 'Dalam Proses' }}</p>
                                     <p class="text-lg lg:text-xl font-semibold">{{ $stats['processing'] }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-gray-400">Sukses</p>
+                                    <p class="text-gray-400">{{ app()->getLocale() === 'en' ? 'Success' : 'Sukses' }}</p>
                                     <p class="text-lg lg:text-xl font-semibold">{{ $stats['success'] }}</p>
                                 </div>
                             </div>
@@ -111,32 +111,31 @@
                 </div>
     
                 <div>
-                    <h3 class="text-base lg:text-lg font-semibold text-white">Transaksi Hari Ini</h3>
-                    <div class="mt-3 lg:mt-4 grid gap-3 lg:gap-4 grid-cols-1 md:grid-cols-2">
+                    <div class="grid gap-3 lg:gap-4 grid-cols-1 md:grid-cols-2">
                         <div class="rounded-xl lg:rounded-2xl border border-white/5 bg-[#111114] p-4 lg:p-5 text-white">
-                            <p class="text-xs lg:text-sm text-gray-400">Total Transaksi</p>
+                            <p class="text-xs lg:text-sm text-gray-400">{{ app()->getLocale() === 'en' ? 'Total Transactions' : 'Total Transaksi' }}</p>
                             <p class="mt-1 lg:mt-2 text-2xl lg:text-4xl font-semibold">{{ $stats['total_transactions'] }}</p>
                         </div>
                         <div class="rounded-xl lg:rounded-2xl border border-white/5 bg-[#111114] p-4 lg:p-5 text-white">
-                            <p class="text-xs lg:text-sm text-gray-400">Total Penjualan</p>
+                            <p class="text-xs lg:text-sm text-gray-400">{{ app()->getLocale() === 'en' ? 'Total Revenue' : 'Total Penjualan' }}</p>
                             <p class="mt-1 lg:mt-2 text-xl lg:text-3xl font-semibold wrap-break-word">Rp {{ number_format($stats['total_revenue'], 0, ',', '.') }}</p>
                         </div>
                     </div>
                     <div class="mt-3 lg:mt-4 grid gap-3 lg:gap-4 grid-cols-2 lg:grid-cols-4">
                         <div class="rounded-xl lg:rounded-2xl border border-yellow-500/20 bg-linear-to-br from-yellow-500/10 to-yellow-600/5 p-3 lg:p-4 text-white">
-                            <p class="text-xs lg:text-sm text-yellow-200/80">Menunggu</p>
+                            <p class="text-xs lg:text-sm text-yellow-200/80">{{ app()->getLocale() === 'en' ? 'Waiting' : 'Menunggu' }}</p>
                             <p class="mt-1 lg:mt-2 text-xl lg:text-3xl font-semibold text-yellow-400">{{ $stats['waiting'] }}</p>
                         </div>
                         <div class="rounded-xl lg:rounded-2xl border border-blue-500/20 bg-linear-to-br from-blue-500/10 to-blue-600/5 p-3 lg:p-4 text-white">
-                            <p class="text-xs lg:text-sm text-blue-200/80">Dalam Proses</p>
+                            <p class="text-xs lg:text-sm text-blue-200/80">{{ app()->getLocale() === 'en' ? 'Processing' : 'Dalam Proses' }}</p>
                             <p class="mt-1 lg:mt-2 text-xl lg:text-3xl font-semibold text-blue-400">{{ $stats['processing'] }}</p>
                         </div>
                         <div class="rounded-xl lg:rounded-2xl border border-emerald-500/20 bg-linear-to-br from-emerald-500/10 to-emerald-600/5 p-3 lg:p-4 text-white">
-                            <p class="text-xs lg:text-sm text-emerald-200/80">Sukses</p>
+                            <p class="text-xs lg:text-sm text-emerald-200/80">{{ app()->getLocale() === 'en' ? 'Success' : 'Sukses' }}</p>
                             <p class="mt-1 lg:mt-2 text-xl lg:text-3xl font-semibold text-emerald-400">{{ $stats['success'] }}</p>
                         </div>
                         <div class="rounded-xl lg:rounded-2xl border border-rose-500/20 bg-linear-to-br from-rose-500/10 to-rose-600/5 p-3 lg:p-4 text-white">
-                            <p class="text-xs lg:text-sm text-rose-200/80">Gagal</p>
+                            <p class="text-xs lg:text-sm text-rose-200/80">{{ app()->getLocale() === 'en' ? 'Failed' : 'Gagal' }}</p>
                             <p class="mt-1 lg:mt-2 text-xl lg:text-3xl font-semibold text-rose-500">{{ $stats['failed'] }}</p>
                         </div>
                     </div>
@@ -145,10 +144,10 @@
                 <div class="rounded-2xl lg:rounded-3xl border border-white/5 bg-[#0f0f12] p-4 lg:p-6">
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 lg:gap-0 text-white">
                         <div>
-                            <h3 class="text-base lg:text-lg font-semibold">Riwayat Transaksi Terbaru Hari Ini</h3>
-                            <p class="text-xs lg:text-sm text-gray-400 mt-1">Monitor aktivitas transaksi Anda setiap saat.</p>
+                            <h3 class="text-base lg:text-lg font-semibold">{{ app()->getLocale() === 'en' ? 'Latest Transaction History' : 'Riwayat Transaksi Terbaru' }}</h3>
+                            <p class="text-xs lg:text-sm text-gray-400 mt-1">{{ app()->getLocale() === 'en' ? 'Monitor your transaction activities at any time.' : 'Monitor aktivitas transaksi Anda setiap saat.' }}</p>
                         </div>
-                        <button class="rounded-full border border-white/10 px-4 py-2 text-xs lg:text-sm hover:bg-white/10 self-start lg:self-auto shrink-0">Lihat Semua</button>
+                        <button type="button" data-switch-tab="transactions" class="rounded-full border border-white/10 px-4 py-2 text-xs lg:text-sm hover:bg-white/10 self-start lg:self-auto shrink-0">{{ app()->getLocale() === 'en' ? 'See All' : 'Lihat Semua' }}</button>
                     </div>
                     
                     <!-- Desktop Table -->
@@ -156,13 +155,13 @@
                         <table class="min-w-full text-left text-sm text-gray-300">
                             <thead>
                                 <tr class="text-xs uppercase tracking-wider text-gray-500">
-                                    <th class="pb-3 px-2">Invoice</th>
-                                    <th class="pb-3 px-2">Game</th>
-                                    <th class="pb-3 px-2">Produk</th>
-                                    <th class="pb-3 px-2">User ID</th>
-                                    <th class="pb-3 px-2">Harga</th>
-                                    <th class="pb-3 px-2">Tanggal</th>
-                                    <th class="pb-3 px-2">Status</th>
+                                    <th class="pb-3 px-2">{{ app()->getLocale() === 'en' ? 'Invoice' : 'Invoice' }}</th>
+                                    <th class="pb-3 px-2">{{ app()->getLocale() === 'en' ? 'Game' : 'Game' }}</th>
+                                    <th class="pb-3 px-2">{{ app()->getLocale() === 'en' ? 'Product' : 'Produk' }}</th>
+                                    <th class="pb-3 px-2">{{ app()->getLocale() === 'en' ? 'User ID' : 'User ID' }}</th>
+                                    <th class="pb-3 px-2">{{ app()->getLocale() === 'en' ? 'Price' : 'Harga' }}</th>
+                                    <th class="pb-3 px-2">{{ app()->getLocale() === 'en' ? 'Date' : 'Tanggal' }}</th>
+                                    <th class="pb-3 px-2">{{ app()->getLocale() === 'en' ? 'Status' : 'Status' }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -189,7 +188,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="py-6 px-2 text-center text-gray-500">Belum ada transaksi hari ini</td>
+                                        <td colspan="7" class="py-6 px-2 text-center text-gray-500">{{ app()->getLocale() === 'en' ? 'No transactions today' : 'Belum ada transaksi hari ini' }}</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -222,27 +221,27 @@
                                         <p class="text-white font-medium truncate">{{ $transaction->game }}</p>
                                     </div>
                                     <div>
-                                        <p class="text-gray-500">Produk</p>
+                                        <p class="text-gray-500">{{ app()->getLocale() === 'en' ? 'Product' : 'Produk' }}</p>
                                         <p class="text-white font-medium truncate">{{ $transaction->product }}</p>
                                     </div>
                                     <div>
-                                        <p class="text-gray-500">User ID</p>
+                                        <p class="text-gray-500">{{ app()->getLocale() === 'en' ? 'User ID' : 'User ID' }}</p>
                                         <p class="text-white font-medium truncate">{{ $transaction->user_input }}</p>
                                     </div>
                                     <div>
-                                        <p class="text-gray-500">Tanggal</p>
+                                        <p class="text-gray-500">{{ app()->getLocale() === 'en' ? 'Date' : 'Tanggal' }}</p>
                                         <p class="text-white font-medium">{{ $transaction->date }}</p>
                                     </div>
                                 </div>
                                 <div class="mt-2 pt-2 border-t border-white/5">
-                                    <p class="text-xs text-gray-500">Harga</p>
+                                    <p class="text-xs text-gray-500">{{ app()->getLocale() === 'en' ? 'Price' : 'Harga' }}</p>
                                     <p class="text-base font-bold text-rose-400">Rp {{ number_format($transaction->price, 0, ',', '.') }}</p>
                                 </div>
                             </div>
                         @empty
                             <div class="rounded-xl border border-white/5 bg-[#1a1a1e] p-6 text-center">
                                 <i class="ri-file-list-3-line text-3xl text-gray-500"></i>
-                                <p class="text-sm text-gray-500 mt-2">Belum ada transaksi hari ini</p>
+                                <p class="text-sm text-gray-500 mt-2">{{ app()->getLocale() === 'en' ? 'No transactions today' : 'Belum ada transaksi hari ini' }}</p>
                             </div>
                         @endforelse
                     </div>
@@ -252,49 +251,50 @@
                 <section class="space-y-4 lg:space-y-6 flex-1 hidden" data-tab-content="transactions">
                     <div class="rounded-2xl bg-[#0f0f12] border border-white/5 p-4 lg:p-6 text-white">
                         <div class="flex items-center justify-between">
-                            <h2 class="text-lg font-semibold">Riwayat Transaksi</h2>
+                            <h2 class="text-lg font-semibold">{{ app()->getLocale() === 'en' ? 'Transaction History' : 'Riwayat Transaksi' }}</h2>
                         </div>
                         <form action="{{ route('profile') }}" method="GET" class="mt-4 grid gap-3 md:grid-cols-[1fr,200px,200px]">
                             <!-- Preserve active tab -->
                             <input type="hidden" name="tab" value="transactions">
                             
                             <label class="flex flex-col text-xs uppercase tracking-wide text-gray-400">
-                                <span class="mb-1 text-gray-500 normal-case">Cari transaksi</span>
-                                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari ID, Produk, atau No. HP..." class="rounded-2xl border border-white/10 bg-transparent px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
+                                <span class="mb-1 text-gray-500 normal-case">{{ app()->getLocale() === 'en' ? 'Search Transactions' : 'Cari Transaksi' }}</span>
+                                <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ app()->getLocale() === 'en' ? 'Search ID, Product, or Phone Number...' : 'Cari ID, Produk, atau No. HP...' }}" class="rounded-2xl border border-white/10 bg-transparent px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
                             </label>
                             <label class="flex flex-col text-xs uppercase tracking-wide text-gray-400">
-                                <span class="mb-1 text-gray-500 normal-case">Tanggal</span>
+                                <span class="mb-1 text-gray-500 normal-case">{{ app()->getLocale() === 'en' ? 'Date' : 'Tanggal' }}</span>
                                 <select name="date" onchange="this.form.submit()" class="rounded-2xl border border-white/10 bg-[#050505] px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
-                                    <option value="all" {{ request('date') == 'all' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">Semua</option>
-                                    <option value="today" {{ request('date') == 'today' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">Hari Ini</option>
+                                    <option value="all" {{ request('date') == 'all' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">{{ app()->getLocale() === 'en' ? 'All' : 'Semua' }}</option>
+                                    <option value="today" {{ request('date') == 'today' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">{{ app()->getLocale() === 'en' ? 'Today' : 'Hari Ini' }}</option>
                                     <option value="week" {{ request('date') == 'week' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">7 Hari Terakhir</option>
                                     <option value="month" {{ request('date') == 'month' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">Bulan Ini</option>
                                 </select>
                             </label>
                             <label class="flex flex-col text-xs uppercase tracking-wide text-gray-400">
-                                <span class="mb-1 text-gray-500 normal-case">Status</span>
+                                <span class="mb-1 text-gray-500 normal-case">{{ app()->getLocale() === 'en' ? 'Status' : 'Status' }}</span>
                                 <select name="status" onchange="this.form.submit()" class="rounded-2xl border border-white/10 bg-[#050505] px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
-                                    <option value="all" {{ request('status') == 'all' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">Semua</option>
-                                    <option value="waiting" {{ request('status') == 'waiting' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">Menunggu</option>
-                                    <option value="processing" {{ request('status') == 'processing' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">Dalam Proses</option>
-                                    <option value="success" {{ request('status') == 'success' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">Sukses</option>
-                                    <option value="failed" {{ request('status') == 'failed' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">Gagal</option>
+                                    <option value="all" {{ request('status') == 'all' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">{{ app()->getLocale() === 'en' ? 'All' : 'Semua' }}</option>
+                                    <option value="waiting" {{ request('status') == 'waiting' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">{{ app()->getLocale() === 'en' ? 'Waiting' : 'Menunggu' }}</option>
+                                    <option value="processing" {{ request('status') == 'processing' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">{{ app()->getLocale() === 'en' ? 'Processing' : 'Dalam Proses' }}</option>
+                                    <option value="success" {{ request('status') == 'success' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">{{ app()->getLocale() === 'en' ? 'Success' : 'Sukses' }}</option>
+                                    <option value="failed" {{ request('status') == 'failed' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">{{ app()->getLocale() === 'en' ? 'Failed' : 'Gagal' }}</option>
                                 </select>
                             </label>
                         </form>
     
-                        <div class="mt-6 rounded-2xl border border-white/5 overflow-hidden">
+                        <!-- Desktop Table -->
+                        <div class="hidden md:block mt-6 rounded-2xl border border-white/5 overflow-hidden">
                             <table class="min-w-full text-left text-sm text-gray-300">
                                 <thead class="bg-white/5 text-xs uppercase tracking-wide text-gray-400">
                                     <tr>
-                                        <th class="px-4 py-3">Tanggal</th>
-                                        <th class="px-4 py-3">Nomor Invoice</th>
-                                        <th class="px-4 py-3">Game</th>
-                                        <th class="px-4 py-3">Produk</th>
-                                        <th class="px-4 py-3">Harga</th>
-                                        <th class="px-4 py-3">User Input</th>
-                                        <th class="px-4 py-3">Status</th>
-                                        <th class="px-4 py-3">Aksi</th>
+                                        <th class="px-4 py-3">{{ app()->getLocale() === 'en' ? 'Date' : 'Tanggal' }}</th>
+                                        <th class="px-4 py-3">{{ app()->getLocale() === 'en' ? 'Invoice Number' : 'Nomor Invoice' }}</th>
+                                        <th class="px-4 py-3">{{ app()->getLocale() === 'en' ? 'Game' : 'Game' }}</th>
+                                        <th class="px-4 py-3">{{ app()->getLocale() === 'en' ? 'Product' : 'Produk' }}</th>
+                                        <th class="px-4 py-3">{{ app()->getLocale() === 'en' ? 'Price' : 'Harga' }}</th>
+                                        <th class="px-4 py-3">{{ app()->getLocale() === 'en' ? 'User Input' : 'User Input' }}</th>
+                                        <th class="px-4 py-3">{{ app()->getLocale() === 'en' ? 'Status' : 'Status' }}</th>
+                                        <th class="px-4 py-3">{{ app()->getLocale() === 'en' ? 'Action' : 'Aksi' }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -321,20 +321,99 @@
                                             <td class="px-4 py-3">
                                                 @if($transaction->status === 'waiting' && !empty($transaction->payment_url))
                                                     <a href="{{ $transaction->payment_url }}" target="_blank" class="rounded-lg bg-yellow-500 px-3 py-1.5 text-xs font-semibold text-black hover:bg-yellow-400 transition-colors">
-                                                        Bayar
+                                                        {{ app()->getLocale() === 'en' ? 'Pay' : 'Bayar' }}
                                                     </a>
                                                 @endif
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="8" class="px-4 py-6 text-center text-gray-500">Belum ada transaksi yang ditemukan.</td>
+                                            <td colspan="8" class="px-4 py-6 text-center text-gray-500">{{ app()->getLocale() === 'en' ? 'No transactions found' : 'Belum ada transaksi yang ditemukan' }}</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- Mobile Cards -->
+                        <div class="md:hidden mt-4 space-y-3">
+                            @forelse($latestTransactions as $transaction)
+                                <div class="rounded-xl border border-white/5 bg-[#1a1a1e] p-3">
+                                    <div class="flex items-start justify-between gap-2 mb-2">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-xs text-gray-500">Invoice</p>
+                                            <p class="text-sm font-semibold text-white truncate">{{ $transaction->invoice }}</p>
+                                        </div>
+                                        @php
+                                            $statusColor = match($transaction->status) {
+                                                'waiting' => 'bg-linear-to-br from-yellow-500/20 to-yellow-600/10 border-yellow-500/30 text-yellow-400',
+                                                'processing' => 'bg-linear-to-br from-blue-500/20 to-blue-600/10 border-blue-500/30 text-blue-400',
+                                                'success' => 'bg-linear-to-br from-emerald-500/20 to-emerald-600/10 border-emerald-500/30 text-emerald-400',
+                                                'failed', 'expired', 'canceled' => 'bg-linear-to-br from-rose-500/20 to-rose-600/10 border-rose-500/30 text-rose-400',
+                                                default => 'bg-white/10 border-white/10 text-white',
+                                            };
+                                        @endphp
+                                        <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold border shrink-0 {{ $statusColor }}">{{ ucfirst($transaction->status) }}</span>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2 text-xs">
+                                        <div>
+                                            <p class="text-gray-500">{{ app()->getLocale() === 'en' ? 'Game' : 'Game' }}</p>
+                                            <p class="text-white font-medium truncate">{{ $transaction->game }}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-500">{{ app()->getLocale() === 'en' ? 'Product' : 'Produk' }}</p>
+                                            <p class="text-white font-medium truncate">{{ $transaction->product }}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-500">{{ app()->getLocale() === 'en' ? 'User ID' : 'User ID' }}</p>
+                                            <p class="text-white font-medium truncate">{{ $transaction->user_input }}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-500">{{ app()->getLocale() === 'en' ? 'Date' : 'Tanggal' }}</p>
+                                            <p class="text-white font-medium">{{ $transaction->date }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2 pt-2 border-t border-white/5 flex items-center justify-between">
+                                        <div>
+                                            <p class="text-xs text-gray-500">{{ app()->getLocale() === 'en' ? 'Price' : 'Harga' }}</p>
+                                            <p class="text-base font-bold text-rose-400">Rp {{ number_format($transaction->price, 0, ',', '.') }}</p>
+                                        </div>
+                                        @if($transaction->status === 'waiting' && !empty($transaction->payment_url))
+                                            <a href="{{ $transaction->payment_url }}" target="_blank" class="rounded-lg bg-yellow-500 px-3 py-1.5 text-xs font-semibold text-black hover:bg-yellow-400 transition-colors">
+                                                {{ app()->getLocale() === 'en' ? 'Pay' : 'Bayar' }}
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="rounded-xl border border-white/5 bg-[#1a1a1e] p-6 text-center">
+                                    <i class="ri-file-list-3-line text-3xl text-gray-500"></i>
+                                    <p class="text-sm text-gray-500 mt-2">{{ app()->getLocale() === 'en' ? 'No transactions found' : 'Belum ada transaksi yang ditemukan' }}</p>
+                                </div>
+                            @endforelse
+                        </div>
     
+                        <!-- Pagination -->
+                        @if(method_exists($latestTransactions, 'total') && $latestTransactions->total() > 5)
+                            <div class="mt-4 flex flex-col gap-3 text-sm text-gray-400 md:flex-row md:items-center md:justify-between">
+                                <p>{{ app()->getLocale() === 'en' ? 'Showing' : 'Menampilkan' }} {{ $latestTransactions->firstItem() }} - {{ $latestTransactions->lastItem() }} {{ app()->getLocale() === 'en' ? 'of' : 'dari' }} {{ $latestTransactions->total() }} {{ app()->getLocale() === 'en' ? 'transactions' : 'transaksi' }}</p>
+                                <div class="flex items-center gap-3">
+                                    @if($latestTransactions->onFirstPage())
+                                        <button disabled class="rounded-2xl bg-gray-700/50 px-4 py-2 text-gray-500 cursor-not-allowed">{{ app()->getLocale() === 'en' ? 'Previous' : 'Sebelumnya' }}</button>
+                                    @else
+                                        <a href="{{ $latestTransactions->appends(['tab' => 'transactions'])->previousPageUrl() }}" class="rounded-2xl bg-rose-600 px-4 py-2 text-white hover:bg-rose-500">{{ app()->getLocale() === 'en' ? 'Previous' : 'Sebelumnya' }}</a>
+                                    @endif
+                                    
+                                    <span>Halaman {{ $latestTransactions->currentPage() }} dari {{ $latestTransactions->lastPage() }}</span>
+                                    
+                                    @if($latestTransactions->hasMorePages())
+                                        <a href="{{ $latestTransactions->appends(['tab' => 'transactions'])->nextPageUrl() }}" class="rounded-2xl bg-rose-600 px-4 py-2 text-white hover:bg-rose-500">{{ app()->getLocale() === 'en' ? 'Next' : 'Selanjutnya' }}</a>
+                                    @else
+                                        <button disabled class="rounded-2xl bg-gray-700/50 px-4 py-2 text-gray-500 cursor-not-allowed">{{ app()->getLocale() === 'en' ? 'Next' : 'Selanjutnya' }}</button>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
 
                     </div>
                 </section>
@@ -345,36 +424,36 @@
                             <div>
                                 <p class="text-sm font-semibold flex items-center gap-2">
                                     <i class="ri-exchange-dollar-line text-amber-400 text-xl"></i>
-                                    Mutasi Saldo
+                                    {{ app()->getLocale() === 'en' ? 'Balance Mutation' : 'Mutasi Saldo' }}
                                 </p>
-                                <p class="text-xs text-gray-400">Riwayat perubahan saldo akun Anda (top-up & transaksi).</p>
+                                <p class="text-xs text-gray-400">{{ app()->getLocale() === 'en' ? 'Account balance history (top-up & transactions).' : 'Riwayat perubahan saldo akun Anda (top-up & transaksi).' }}</p>
                             </div>
                             <form method="GET" action="{{ route('profile') }}" class="grid gap-3 md:grid-cols-[1fr,200px,200px,200px]" id="mutation-filter-form">
                                 <input type="hidden" name="tab" value="mutations">
                                 <label class="flex flex-col space-y-1 text-xs text-gray-500">
-                                    <span class="normal-case">Cari mutasi</span>
+                                    <span class="normal-case">{{ app()->getLocale() === 'en' ? 'Search mutation' : 'Cari mutasi' }}</span>
                                     <div class="relative">
                                         <i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
                                         <input 
                                             type="text" 
                                             name="search" 
                                             value="{{ request('search') }}"
-                                            placeholder="Cari deskripsi..." 
+                                            placeholder="{{ app()->getLocale() === 'en' ? 'Search description...' : 'Cari deskripsi...' }}" 
                                             class="w-full rounded-2xl border border-white/10 bg-transparent pl-10 pr-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
                                     </div>
                                 </label>
                                 <label class="flex flex-col space-y-1 text-xs text-gray-500">
-                                    <span class="normal-case">Tipe</span>
+                                    <span class="normal-case">{{ app()->getLocale() === 'en' ? 'Type' : 'Tipe' }}</span>
                                     <select 
                                         name="type" 
                                         class="rounded-2xl border border-white/10 bg-[#050505] px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
-                                        <option value="">Semua</option>
-                                        <option value="credit" {{ request('type') == 'credit' ? 'selected' : '' }}>Masuk</option>
-                                        <option value="debit" {{ request('type') == 'debit' ? 'selected' : '' }}>Keluar</option>
+                                        <option value="">{{ app()->getLocale() === 'en' ? 'All' : 'Semua' }}</option>
+                                        <option value="credit" {{ request('type') == 'credit' ? 'selected' : '' }}>{{ app()->getLocale() === 'en' ? 'Credit' : 'Masuk' }}</option>
+                                        <option value="debit" {{ request('type') == 'debit' ? 'selected' : '' }}>{{ app()->getLocale() === 'en' ? 'Debit' : 'Keluar' }}</option>
                                     </select>
                                 </label>
                                 <label class="flex flex-col space-y-1 text-xs text-gray-500">
-                                    <span class="normal-case">Dari Tanggal</span>
+                                    <span class="normal-case">{{ app()->getLocale() === 'en' ? 'From Date' : 'Dari Tanggal' }}</span>
                                     <input 
                                         type="date" 
                                         name="date_from" 
@@ -382,7 +461,7 @@
                                         class="rounded-2xl border border-white/10 bg-transparent px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
                                 </label>
                                 <label class="flex flex-col space-y-1 text-xs text-gray-500">
-                                    <span class="normal-case">Sampai Tanggal</span>
+                                    <span class="normal-case">{{ app()->getLocale() === 'en' ? 'To Date' : 'Sampai Tanggal' }}</span>
                                     <input 
                                         type="date" 
                                         name="date_to" 
@@ -392,25 +471,26 @@
                             </form>
                             <div class="flex gap-2">
                                 <button type="submit" form="mutation-filter-form" class="rounded-2xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500">
-                                    <i class="ri-search-line"></i> Filter
+                                    <i class="ri-search-line"></i> {{ app()->getLocale() === 'en' ? 'Filter' : 'Filter' }}
                                 </button>
                                 <a href="{{ route('profile') }}?tab=mutations" class="rounded-2xl border border-white/10 px-4 py-2 text-sm font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
-                                    <i class="ri-refresh-line"></i> Reset
+                                    <i class="ri-refresh-line"></i> {{ app()->getLocale() === 'en' ? 'Reset' : 'Reset' }}
                                 </a>
                             </div>
                         </div>
     
-                        <div class="mt-6 rounded-2xl border border-white/5 overflow-hidden">
+                        <!-- Desktop Table -->
+                        <div class="hidden md:block mt-6 rounded-2xl border border-white/5 overflow-hidden">
                             <table class="min-w-full text-left text-sm text-gray-300">
                                 <thead class="bg-white/5 text-xs uppercase tracking-wide text-gray-400">
                                     <tr>
                                         <th class="px-4 py-3">ID</th>
-                                        <th class="px-4 py-3">Tipe</th>
-                                        <th class="px-4 py-3">Deskripsi</th>
-                                        <th class="px-4 py-3">Jumlah</th>
-                                        <th class="px-4 py-3">Saldo Sebelum</th>
-                                        <th class="px-4 py-3">Saldo Setelah</th>
-                                        <th class="px-4 py-3">Tanggal</th>
+                                        <th class="px-4 py-3">{{ app()->getLocale() === 'en' ? 'Type' : 'Tipe' }}</th>
+                                        <th class="px-4 py-3">{{ app()->getLocale() === 'en' ? 'Description' : 'Deskripsi' }}</th>
+                                        <th class="px-4 py-3">{{ app()->getLocale() === 'en' ? 'Amount' : 'Jumlah' }}</th>
+                                        <th class="px-4 py-3">{{ app()->getLocale() === 'en' ? 'Balance Before' : 'Saldo Sebelum' }}</th>
+                                        <th class="px-4 py-3">{{ app()->getLocale() === 'en' ? 'Balance After' : 'Saldo Setelah' }}</th>
+                                        <th class="px-4 py-3">{{ app()->getLocale() === 'en' ? 'Date' : 'Tanggal' }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -421,12 +501,12 @@
                                                 @if($mutation->type === 'credit')
                                                     <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-400">
                                                         <i class="ri-arrow-down-line"></i>
-                                                        Masuk
+                                                        {{ app()->getLocale() === 'en' ? 'Credit' : 'Masuk' }}
                                                     </span>
                                                 @else
                                                     <span class="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2.5 py-1 text-xs font-medium text-rose-400">
                                                         <i class="ri-arrow-up-line"></i>
-                                                        Keluar
+                                                        {{ app()->getLocale() === 'en' ? 'Debit' : 'Keluar' }}
                                                     </span>
                                                 @endif
                                             </td>
@@ -447,7 +527,7 @@
                                             <td class="px-4 py-3 font-semibold">Rp {{ number_format((float)$mutation->balance_after, 0, ',', '.') }}</td>
                                             <td class="px-4 py-3 text-gray-400">
                                                 <div>
-                                                    <p>{{ $mutation->created_at->locale('id')->isoFormat('D MMM Y') }}</p>
+                                                    <p>{{ $mutation->created_at->locale(app()->getLocale())->isoFormat('D MMM Y') }}</p>
                                                     <p class="text-xs text-gray-500">{{ $mutation->created_at->format('H:i') }}</p>
                                                 </div>
                                             </td>
@@ -457,8 +537,8 @@
                                             <td colspan="7" class="px-4 py-8 text-center">
                                                 <div class="flex flex-col items-center gap-3 text-gray-500">
                                                     <i class="ri-file-list-3-line text-4xl"></i>
-                                                    <p class="text-sm">Belum ada riwayat mutasi saldo.</p>
-                                                    <p class="text-xs">Lakukan top-up pertama Anda untuk melihat mutasi.</p>
+                                                    <p class="text-sm">{{ app()->getLocale() === 'en' ? 'No mutation history found.' : 'Belum ada riwayat mutasi saldo.' }}</p>
+                                                    <p class="text-xs">{{ app()->getLocale() === 'en' ? 'Make your first top-up to see the mutation.' : 'Lakukan top-up pertama Anda untuk melihat mutasi.' }}</p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -466,23 +546,82 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- Mobile Cards -->
+                        <div class="md:hidden mt-4 space-y-3">
+                            @forelse($mutations as $mutation)
+                                <div class="rounded-xl border border-white/5 bg-[#1a1a1e] p-3">
+                                    <div class="flex items-start justify-between gap-2 mb-2">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-xs text-gray-500">ID</p>
+                                            <p class="text-sm font-semibold text-white">#{{ $mutation->id }}</p>
+                                        </div>
+                                        @if($mutation->type === 'credit')
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400 border border-emerald-500/30 shrink-0">
+                                                <i class="ri-arrow-down-line"></i>
+                                                {{ app()->getLocale() === 'en' ? 'Credit' : 'Masuk' }}
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2.5 py-0.5 text-xs font-medium text-rose-400 border border-rose-500/30 shrink-0">
+                                                <i class="ri-arrow-up-line"></i>
+                                                {{ app()->getLocale() === 'en' ? 'Debit' : 'Keluar' }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div class="mb-2">
+                                        <p class="text-xs text-gray-500">{{ app()->getLocale() === 'en' ? 'Description' : 'Deskripsi' }}</p>
+                                        <p class="text-sm font-medium text-white">{{ $mutation->description }}</p>
+                                        @if($mutation->notes)
+                                            <p class="text-xs text-gray-400 mt-0.5">{{ $mutation->notes }}</p>
+                                        @endif
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2 text-xs mb-2">
+                                        <div>
+                                            <p class="text-gray-500">{{ app()->getLocale() === 'en' ? 'Amount' : 'Jumlah' }}</p>
+                                            <p class="font-semibold {{ $mutation->type === 'credit' ? 'text-emerald-400' : 'text-rose-400' }}">{{ $mutation->formatted_amount }}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-500">{{ app()->getLocale() === 'en' ? 'Date' : 'Tanggal' }}</p>
+                                            <p class="text-white font-medium">{{ $mutation->created_at->locale(app()->getLocale())->isoFormat('D MMM Y') }}</p>
+                                            <p class="text-gray-400 text-xs">{{ $mutation->created_at->format('H:i') }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="pt-2 border-t border-white/5 grid grid-cols-2 gap-2 text-xs">
+                                        <div>
+                                            <p class="text-gray-500">{{ app()->getLocale() === 'en' ? 'Balance Before' : 'Saldo Sebelum' }}</p>
+                                            <p class="text-white font-medium">Rp {{ number_format((float)$mutation->balance_before, 0, ',', '.') }}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-500">{{ app()->getLocale() === 'en' ? 'Balance After' : 'Saldo Setelah' }}</p>
+                                            <p class="text-white font-semibold">Rp {{ number_format((float)$mutation->balance_after, 0, ',', '.') }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="rounded-xl border border-white/5 bg-[#1a1a1e] p-6 text-center">
+                                    <i class="ri-file-list-3-line text-3xl text-gray-500"></i>
+                                    <p class="text-sm text-gray-500 mt-2">{{ app()->getLocale() === 'en' ? 'No mutation history found.' : 'Belum ada riwayat mutasi saldo.' }}</p>
+                                    <p class="text-xs text-gray-400 mt-1">{{ app()->getLocale() === 'en' ? 'Make your first top-up to see the mutation.' : 'Lakukan top-up pertama Anda untuk melihat mutasi.' }}</p>
+                                </div>
+                            @endforelse
+                        </div>
     
-                        @if($mutations->total() > 0 && $mutations->lastPage() > 1)
+                        @if($mutations->total() > 5)
                             <div class="mt-4 flex flex-col gap-3 text-sm text-gray-400 md:flex-row md:items-center md:justify-between">
-                                <p>Menampilkan {{ $mutations->firstItem() }} - {{ $mutations->lastItem() }} dari {{ $mutations->total() }} data</p>
+                                <p>{{ app()->getLocale() === 'en' ? 'Showing' : 'Menampilkan' }} {{ $mutations->firstItem() }} - {{ $mutations->lastItem() }} {{ app()->getLocale() === 'en' ? 'of' : 'dari' }} {{ $mutations->total() }} data</p>
                                 <div class="flex items-center gap-3">
                                     @if($mutations->onFirstPage())
-                                        <button disabled class="rounded-2xl bg-gray-700/50 px-4 py-2 text-gray-500 cursor-not-allowed">Sebelumnya</button>
+                                        <button disabled class="rounded-2xl bg-gray-700/50 px-4 py-2 text-gray-500 cursor-not-allowed">{{ app()->getLocale() === 'en' ? 'Previous' : 'Sebelumnya' }}</button>
                                     @else
-                                        <a href="{{ $mutations->previousPageUrl() }}" class="rounded-2xl bg-rose-600 px-4 py-2 text-white hover:bg-rose-500">Sebelumnya</a>
+                                        <a href="{{ $mutations->previousPageUrl() }}" class="rounded-2xl bg-rose-600 px-4 py-2 text-white hover:bg-rose-500">{{ app()->getLocale() === 'en' ? 'Previous' : 'Sebelumnya' }}</a>
                                     @endif
                                     
-                                    <span>Halaman {{ $mutations->currentPage() }} dari {{ $mutations->lastPage() }}</span>
+                                    <span>{{ app()->getLocale() === 'en' ? 'Page' : 'Halaman' }} {{ $mutations->currentPage() }} {{ app()->getLocale() === 'en' ? 'of' : 'dari' }} {{ $mutations->lastPage() }}</span>
                                     
                                     @if($mutations->hasMorePages())
-                                        <a href="{{ $mutations->nextPageUrl() }}" class="rounded-2xl bg-rose-600 px-4 py-2 text-white hover:bg-rose-500">Selanjutnya</a>
+                                        <a href="{{ $mutations->nextPageUrl() }}" class="rounded-2xl bg-rose-600 px-4 py-2 text-white hover:bg-rose-500">{{ app()->getLocale() === 'en' ? 'Next' : 'Selanjutnya' }}</a>
                                     @else
-                                        <button disabled class="rounded-2xl bg-gray-700/50 px-4 py-2 text-gray-500 cursor-not-allowed">Selanjutnya</button>
+                                        <button disabled class="rounded-2xl bg-gray-700/50 px-4 py-2 text-gray-500 cursor-not-allowed">{{ app()->getLocale() === 'en' ? 'Next' : 'Selanjutnya' }}</button>
                                     @endif
                                 </div>
                             </div>
@@ -511,7 +650,7 @@
                                 <div class="flex items-start gap-3">
                                     <i class="ri-error-warning-line text-base"></i>
                                     <div class="flex-1">
-                                        <p class="font-semibold mb-1">Terdapat kesalahan:</p>
+                                        <p class="font-semibold mb-1">{{ app()->getLocale() === 'en' ? 'There are errors:' : 'Terdapat kesalahan:' }}</p>
                                         <ul class="list-disc list-inside space-y-0.5">
                                             @foreach($errors->all() as $error)
                                                 <li>{{ $error }}</li>
@@ -523,39 +662,39 @@
                         @endif
 
                         <div>
-                            <h2 class="text-lg font-semibold">Profil</h2>
-                            <p class="text-sm text-gray-400">Informasi ini bersifat rahasia, jadi berhati-hatilah dengan apa yang kamu bagikan.</p>
+                            <h2 class="text-lg font-semibold">{{ app()->getLocale() === 'en' ? 'Profile' : 'Profil' }}</h2>
+                            <p class="text-sm text-gray-400">{{ app()->getLocale() === 'en' ? 'This information is confidential, so be careful what you share.' : 'Informasi ini bersifat rahasia, jadi berhati-hatilah dengan apa yang kamu bagikan.' }}</p>
                         </div>
     
                         <form method="POST" action="{{ route('profile.update') }}" class="space-y-4">
                             @csrf
                             <div class="grid gap-4 md:grid-cols-2">
                                 <label class="space-y-2 text-sm text-gray-400">
-                                    <span>Nama kamu</span>
+                                    <span>{{ app()->getLocale() === 'en' ? 'Your Name' : 'Nama Kamu' }}</span>
                                     <input type="text" name="name" value="{{ old('name', $user->name) }}" required class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" />
                                 </label>
                                 <label class="space-y-2 text-sm text-gray-400">
-                                    <span>Alamat Email</span>
+                                    <span>{{ app()->getLocale() === 'en' ? 'Email Address' : 'Alamat Email' }}</span>
                                     <input type="email" name="email" value="{{ old('email', $user->email) }}" required class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" />
                                 </label>
                                 <label class="space-y-2 text-sm text-gray-400">
-                                    <span>No. Handphone</span>
+                                    <span>{{ app()->getLocale() === 'en' ? 'Phone Number' : 'No. Handphone' }}</span>
                                     <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" placeholder="081234567890" class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" />
                                 </label>
                                 <label class="space-y-2 text-sm text-gray-400">
-                                    <span>Password Lama (jika ingin ubah password)</span>
-                                    <input type="password" name="current_password" class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" placeholder="Kosongkan jika tidak ingin ubah password" />
+                                    <span>{{ app()->getLocale() === 'en' ? 'Current Password (if you want to change password)' : 'Password Lama (jika ingin ubah password)' }}</span>
+                                    <input type="password" name="current_password" class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" placeholder="{{ app()->getLocale() === 'en' ? 'Leave blank if you don\'t want to change password' : 'Kosongkan jika tidak ingin ubah password' }}" />
                                 </label>
                                 <label class="space-y-2 text-sm text-gray-400">
-                                    <span>Password Baru</span>
-                                    <input type="password" name="new_password" class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" placeholder="Minimal 8 karakter" />
+                                    <span>{{ app()->getLocale() === 'en' ? 'New Password' : 'Password Baru' }}</span>
+                                    <input type="password" name="new_password" class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" placeholder="{{ app()->getLocale() === 'en' ? 'Minimum 8 characters' : 'Minimal 8 karakter' }}" />
                                 </label>
                                 <label class="space-y-2 text-sm text-gray-400">
-                                    <span>Konfirmasi Password Baru</span>
-                                    <input type="password" name="new_password_confirmation" class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" placeholder="Ulangi password baru" />
+                                    <span>{{ app()->getLocale() === 'en' ? 'Confirm New Password' : 'Konfirmasi Password Baru' }}</span>
+                                    <input type="password" name="new_password_confirmation" class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:border-rose-500 focus:outline-none" placeholder="{{ app()->getLocale() === 'en' ? 'Repeat new password' : 'Ulangi password baru' }}" />
                                 </label>
                             </div>
-                            <button type="submit" class="rounded-2xl bg-rose-700 px-6 py-3 text-sm font-semibold hover:bg-rose-600 transition">Simpan Profil</button>
+                            <button type="submit" class="rounded-2xl bg-rose-700 px-6 py-2 text-sm font-semibold hover:bg-rose-600 transition">{{ app()->getLocale() === 'en' ? 'Save Profile' : 'Simpan Profil' }}</button>
                         </form>
                     </div>
                 </section>
@@ -698,13 +837,17 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Check URL for tab parameter
+    // Check URL for tab parameter or hash
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
+    const hashParam = window.location.hash.substring(1); // Remove the # symbol
     
     if (tabParam) {
         // Activate tab from URL parameter
         activateTab(tabParam);
+    } else if (hashParam) {
+        // Activate tab from URL hash (e.g., #transaksi)
+        activateTab(hashParam);
     } else {
         // Use default tab
         const defaultTrigger = document.querySelector('.tab-trigger[data-tab-default="true"]');

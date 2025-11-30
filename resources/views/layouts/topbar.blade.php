@@ -114,7 +114,7 @@
             @endguest
 
             <!-- Search Icon (Mobile only) -->
-            <button class="lg:hidden text-gray-300 hover:text-white transition-colors">
+            <button id="mobileSearchToggle" class="lg:hidden text-gray-300 hover:text-white transition-colors">
                 <i class="ri-search-line text-[22px]"></i>
             </button>
 
@@ -255,7 +255,7 @@
             </a>
 
             <!-- Check Invoice -->
-            <a href="{{ localized_url('/invoices') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
+            <a href="{{ localized_url('/check-invoice') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
                 <i class="ri-file-list-3-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
                 <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Check Invoice' : 'Cek Invoice' }}</span>
             </a>
@@ -270,7 +270,7 @@
             <button class="flex items-center justify-between w-full px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group" id="calculatorToggle">
                 <div class="flex items-center gap-4">
                     <i class="ri-calculator-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
-                    <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Calculator' : 'Kalkulator' }}</span>
+                    <span class="font-medium">{{ app()->getLocale() === 'en' ? 'ML Calculator' : 'Kalkulator ML' }}</span>
                 </div>
                 <i class="ri-arrow-down-s-line text-[18px] transition-transform duration-200" id="calculatorArrow"></i>
             </button>
@@ -300,11 +300,7 @@
                 <i class="ri-user-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
                 <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Profile' : 'Profil' }}</span>
             </a>
-            <a href="{{ url('/saldo') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
-                <i class="ri-wallet-3-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
-                <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Balance' : 'Saldo' }}</span>
-            </a>
-            <a href="{{ url('/transactions') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
+            <a href="{{ localized_url('/profile#transaksi') }}" class="flex items-center gap-4 px-4 py-3 text-gray-300 hover:bg-[#27272A] hover:text-white rounded-lg transition-colors group">
                 <i class="ri-file-list-line text-[18px] group-hover:text-yellow-500 transition-colors"></i>
                 <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Transactions' : 'Transaksi' }}</span>
             </a>
@@ -324,6 +320,36 @@
             </a>
         </div>
         @endguest
+    </div>
+</div>
+
+<!-- Mobile Search Modal -->
+<div id="mobileSearchModal" class="lg:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-120 hidden transition-opacity duration-300 opacity-0">
+    <div class="flex flex-col h-full">
+        <!-- Search Header -->
+        <div class="bg-[#1F1F23] border-b border-white/10 p-4">
+            <div class="flex items-center gap-3">
+                <button id="closeMobileSearch" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="ri-arrow-left-line text-2xl"></i>
+                </button>
+                <div class="relative flex-1">
+                    <i class="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+                    <input type="text" 
+                           id="mobileGameSearchInput"
+                           placeholder="{{ app()->getLocale() === 'en' ? 'Search Game...' : 'Cari Game...' }}" 
+                           class="w-full bg-[#1a1a1a] border border-gray-800 rounded-2xl pl-12 pr-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-colors"
+                           autocomplete="off">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Search Results -->
+        <div id="mobileSearchResults" class="flex-1 bg-[#18181B] overflow-y-auto">
+            <div class="p-4 text-center text-gray-400">
+                <i class="ri-search-line text-4xl mb-2"></i>
+                <p class="text-sm">{{ app()->getLocale() === 'en' ? 'Start typing to search games' : 'Mulai ketik untuk mencari game' }}</p>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -446,6 +472,11 @@
         // ============= Game Search Functionality =============
         const searchInput = document.getElementById('gameSearchInput');
         const searchResults = document.getElementById('searchResults');
+        const mobileSearchToggle = document.getElementById('mobileSearchToggle');
+        const mobileSearchModal = document.getElementById('mobileSearchModal');
+        const closeMobileSearch = document.getElementById('closeMobileSearch');
+        const mobileSearchInput = document.getElementById('mobileGameSearchInput');
+        const mobileSearchResults = document.getElementById('mobileSearchResults');
         let allGames = [];
         let searchTimeout;
 
@@ -462,9 +493,18 @@
         }
 
         // Search and filter games
-        function searchGames(query) {
+        function searchGames(query, resultsContainer) {
             if (!query || query.trim().length === 0) {
-                searchResults.classList.add('hidden');
+                if (resultsContainer === searchResults) {
+                    searchResults.classList.add('hidden');
+                } else {
+                    mobileSearchResults.innerHTML = `
+                        <div class="p-4 text-center text-gray-400">
+                            <i class="ri-search-line text-4xl mb-2"></i>
+                            <p class="text-sm">{{ app()->getLocale() === 'en' ? 'Start typing to search games' : 'Mulai ketik untuk mencari game' }}</p>
+                        </div>
+                    `;
+                }
                 return;
             }
 
@@ -473,19 +513,22 @@
                 game.name.toLowerCase().includes(searchTerm)
             );
 
-            displaySearchResults(filtered, searchTerm);
+            displaySearchResults(filtered, searchTerm, resultsContainer);
         }
 
         // Display search results
-        function displaySearchResults(games, searchTerm) {
+        function displaySearchResults(games, searchTerm, resultsContainer) {
             if (games.length === 0) {
-                searchResults.innerHTML = `
+                const noResultsHTML = `
                     <div class="p-4 text-center text-gray-400">
                         <i class="ri-search-line text-3xl mb-2"></i>
                         <p class="text-sm">{{ app()->getLocale() === 'en' ? 'No games found' : 'Game tidak ditemukan' }}</p>
                     </div>
                 `;
-                searchResults.classList.remove('hidden');
+                resultsContainer.innerHTML = noResultsHTML;
+                if (resultsContainer === searchResults) {
+                    searchResults.classList.remove('hidden');
+                }
                 return;
             }
 
@@ -507,8 +550,10 @@
                 </a>
             `).join('');
 
-            searchResults.innerHTML = resultsHTML;
-            searchResults.classList.remove('hidden');
+            resultsContainer.innerHTML = resultsHTML;
+            if (resultsContainer === searchResults) {
+                searchResults.classList.remove('hidden');
+            }
         }
 
         // Highlight matching text
@@ -517,7 +562,41 @@
             return text.replace(regex, '<span class="text-yellow-500">$1</span>');
         }
 
-        // Event listeners for search
+        // Mobile search modal handlers
+        if (mobileSearchToggle && mobileSearchModal) {
+            mobileSearchToggle.addEventListener('click', function() {
+                mobileSearchModal.classList.remove('hidden');
+                setTimeout(() => {
+                    mobileSearchModal.classList.remove('opacity-0');
+                    mobileSearchModal.classList.add('opacity-100');
+                }, 10);
+                document.body.style.overflow = 'hidden';
+                // Focus on input after modal opens
+                setTimeout(() => {
+                    mobileSearchInput.focus();
+                }, 100);
+            });
+        }
+
+        if (closeMobileSearch && mobileSearchModal) {
+            closeMobileSearch.addEventListener('click', function() {
+                mobileSearchModal.classList.remove('opacity-100');
+                mobileSearchModal.classList.add('opacity-0');
+                setTimeout(() => {
+                    mobileSearchModal.classList.add('hidden');
+                }, 300);
+                document.body.style.overflow = '';
+                mobileSearchInput.value = '';
+                mobileSearchResults.innerHTML = `
+                    <div class="p-4 text-center text-gray-400">
+                        <i class="ri-search-line text-4xl mb-2"></i>
+                        <p class="text-sm">{{ app()->getLocale() === 'en' ? 'Start typing to search games' : 'Mulai ketik untuk mencari game' }}</p>
+                    </div>
+                `;
+            });
+        }
+
+        // Event listeners for desktop search
         if (searchInput) {
             // Fetch games data when page loads
             fetchGamesData();
@@ -525,13 +604,13 @@
             searchInput.addEventListener('input', function(e) {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => {
-                    searchGames(e.target.value);
+                    searchGames(e.target.value, searchResults);
                 }, 300); // Debounce for 300ms
             });
 
             searchInput.addEventListener('focus', function(e) {
                 if (e.target.value.trim().length > 0) {
-                    searchGames(e.target.value);
+                    searchGames(e.target.value, searchResults);
                 }
             });
 
@@ -540,6 +619,16 @@
                 if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
                     searchResults.classList.add('hidden');
                 }
+            });
+        }
+
+        // Event listeners for mobile search
+        if (mobileSearchInput) {
+            mobileSearchInput.addEventListener('input', function(e) {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    searchGames(e.target.value, mobileSearchResults);
+                }, 300); // Debounce for 300ms
             });
         }
     });

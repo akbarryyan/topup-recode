@@ -85,12 +85,6 @@
                     <li>
                         <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
                             <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
-                            <span>{{ app()->getLocale() === 'en' ? 'Top-Up Website Service' : 'Layanan Top-Up Website' }}</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="text-gray-400 text-sm hover:text-yellow-500 transition-colors duration-200 flex items-center gap-2 group">
-                            <i class="ri-arrow-right-s-line text-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
                             <span>{{ app()->getLocale() === 'en' ? 'API Documentation' : 'Dokumentasi API' }}</span>
                         </a>
                     </li>
