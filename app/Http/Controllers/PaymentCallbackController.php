@@ -250,18 +250,25 @@ class PaymentCallbackController extends Controller
                 // Order successful - update transaction with provider data
                 $providerData = $result['data'];
                 
-                $transaction->status = $providerData['status'] ?? 'processing';
+                // Get provider status and map to our status
+                $providerStatus = $providerData['status'] ?? 'waiting';
+                
                 $transaction->provider_trxid = $providerData['trxid'] ?? null;
-                $transaction->provider_status = $providerData['status'] ?? 'waiting';
+                $transaction->provider_status = $providerStatus;
                 $transaction->provider_note = $providerData['note'] ?? null;
                 $transaction->provider_price = $providerData['price'] ?? null;
                 $transaction->note = $result['message'];
+                
+                // Map provider status to transaction status
+                // Provider status: waiting, processing, success, failed/error
+                $transaction->status = $this->mapProviderStatusToTransactionStatus($providerStatus);
                 $transaction->save();
 
                 Log::info('Game Order to VIP Reseller Success', [
                     'trxid' => $transaction->trxid,
                     'provider_trxid' => $providerData['trxid'] ?? null,
-                    'provider_status' => $providerData['status'] ?? null,
+                    'provider_status' => $providerStatus,
+                    'mapped_status' => $transaction->status,
                     'message' => $result['message'],
                 ]);
 
@@ -289,6 +296,19 @@ class PaymentCallbackController extends Controller
             $transaction->note = 'System Error: ' . $e->getMessage();
             $transaction->save();
         }
+    }
+
+    /**
+     * Map VIP Reseller provider status to our transaction status
+     */
+    private function mapProviderStatusToTransactionStatus(string $providerStatus): string
+    {
+        return match(strtolower($providerStatus)) {
+            'success' => 'success',
+            'failed', 'error' => 'failed',
+            'waiting', 'processing' => 'processing',
+            default => 'processing',
+        };
     }
 
     /**

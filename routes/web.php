@@ -45,6 +45,11 @@ Route::post('/payment/callback', [App\Http\Controllers\PaymentCallbackController
     ->middleware('duitku.ip')
     ->name('payment.callback');
 
+// VIP Reseller Webhook Callback - Real-time status update from provider
+Route::post('/webhook/vipresel', [App\Http\Controllers\VipResellerWebhookController::class, 'handle'])
+    ->middleware('vipresel.ip')
+    ->name('vipresel.webhook');
+
 // Duitku Redirect - User Return URL (GET)
 Route::get('/payment/duitku/redirect', [App\Http\Controllers\TopUpController::class, 'redirect'])
     ->name('topup.redirect');

@@ -28,13 +28,15 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth' => Authenticate::class,
             'guest' => RedirectIfAuthenticated::class,
             'duitku.ip' => \App\Http\Middleware\DuitkuIpWhitelist::class,
+            'vipresel.ip' => \App\Http\Middleware\VipResellerIpWhitelist::class,
             'track.visitor' => \App\Http\Middleware\TrackVisitor::class,
         ]);
 
-        // Exclude Duitku callback from CSRF verification (external request)
+        // Exclude Duitku callback and VIP Reseller webhook from CSRF verification (external request)
         $middleware->validateCsrfTokens(except: [
             'payment/duitku/callback',
             'payment/callback',
+            'webhook/vipresel',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
