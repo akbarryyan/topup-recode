@@ -142,7 +142,17 @@
   <script>
     $(document).ready(function() {
       $('#loginForm').on('submit', function(e) {
-        // Show loading state
+        // Check if form is valid before showing loading state
+        var form = this;
+        var isValid = form.checkValidity();
+        
+        if (!isValid) {
+          // Form is invalid, don't show loading state
+          // Let browser handle the validation display
+          return;
+        }
+        
+        // Form is valid, show loading state
         $('#loginBtn').prop('disabled', true);
         $('#btnText').hide();
         $('#btnLoader').show();
