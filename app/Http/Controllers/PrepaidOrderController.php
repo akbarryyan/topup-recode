@@ -11,14 +11,17 @@ use Illuminate\Support\Facades\Log;
 
 use App\Models\PaymentMethod;
 use App\Services\DuitkuService;
+use App\Services\VipResellerService;
 
 class PrepaidOrderController extends Controller
 {
     protected $duitkuService;
+    protected $vipResellerService;
 
-    public function __construct(DuitkuService $duitkuService)
+    public function __construct(DuitkuService $duitkuService, VipResellerService $vipResellerService)
     {
         $this->duitkuService = $duitkuService;
+        $this->vipResellerService = $vipResellerService;
     }
 
     /**
@@ -104,7 +107,7 @@ class PrepaidOrderController extends Controller
                 'service_code' => $service->code,
                 'service_name' => $service->name,
                 'data_no' => $validated['phone_number'],
-                'status' => $isCreditsPayment ? 'success' : 'waiting', // Credits payment is instant success
+                'status' => 'waiting', // Will be updated after payment/provider processing
                 'price' => $servicePrice,
                 'balance' => $user ? $user->balance : 0,
                 'note' => json_encode([
@@ -141,6 +144,9 @@ class PrepaidOrderController extends Controller
                 ]);
 
                 DB::commit();
+
+                // Process order to VIP Reseller (after commit to ensure transaction is saved)
+                $this->processOrderToProvider($transaction);
 
                 Log::info('Prepaid Order with Credits Completed', [
                     'trxid' => $trxid,
@@ -224,6 +230,83 @@ class PrepaidOrderController extends Controller
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat memproses pesanan: ' . $e->getMessage(),
             ], 500);
+        }
+    }
+
+    /**
+     * Process order to VIP Reseller Provider
+     */
+    private function processOrderToProvider(PrepaidTransaction $transaction): void
+    {
+        try {
+            Log::info('Processing Prepaid Order to VIP Reseller (Credits)', [
+                'trxid' => $transaction->trxid,
+                'service_code' => $transaction->service_code,
+                'data_no' => $transaction->data_no,
+            ]);
+
+            // Update status to processing before calling provider
+            $transaction->status = 'processing';
+            $transaction->save();
+
+            // Call VIP Reseller API to place order (prepaid uses different endpoint)
+            $result = $this->vipResellerService->orderPrepaid(
+                $transaction->service_code,
+                $transaction->data_no
+            );
+
+            if ($result['success']) {
+                // Order successful - update transaction with provider data
+                $providerData = $result['data'];
+                
+                // Get provider status and map to our status
+                $providerStatus = $providerData['status'] ?? 'waiting';
+                
+                $transaction->provider_trxid = $providerData['trxid'] ?? null;
+                $transaction->provider_status = $providerStatus;
+                $transaction->provider_note = $providerData['note'] ?? null;
+                $transaction->provider_price = $providerData['price'] ?? null;
+                $transaction->note = $result['message'];
+                
+                // Map provider status to transaction status
+                $transaction->status = match(strtolower($providerStatus)) {
+                    'success' => 'success',
+                    'failed', 'error' => 'failed',
+                    'waiting', 'processing' => 'processing',
+                    default => 'processing',
+                };
+                $transaction->save();
+
+                Log::info('Prepaid Order to VIP Reseller Success (Credits)', [
+                    'trxid' => $transaction->trxid,
+                    'provider_trxid' => $providerData['trxid'] ?? null,
+                    'provider_status' => $providerStatus,
+                    'mapped_status' => $transaction->status,
+                ]);
+
+            } else {
+                // Order failed - mark transaction as failed
+                $transaction->status = 'failed';
+                $transaction->note = 'Provider Error: ' . $result['message'];
+                $transaction->save();
+
+                Log::error('Prepaid Order to VIP Reseller Failed (Credits)', [
+                    'trxid' => $transaction->trxid,
+                    'error' => $result['message'],
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Prepaid Order to VIP Reseller Exception (Credits)', [
+                'trxid' => $transaction->trxid,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Mark as failed
+            $transaction->status = 'failed';
+            $transaction->note = 'System Error: ' . $e->getMessage();
+            $transaction->save();
         }
     }
 }

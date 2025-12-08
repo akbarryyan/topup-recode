@@ -331,7 +331,7 @@ class PaymentCallbackController extends Controller
         if ($resultCode === '00') {
             // Payment successful - update status
             $transaction->payment_status = 'paid';
-            $transaction->status = 'processing'; // Will be processed by prepaid service
+            $transaction->status = 'processing';
             $transaction->paid_at = now();
             $transaction->save();
 
@@ -341,8 +341,8 @@ class PaymentCallbackController extends Controller
                 'service' => $transaction->service_name,
             ]);
 
-            // TODO: Trigger prepaid order processing (DigiFlazz API call)
-            // This should be handled by a job or service
+            // Process order to VIP Reseller
+            $this->processPrepaidOrderToProvider($transaction);
 
             return true;
         } else {
@@ -357,6 +357,74 @@ class PaymentCallbackController extends Controller
             ]);
 
             return false;
+        }
+    }
+
+    /**
+     * Process Prepaid Order to VIP Reseller Provider
+     */
+    private function processPrepaidOrderToProvider(PrepaidTransaction $transaction): void
+    {
+        try {
+            Log::info('Processing Prepaid Order to VIP Reseller', [
+                'trxid' => $transaction->trxid,
+                'service_code' => $transaction->service_code,
+                'data_no' => $transaction->data_no,
+            ]);
+
+            // Call VIP Reseller API to place order
+            $result = $this->vipResellerService->orderPrepaid(
+                $transaction->service_code,
+                $transaction->data_no
+            );
+
+            if ($result['success']) {
+                // Order successful - update transaction with provider data
+                $providerData = $result['data'];
+                
+                // Get provider status and map to our status
+                $providerStatus = $providerData['status'] ?? 'waiting';
+                
+                $transaction->provider_trxid = $providerData['trxid'] ?? null;
+                $transaction->provider_status = $providerStatus;
+                $transaction->provider_note = $providerData['note'] ?? null;
+                $transaction->provider_price = $providerData['price'] ?? null;
+                $transaction->note = $result['message'];
+                
+                // Map provider status to transaction status
+                $transaction->status = $this->mapProviderStatusToTransactionStatus($providerStatus);
+                $transaction->save();
+
+                Log::info('Prepaid Order to VIP Reseller Success', [
+                    'trxid' => $transaction->trxid,
+                    'provider_trxid' => $providerData['trxid'] ?? null,
+                    'provider_status' => $providerStatus,
+                    'mapped_status' => $transaction->status,
+                ]);
+
+            } else {
+                // Order failed - mark transaction as failed
+                $transaction->status = 'failed';
+                $transaction->note = 'Provider Error: ' . $result['message'];
+                $transaction->save();
+
+                Log::error('Prepaid Order to VIP Reseller Failed', [
+                    'trxid' => $transaction->trxid,
+                    'error' => $result['message'],
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Prepaid Order to VIP Reseller Exception', [
+                'trxid' => $transaction->trxid,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Mark as failed but don't throw - payment is already confirmed
+            $transaction->status = 'failed';
+            $transaction->note = 'System Error: ' . $e->getMessage();
+            $transaction->save();
         }
     }
 }

@@ -616,4 +616,84 @@ class VipResellerService
             ];
         }
     }
+
+    /**
+     * Check Prepaid Order Status from VIP Reseller
+     * 
+     * @param string $trxid Transaction ID from VIP Reseller
+     * @return array
+     */
+    public function checkPrepaidOrderStatus(string $trxid): array
+    {
+        if (!$this->ensureConfigured()) {
+            return [
+                'success' => false,
+                'data' => [],
+                'message' => 'Konfigurasi VIP Reseller belum lengkap. Mohon lengkapi kredensial API.',
+            ];
+        }
+
+        try {
+            $payload = [
+                'key' => $this->apiKey,
+                'sign' => $this->sign,
+                'type' => 'status',
+                'trxid' => $trxid,
+            ];
+
+            Log::info('VIP Reseller Check Prepaid Status Request', [
+                'url' => $this->apiUrl . '/prepaid',
+                'trxid' => $trxid,
+            ]);
+
+            $response = Http::timeout(30)
+                ->connectTimeout(10)
+                ->asForm()
+                ->post($this->apiUrl . '/prepaid', $payload);
+
+            Log::info('VIP Reseller Check Prepaid Status Response', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+
+                if (isset($data['result']) && $data['result'] === true) {
+                    // Get the first transaction data (since we query by specific trxid)
+                    $transactionData = $data['data'][0] ?? [];
+                    
+                    return [
+                        'success' => true,
+                        'data' => $transactionData,
+                        'message' => $data['message'] ?? 'Status berhasil didapatkan.',
+                    ];
+                }
+
+                return [
+                    'success' => false,
+                    'data' => [],
+                    'message' => $data['message'] ?? 'Gagal mendapatkan status.',
+                ];
+            }
+
+            return [
+                'success' => false,
+                'data' => [],
+                'message' => 'API request failed: ' . $response->status(),
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('VIP Reseller Check Prepaid Status Error: ' . $e->getMessage(), [
+                'trxid' => $trxid,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'data' => [],
+                'message' => 'Error: ' . $e->getMessage(),
+            ];
+        }
+    }
 }

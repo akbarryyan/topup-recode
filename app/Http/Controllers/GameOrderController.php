@@ -11,14 +11,17 @@ use Illuminate\Support\Facades\Log;
 
 use App\Models\PaymentMethod;
 use App\Services\DuitkuService;
+use App\Services\VipResellerService;
 
 class GameOrderController extends Controller
 {
     protected $duitkuService;
+    protected $vipResellerService;
 
-    public function __construct(DuitkuService $duitkuService)
+    public function __construct(DuitkuService $duitkuService, VipResellerService $vipResellerService)
     {
         $this->duitkuService = $duitkuService;
+        $this->vipResellerService = $vipResellerService;
     }
 
     /**
@@ -108,7 +111,7 @@ class GameOrderController extends Controller
                 'service_name' => $service->name,
                 'data_no' => $userId,
                 'data_zone' => $zoneId,
-                'status' => $isCreditsPayment ? 'success' : 'waiting', // Credits payment is instant success
+                'status' => 'waiting', // Will be updated after payment/provider processing
                 'price' => $servicePrice,
                 'balance' => $user ? $user->balance : 0,
                 'note' => json_encode([
@@ -151,6 +154,9 @@ class GameOrderController extends Controller
                 }
 
                 DB::commit();
+
+                // Process order to VIP Reseller (after commit to ensure transaction is saved)
+                $this->processOrderToProvider($transaction);
 
                 Log::info('Game Order with Credits Completed', [
                     'trxid' => $trxid,
@@ -239,6 +245,85 @@ class GameOrderController extends Controller
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat memproses pesanan: ' . $e->getMessage(),
             ], 500);
+        }
+    }
+
+    /**
+     * Process order to VIP Reseller Provider
+     */
+    private function processOrderToProvider(GameTransaction $transaction): void
+    {
+        try {
+            Log::info('Processing Game Order to VIP Reseller (Credits)', [
+                'trxid' => $transaction->trxid,
+                'service_code' => $transaction->service_code,
+                'data_no' => $transaction->data_no,
+                'data_zone' => $transaction->data_zone,
+            ]);
+
+            // Update status to processing before calling provider
+            $transaction->status = 'processing';
+            $transaction->save();
+
+            // Call VIP Reseller API to place order
+            $result = $this->vipResellerService->orderGame(
+                $transaction->service_code,
+                $transaction->data_no,
+                $transaction->data_zone
+            );
+
+            if ($result['success']) {
+                // Order successful - update transaction with provider data
+                $providerData = $result['data'];
+                
+                // Get provider status and map to our status
+                $providerStatus = $providerData['status'] ?? 'waiting';
+                
+                $transaction->provider_trxid = $providerData['trxid'] ?? null;
+                $transaction->provider_status = $providerStatus;
+                $transaction->provider_note = $providerData['note'] ?? null;
+                $transaction->provider_price = $providerData['price'] ?? null;
+                $transaction->note = $result['message'];
+                
+                // Map provider status to transaction status
+                $transaction->status = match(strtolower($providerStatus)) {
+                    'success' => 'success',
+                    'failed', 'error' => 'failed',
+                    'waiting', 'processing' => 'processing',
+                    default => 'processing',
+                };
+                $transaction->save();
+
+                Log::info('Game Order to VIP Reseller Success (Credits)', [
+                    'trxid' => $transaction->trxid,
+                    'provider_trxid' => $providerData['trxid'] ?? null,
+                    'provider_status' => $providerStatus,
+                    'mapped_status' => $transaction->status,
+                ]);
+
+            } else {
+                // Order failed - mark transaction as failed
+                $transaction->status = 'failed';
+                $transaction->note = 'Provider Error: ' . $result['message'];
+                $transaction->save();
+
+                Log::error('Game Order to VIP Reseller Failed (Credits)', [
+                    'trxid' => $transaction->trxid,
+                    'error' => $result['message'],
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Game Order to VIP Reseller Exception (Credits)', [
+                'trxid' => $transaction->trxid,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Mark as failed
+            $transaction->status = 'failed';
+            $transaction->note = 'System Error: ' . $e->getMessage();
+            $transaction->save();
         }
     }
 }

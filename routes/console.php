@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // Check game order status every minute for faster updates
 Schedule::command('game:check-status')->everyMinute();
+
+// Check prepaid order status every minute for faster updates
+Schedule::command('prepaid:check-status')->everyMinute();
