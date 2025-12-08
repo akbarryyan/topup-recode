@@ -6,6 +6,7 @@ use App\Models\GameTransaction;
 use App\Models\PrepaidTransaction;
 use App\Models\TopUpTransaction;
 use App\Services\DuitkuService;
+use App\Services\VipResellerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -13,10 +14,12 @@ use Illuminate\Support\Facades\Log;
 class PaymentCallbackController extends Controller
 {
     protected $duitkuService;
+    protected $vipResellerService;
 
-    public function __construct(DuitkuService $duitkuService)
+    public function __construct(DuitkuService $duitkuService, VipResellerService $vipResellerService)
     {
         $this->duitkuService = $duitkuService;
+        $this->vipResellerService = $vipResellerService;
     }
 
     /**
@@ -204,8 +207,8 @@ class PaymentCallbackController extends Controller
                 'service' => $transaction->service_name,
             ]);
 
-            // TODO: Trigger game order processing (DigiFlazz API call)
-            // This should be handled by a job or service
+            // Process order to VIP Reseller
+            $this->processGameOrderToProvider($transaction);
 
             return true;
         } else {
@@ -220,6 +223,71 @@ class PaymentCallbackController extends Controller
             ]);
 
             return false;
+        }
+    }
+
+    /**
+     * Process Game Order to VIP Reseller Provider
+     */
+    private function processGameOrderToProvider(GameTransaction $transaction): void
+    {
+        try {
+            Log::info('Processing Game Order to VIP Reseller', [
+                'trxid' => $transaction->trxid,
+                'service_code' => $transaction->service_code,
+                'data_no' => $transaction->data_no,
+                'data_zone' => $transaction->data_zone,
+            ]);
+
+            // Call VIP Reseller API to place order
+            $result = $this->vipResellerService->orderGame(
+                $transaction->service_code,
+                $transaction->data_no,
+                $transaction->data_zone
+            );
+
+            if ($result['success']) {
+                // Order successful - update transaction with provider data
+                $providerData = $result['data'];
+                
+                $transaction->status = $providerData['status'] ?? 'processing';
+                $transaction->provider_trxid = $providerData['trxid'] ?? null;
+                $transaction->provider_status = $providerData['status'] ?? 'waiting';
+                $transaction->provider_note = $providerData['note'] ?? null;
+                $transaction->provider_price = $providerData['price'] ?? null;
+                $transaction->note = $result['message'];
+                $transaction->save();
+
+                Log::info('Game Order to VIP Reseller Success', [
+                    'trxid' => $transaction->trxid,
+                    'provider_trxid' => $providerData['trxid'] ?? null,
+                    'provider_status' => $providerData['status'] ?? null,
+                    'message' => $result['message'],
+                ]);
+
+            } else {
+                // Order failed - mark transaction as failed
+                $transaction->status = 'failed';
+                $transaction->note = 'Provider Error: ' . $result['message'];
+                $transaction->save();
+
+                Log::error('Game Order to VIP Reseller Failed', [
+                    'trxid' => $transaction->trxid,
+                    'error' => $result['message'],
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Game Order to VIP Reseller Exception', [
+                'trxid' => $transaction->trxid,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Mark as failed but don't throw - payment is already confirmed
+            $transaction->status = 'failed';
+            $transaction->note = 'System Error: ' . $e->getMessage();
+            $transaction->save();
         }
     }
 

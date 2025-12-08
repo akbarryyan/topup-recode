@@ -369,4 +369,171 @@ class VipResellerService
             ];
         }
     }
+
+    /**
+     * Order Game Service (Top Up Game)
+     * 
+     * @param string $serviceCode Kode layanan dari VIP Reseller
+     * @param string $dataNo User ID game (data_no)
+     * @param string|null $dataZone Zone ID (jika diperlukan)
+     * @return array
+     */
+    public function orderGame(string $serviceCode, string $dataNo, ?string $dataZone = null): array
+    {
+        if (!$this->ensureConfigured()) {
+            return [
+                'success' => false,
+                'data' => [],
+                'message' => 'Konfigurasi VIP Reseller belum lengkap. Mohon lengkapi kredensial API.',
+            ];
+        }
+
+        try {
+            $payload = [
+                'key' => $this->apiKey,
+                'sign' => $this->sign,
+                'type' => 'order',
+                'service' => $serviceCode,
+                'data_no' => $dataNo,
+            ];
+
+            // Add zone if provided
+            if (!empty($dataZone)) {
+                $payload['data_zone'] = $dataZone;
+            }
+
+            Log::info('VIP Reseller Order Game Request', [
+                'url' => $this->apiUrl . '/game-feature',
+                'payload' => array_merge($payload, ['key' => '***', 'sign' => '***']), // Hide sensitive data
+            ]);
+
+            $response = Http::timeout(60)
+                ->connectTimeout(10)
+                ->asForm()
+                ->post($this->apiUrl . '/game-feature', $payload);
+
+            Log::info('VIP Reseller Order Game Response', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+
+                if (isset($data['result']) && $data['result'] === true) {
+                    return [
+                        'success' => true,
+                        'data' => $data['data'] ?? [],
+                        'message' => $data['message'] ?? 'Pesanan berhasil diproses.',
+                    ];
+                }
+
+                return [
+                    'success' => false,
+                    'data' => $data['data'] ?? [],
+                    'message' => $data['message'] ?? 'Gagal memproses pesanan.',
+                ];
+            }
+
+            return [
+                'success' => false,
+                'data' => [],
+                'message' => 'API request failed: ' . $response->status(),
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('VIP Reseller Order Game Error: ' . $e->getMessage(), [
+                'service' => $serviceCode,
+                'data_no' => $dataNo,
+                'data_zone' => $dataZone,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'data' => [],
+                'message' => 'Error: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Order Prepaid Service (Pulsa, Data, etc)
+     * 
+     * @param string $serviceCode Kode layanan dari VIP Reseller
+     * @param string $phoneNumber Nomor HP tujuan
+     * @return array
+     */
+    public function orderPrepaid(string $serviceCode, string $phoneNumber): array
+    {
+        if (!$this->ensureConfigured()) {
+            return [
+                'success' => false,
+                'data' => [],
+                'message' => 'Konfigurasi VIP Reseller belum lengkap. Mohon lengkapi kredensial API.',
+            ];
+        }
+
+        try {
+            $payload = [
+                'key' => $this->apiKey,
+                'sign' => $this->sign,
+                'type' => 'order',
+                'service' => $serviceCode,
+                'data_no' => $phoneNumber,
+            ];
+
+            Log::info('VIP Reseller Order Prepaid Request', [
+                'url' => $this->apiUrl . '/prepaid',
+                'payload' => array_merge($payload, ['key' => '***', 'sign' => '***']),
+            ]);
+
+            $response = Http::timeout(60)
+                ->connectTimeout(10)
+                ->asForm()
+                ->post($this->apiUrl . '/prepaid', $payload);
+
+            Log::info('VIP Reseller Order Prepaid Response', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+
+                if (isset($data['result']) && $data['result'] === true) {
+                    return [
+                        'success' => true,
+                        'data' => $data['data'] ?? [],
+                        'message' => $data['message'] ?? 'Pesanan berhasil diproses.',
+                    ];
+                }
+
+                return [
+                    'success' => false,
+                    'data' => $data['data'] ?? [],
+                    'message' => $data['message'] ?? 'Gagal memproses pesanan.',
+                ];
+            }
+
+            return [
+                'success' => false,
+                'data' => [],
+                'message' => 'API request failed: ' . $response->status(),
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('VIP Reseller Order Prepaid Error: ' . $e->getMessage(), [
+                'service' => $serviceCode,
+                'phone' => $phoneNumber,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'data' => [],
+                'message' => 'Error: ' . $e->getMessage(),
+            ];
+        }
+    }
 }

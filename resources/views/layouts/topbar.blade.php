@@ -10,10 +10,11 @@
                 </button>
             @endauth
             <a href="{{ url('/') }}" class="shrink-0 hover:opacity-80 transition-opacity">
+                @php($websiteLogo = \App\Models\WebsiteSetting::get('website_logo'))
                 @if($websiteLogo)
-                    <img src="{{ $websiteLogo }}" alt="{{ $websiteName }}" class="h-8 lg:h-12 w-auto">
+                    <img src="{{ $websiteLogo }}" alt="{{ \App\Models\WebsiteSetting::get('website_name', 'NVD STORE') }}" class="h-8 lg:h-12 w-auto">
                 @else
-                    <span class="text-xl font-bold text-white">{{ $websiteName }}</span>
+                    <span class="text-xl font-bold text-white">{{ \App\Models\WebsiteSetting::get('website_name', 'NVD STORE') }}</span>
                 @endif
             </a>
         </div>
@@ -236,10 +237,11 @@
     <div class="p-6 overflow-y-auto h-full">
         <!-- Close Button & Logo -->
         <div class="flex items-center justify-between mb-8">
-            @if($websiteLogo)
-                <img src="{{ $websiteLogo }}" alt="{{ $websiteName }}" class="h-6">
+            @php($sidebarLogo = \App\Models\WebsiteSetting::get('website_logo'))
+            @if($sidebarLogo)
+                <img src="{{ $sidebarLogo }}" alt="{{ \App\Models\WebsiteSetting::get('website_name', 'NVD STORE') }}" class="h-6">
             @else
-                <span class="text-lg font-bold text-white">{{ $websiteName }}</span>
+                <span class="text-lg font-bold text-white">{{ \App\Models\WebsiteSetting::get('website_name', 'NVD STORE') }}</span>
             @endif
             <button id="closeMenu" class="text-gray-400 hover:text-white transition-colors">
                 <i class="ri-close-line text-2xl"></i>

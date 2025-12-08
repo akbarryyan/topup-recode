@@ -34,6 +34,11 @@ class GameTransaction extends Model
         'payment_status',
         'paid_at',
         'expired_at',
+        // Provider (VIP Reseller) Fields
+        'provider_trxid',
+        'provider_status',
+        'provider_note',
+        'provider_price',
     ];
 
     protected $casts = [
@@ -41,6 +46,7 @@ class GameTransaction extends Model
         'balance' => 'decimal:2',
         'payment_amount' => 'decimal:2',
         'payment_fee' => 'decimal:2',
+        'provider_price' => 'decimal:2',
         'paid_at' => 'datetime',
         'expired_at' => 'datetime',
     ];
