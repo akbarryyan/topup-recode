@@ -95,25 +95,52 @@ Route::get('/payment/invoice/{trxid}/pdf', [PaymentSuccessController::class, 'do
 Route::group(['prefix' => '{locale?}', 'where' => ['locale' => 'id|en']], function () {
 
 Route::get('/', function () {
-    // Get active game services grouped by game
-    $gameServices = GameService::where('is_active', true)
+    // Get active game services
+    $allGameServices = GameService::where('is_active', true)
         ->where('status', 'available')
         ->orderBy('game')
-        ->get()
-        ->groupBy('game');
+        ->get();
     
-    // Get game images
-    $gameImages = GameImage::all()->keyBy('game_name');
+    // Group by normalized game name (case-insensitive, trimmed)
+    // This prevents duplicates like "Call Of Duty Mobile" and "Call of Duty Mobile"
+    $gameServices = $allGameServices->groupBy(function ($item) {
+        return strtolower(trim($item->game));
+    })->map(function ($group) {
+        // Use the first item's original game name as the display name
+        return $group;
+    })->mapWithKeys(function ($group, $key) {
+        // Get the original game name (with proper casing) from the first item
+        $originalName = $group->first()->game;
+        return [$originalName => $group];
+    });
     
-    // Get active prepaid services grouped by brand
-    $prepaidServices = PrepaidService::where('is_active', true)
+    // Get game images - create a case-insensitive lookup
+    $gameImagesRaw = GameImage::all();
+    $gameImages = collect();
+    foreach ($gameImagesRaw as $img) {
+        $gameImages[trim($img->game_name)] = $img;
+    }
+    
+    // Get active prepaid services
+    $allPrepaidServices = PrepaidService::where('is_active', true)
         ->where('status', 'available')
         ->orderBy('brand')
-        ->get()
-        ->groupBy('brand');
+        ->get();
+    
+    // Group by normalized brand name
+    $prepaidServices = $allPrepaidServices->groupBy(function ($item) {
+        return strtolower(trim($item->brand));
+    })->mapWithKeys(function ($group, $key) {
+        $originalName = $group->first()->brand;
+        return [$originalName => $group];
+    });
     
     // Get brand images
-    $brandImages = BrandImage::all()->keyBy('brand_name');
+    $brandImagesRaw = BrandImage::all();
+    $brandImages = collect();
+    foreach ($brandImagesRaw as $img) {
+        $brandImages[trim($img->brand_name)] = $img;
+    }
     
     // Get active banners
     $banners = Banner::where('is_active', true)

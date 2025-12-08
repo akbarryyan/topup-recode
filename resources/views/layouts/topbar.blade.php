@@ -640,6 +640,7 @@
         
         // Show modal with animation
         modal.classList.remove('hidden');
+        modal.classList.add('flex');
         modalBackdrop.classList.remove('hidden');
         
         setTimeout(() => {
@@ -664,6 +665,7 @@
         
         setTimeout(() => {
             modal.classList.add('hidden');
+            modal.classList.remove('flex');
             modalBackdrop.classList.add('hidden');
             document.body.style.overflow = '';
         }, 300);
@@ -679,7 +681,7 @@
 <div id="modalBackdrop" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-200 opacity-0 transition-opacity duration-300"></div>
 
 <!-- Logout Confirmation Modal -->
-<div id="logoutModal" class="hidden fixed inset-0 z-201 flex items-center justify-center p-4 opacity-0 scale-95 transition-all duration-300">
+<div id="logoutModal" class="hidden fixed inset-0 z-201 items-center justify-center p-4 opacity-0 scale-95 transition-all duration-300">
     <div class="bg-[#1F1F23] rounded-2xl border border-white/10 shadow-2xl max-w-md w-full p-6 relative">
         <!-- Close Button -->
         <button onclick="closeLogoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">

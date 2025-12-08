@@ -130,12 +130,12 @@
                                  data-payment-fee="0">
                                 <div class="flex items-center justify-between mb-3">
                                     <div class="flex items-center gap-2">
-                                        <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center">
+                                        <div class="w-10 h-10 bg-linear-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center">
                                             <i class="ri-wallet-3-fill text-white text-lg"></i>
                                         </div>
                                         <div>
                                             <span class="text-white font-medium block">Credits / Saldo</span>
-                                            <span class="text-gray-400 text-xs">Saldo Anda: <span class="text-green-400 font-semibold">Rp {{ number_format(auth()->user()->balance, 0, ',', '.') }}</span></span>
+                                            <span class="text-gray-400 text-xs">Saldo Anda: <span class="text-green-400 font-semibold">Rp {{ number_format((float)(auth()->user()->balance ?? 0), 0, ',', '.') }}</span></span>
                                         </div>
                                     </div>
                                     <span class="text-green-400 text-xs font-medium">Gratis Biaya Admin</span>

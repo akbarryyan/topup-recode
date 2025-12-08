@@ -170,7 +170,7 @@
                                         </div>
                                         <div>
                                             <span class="text-white font-medium block">Credits / Saldo</span>
-                                            <span class="text-gray-400 text-xs">Saldo Anda: <span class="text-green-400 font-semibold">Rp {{ number_format(auth()->user()->balance, 0, ',', '.') }}</span></span>
+                                            <span class="text-gray-400 text-xs">Saldo Anda: <span class="text-green-400 font-semibold">Rp {{ number_format((float)(auth()->user()->balance ?? 0), 0, ',', '.') }}</span></span>
                                         </div>
                                     </div>
                                     <span class="text-green-400 text-xs font-medium">Gratis Biaya Admin</span>
