@@ -291,12 +291,23 @@ class ProfileController extends Controller
                     // Parse note to get game name
                     $noteData = json_decode($transaction->note, true);
                     
+                    // Get game name from note, or try to find from service
+                    $gameName = $noteData['game'] ?? null;
+                    
+                    // If game name not in note, try to get from GameService
+                    if (empty($gameName)) {
+                        $gameService = \App\Models\GameService::where('code', $transaction->service_code)->first();
+                        if ($gameService) {
+                            $gameName = $gameService->game;
+                        }
+                    }
+                    
                     return response()->json([
                         'success' => true,
                         'data' => [
                             'type' => 'game',
                             'trxid' => $transaction->trxid,
-                            'game' => $noteData['game'] ?? '-',
+                            'game' => $gameName ?? '-',
                             'service_name' => $transaction->service_name,
                             'service_code' => $transaction->service_code,
                             'data_no' => $transaction->data_no,
@@ -323,12 +334,23 @@ class ProfileController extends Controller
                     // Parse note to get brand name
                     $noteData = json_decode($transaction->note, true);
                     
+                    // Get brand name from note, or try to find from service
+                    $brandName = $noteData['brand'] ?? null;
+                    
+                    // If brand name not in note, try to get from PrepaidService
+                    if (empty($brandName)) {
+                        $prepaidService = \App\Models\PrepaidService::where('code', $transaction->service_code)->first();
+                        if ($prepaidService) {
+                            $brandName = $prepaidService->brand;
+                        }
+                    }
+                    
                     return response()->json([
                         'success' => true,
                         'data' => [
                             'type' => 'prepaid',
                             'trxid' => $transaction->trxid,
-                            'brand' => $noteData['brand'] ?? '-',
+                            'brand' => $brandName ?? '-',
                             'service_name' => $transaction->service_name,
                             'service_code' => $transaction->service_code,
                             'data_no' => $transaction->data_no,

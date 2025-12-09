@@ -264,9 +264,8 @@ class PrepaidOrderController extends Controller
                 
                 $transaction->provider_trxid = $providerData['trxid'] ?? null;
                 $transaction->provider_status = $providerStatus;
-                $transaction->provider_note = $providerData['note'] ?? null;
+                $transaction->provider_note = $providerData['note'] ?? $result['message'];
                 $transaction->provider_price = $providerData['price'] ?? null;
-                $transaction->note = $result['message'];
                 
                 // Map provider status to transaction status
                 $transaction->status = match(strtolower($providerStatus)) {
@@ -287,7 +286,7 @@ class PrepaidOrderController extends Controller
             } else {
                 // Order failed - mark transaction as failed
                 $transaction->status = 'failed';
-                $transaction->note = 'Provider Error: ' . $result['message'];
+                $transaction->provider_note = 'Provider Error: ' . $result['message'];
                 $transaction->save();
 
                 Log::error('Prepaid Order to VIP Reseller Failed (Credits)', [
@@ -305,7 +304,7 @@ class PrepaidOrderController extends Controller
 
             // Mark as failed
             $transaction->status = 'failed';
-            $transaction->note = 'System Error: ' . $e->getMessage();
+            $transaction->provider_note = 'System Error: ' . $e->getMessage();
             $transaction->save();
         }
     }

@@ -255,9 +255,8 @@ class PaymentCallbackController extends Controller
                 
                 $transaction->provider_trxid = $providerData['trxid'] ?? null;
                 $transaction->provider_status = $providerStatus;
-                $transaction->provider_note = $providerData['note'] ?? null;
+                $transaction->provider_note = $providerData['note'] ?? $result['message'];
                 $transaction->provider_price = $providerData['price'] ?? null;
-                $transaction->note = $result['message'];
                 
                 // Map provider status to transaction status
                 // Provider status: waiting, processing, success, failed/error
@@ -275,7 +274,7 @@ class PaymentCallbackController extends Controller
             } else {
                 // Order failed - mark transaction as failed
                 $transaction->status = 'failed';
-                $transaction->note = 'Provider Error: ' . $result['message'];
+                $transaction->provider_note = 'Provider Error: ' . $result['message'];
                 $transaction->save();
 
                 Log::error('Game Order to VIP Reseller Failed', [
@@ -293,7 +292,7 @@ class PaymentCallbackController extends Controller
 
             // Mark as failed but don't throw - payment is already confirmed
             $transaction->status = 'failed';
-            $transaction->note = 'System Error: ' . $e->getMessage();
+            $transaction->provider_note = 'System Error: ' . $e->getMessage();
             $transaction->save();
         }
     }
@@ -387,9 +386,8 @@ class PaymentCallbackController extends Controller
                 
                 $transaction->provider_trxid = $providerData['trxid'] ?? null;
                 $transaction->provider_status = $providerStatus;
-                $transaction->provider_note = $providerData['note'] ?? null;
+                $transaction->provider_note = $providerData['note'] ?? $result['message'];
                 $transaction->provider_price = $providerData['price'] ?? null;
-                $transaction->note = $result['message'];
                 
                 // Map provider status to transaction status
                 $transaction->status = $this->mapProviderStatusToTransactionStatus($providerStatus);
@@ -405,7 +403,7 @@ class PaymentCallbackController extends Controller
             } else {
                 // Order failed - mark transaction as failed
                 $transaction->status = 'failed';
-                $transaction->note = 'Provider Error: ' . $result['message'];
+                $transaction->provider_note = 'Provider Error: ' . $result['message'];
                 $transaction->save();
 
                 Log::error('Prepaid Order to VIP Reseller Failed', [
@@ -423,7 +421,7 @@ class PaymentCallbackController extends Controller
 
             // Mark as failed but don't throw - payment is already confirmed
             $transaction->status = 'failed';
-            $transaction->note = 'System Error: ' . $e->getMessage();
+            $transaction->provider_note = 'System Error: ' . $e->getMessage();
             $transaction->save();
         }
     }
