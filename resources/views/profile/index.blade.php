@@ -319,16 +319,20 @@
                                                 <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $statusColor }}">{{ ucfirst($transaction->status) }}</span>
                                             </td>
                                             <td class="px-4 py-3">
-                                                @if($transaction->status === 'waiting' && !empty($transaction->payment_url))
-                                                    <a href="{{ $transaction->payment_url }}" target="_blank" class="rounded-lg bg-yellow-500 px-3 py-1.5 text-xs font-semibold text-black hover:bg-yellow-400 transition-colors">
-                                                        {{ app()->getLocale() === 'en' ? 'Pay' : 'Bayar' }}
-                                                    </a>
-                                                @endif
-                                                <button type="button" 
-                                                    onclick="showTransactionDetail('{{ $transaction->invoice }}', '{{ $transaction->type }}')"
-                                                    class="rounded-lg bg-blue-500/20 border border-blue-500/30 px-3 py-1.5 text-xs font-semibold text-blue-400 hover:bg-blue-500/30 transition-colors ml-1">
-                                                    <i class="ri-eye-line"></i> {{ app()->getLocale() === 'en' ? 'Detail' : 'Detail' }}
-                                                </button>
+                                                <div class="flex flex-wrap items-center gap-1.5">
+                                                    @if($transaction->status === 'waiting' && !empty($transaction->payment_url))
+                                                        <a href="{{ $transaction->payment_url }}" target="_blank" class="inline-flex items-center gap-1 rounded-lg bg-yellow-500 px-2.5 py-1.5 text-xs font-semibold text-black hover:bg-yellow-400 transition-colors whitespace-nowrap">
+                                                            <i class="ri-wallet-line text-sm"></i>
+                                                            <span class="hidden lg:inline">{{ app()->getLocale() === 'en' ? 'Pay' : 'Bayar' }}</span>
+                                                        </a>
+                                                    @endif
+                                                    <button type="button" 
+                                                        onclick="showTransactionDetail('{{ $transaction->invoice }}', '{{ $transaction->type }}')"
+                                                        class="inline-flex items-center gap-1 rounded-lg bg-blue-500/20 border border-blue-500/30 px-2.5 py-1.5 text-xs font-semibold text-blue-400 hover:bg-blue-500/30 transition-colors whitespace-nowrap">
+                                                        <i class="ri-eye-line text-sm"></i>
+                                                        <span class="hidden lg:inline">{{ app()->getLocale() === 'en' ? 'Detail' : 'Detail' }}</span>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     @empty

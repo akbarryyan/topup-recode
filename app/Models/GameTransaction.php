@@ -5,6 +5,38 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property string $trxid
+ * @property int|null $user_id
+ * @property string $service_code
+ * @property string $service_name
+ * @property string $data_no
+ * @property string|null $data_zone
+ * @property string $status
+ * @property float $price
+ * @property float $balance
+ * @property string|null $note
+ * @property int|null $payment_method_id
+ * @property string|null $payment_method_code
+ * @property float|null $payment_amount
+ * @property float|null $payment_fee
+ * @property string|null $payment_url
+ * @property string|null $payment_reference
+ * @property string|null $va_number
+ * @property string|null $qr_string
+ * @property string|null $email
+ * @property string|null $whatsapp
+ * @property string|null $payment_status
+ * @property \Carbon\Carbon|null $paid_at
+ * @property \Carbon\Carbon|null $expired_at
+ * @property string|null $provider_trxid
+ * @property string|null $provider_status
+ * @property string|null $provider_note
+ * @property float|null $provider_price
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ */
 class GameTransaction extends Model
 {
     use HasFactory;

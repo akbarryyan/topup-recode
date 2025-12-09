@@ -99,10 +99,27 @@ class ProfileController extends Controller
             ->take(50) // Increase limit for filtered results
             ->get()
             ->map(function ($trx) {
+                // Try to get game name from note if available
+                $gameName = 'Game Topup';
+                if ($trx->note) {
+                    $note = json_decode($trx->note, true);
+                    if (isset($note['game'])) {
+                        $gameName = $note['game'];
+                    }
+                }
+                
+                // Fallback: try to get from GameService if note is empty
+                if ($gameName === 'Game Topup' && $trx->service_code) {
+                    $gameService = \App\Models\GameService::where('code', $trx->service_code)->first();
+                    if ($gameService && $gameService->game) {
+                        $gameName = $gameService->game;
+                    }
+                }
+
                 return (object) [
                     'type' => 'game',
                     'invoice' => $trx->trxid,
-                    'game' => 'Game Topup',
+                    'game' => $gameName,
                     'product' => $trx->service_name,
                     'user_input' => $trx->data_no . ($trx->data_zone ? ' (' . $trx->data_zone . ')' : ''),
                     'price' => $trx->price,
@@ -123,6 +140,14 @@ class ProfileController extends Controller
                     $note = json_decode($trx->note, true);
                     if (isset($note['brand'])) {
                         $brand = $note['brand'];
+                    }
+                }
+                
+                // Fallback: try to get from PrepaidService if note is empty
+                if ($brand === 'Pulsa & Data' && $trx->service_code) {
+                    $prepaidService = \App\Models\PrepaidService::where('code', $trx->service_code)->first();
+                    if ($prepaidService && $prepaidService->brand) {
+                        $brand = $prepaidService->brand;
                     }
                 }
 
