@@ -209,6 +209,11 @@ Route::get('/article', [ArticleController::class, 'index'])->name('article');
 Route::get('/contact-us', [ContactController::class, 'index'])->name('contact-us');
 Route::post('/contact-us', [ContactController::class, 'store'])->name('contact-us.store');
 
+// API Documentation Route
+Route::get('/api-docs', function () {
+    return view('api-docs');
+})->name('api-docs');
+
 // Win Rate Calculator Routes
 Route::get('/calculator/win-rate', [App\Http\Controllers\WinRateController::class, 'index'])->name('calculator.win-rate');
 Route::post('/calculator/win-rate/calculate', [App\Http\Controllers\WinRateController::class, 'calculate'])->name('calculator.win-rate.calculate');
