@@ -6,6 +6,7 @@ use App\Models\Mutation;
 use Illuminate\Http\Request;
 use App\Models\PaymentMethod;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
@@ -99,6 +100,7 @@ class ProfileController extends Controller
             ->get()
             ->map(function ($trx) {
                 return (object) [
+                    'type' => 'game',
                     'invoice' => $trx->trxid,
                     'game' => 'Game Topup',
                     'product' => $trx->service_name,
@@ -125,6 +127,7 @@ class ProfileController extends Controller
                 }
 
                 return (object) [
+                    'type' => 'prepaid',
                     'invoice' => $trx->trxid,
                     'game' => $brand,
                     'product' => $trx->service_name,
@@ -265,6 +268,102 @@ class ProfileController extends Controller
             ]);
 
             return redirect()->back()->withInput()->with('error', 'Gagal memperbarui profile. Silakan coba lagi.');
+        }
+    }
+
+    /**
+     * Get transaction detail via API
+     */
+    public function getTransactionDetail(string $trxid, Request $request)
+    {
+        $user = Auth::user();
+        $type = $request->query('type', 'game');
+
+        try {
+            $transaction = null;
+
+            if ($type === 'game') {
+                $transaction = \App\Models\GameTransaction::where('trxid', $trxid)
+                    ->where('user_id', $user->id)
+                    ->first();
+
+                if ($transaction) {
+                    // Parse note to get game name
+                    $noteData = json_decode($transaction->note, true);
+                    
+                    return response()->json([
+                        'success' => true,
+                        'data' => [
+                            'type' => 'game',
+                            'trxid' => $transaction->trxid,
+                            'game' => $noteData['game'] ?? '-',
+                            'service_name' => $transaction->service_name,
+                            'service_code' => $transaction->service_code,
+                            'data_no' => $transaction->data_no,
+                            'data_zone' => $transaction->data_zone,
+                            'price' => $transaction->price,
+                            'payment_method_code' => $transaction->payment_method_code,
+                            'payment_status' => $transaction->payment_status,
+                            'status' => $transaction->status,
+                            'provider_trxid' => $transaction->provider_trxid,
+                            'provider_status' => $transaction->provider_status,
+                            'provider_note' => $transaction->provider_note,
+                            'provider_price' => $transaction->provider_price,
+                            'created_at' => $transaction->created_at->format('d M Y H:i'),
+                            'paid_at' => $transaction->paid_at ? $transaction->paid_at->format('d M Y H:i') : null,
+                        ]
+                    ]);
+                }
+            } elseif ($type === 'prepaid') {
+                $transaction = \App\Models\PrepaidTransaction::where('trxid', $trxid)
+                    ->where('user_id', $user->id)
+                    ->first();
+
+                if ($transaction) {
+                    // Parse note to get brand name
+                    $noteData = json_decode($transaction->note, true);
+                    
+                    return response()->json([
+                        'success' => true,
+                        'data' => [
+                            'type' => 'prepaid',
+                            'trxid' => $transaction->trxid,
+                            'brand' => $noteData['brand'] ?? '-',
+                            'service_name' => $transaction->service_name,
+                            'service_code' => $transaction->service_code,
+                            'data_no' => $transaction->data_no,
+                            'data_zone' => null,
+                            'price' => $transaction->price,
+                            'payment_method_code' => $transaction->payment_method_code,
+                            'payment_status' => $transaction->payment_status,
+                            'status' => $transaction->status,
+                            'provider_trxid' => $transaction->provider_trxid,
+                            'provider_status' => $transaction->provider_status,
+                            'provider_note' => $transaction->provider_note,
+                            'provider_price' => $transaction->provider_price,
+                            'created_at' => $transaction->created_at->format('d M Y H:i'),
+                            'paid_at' => $transaction->paid_at ? $transaction->paid_at->format('d M Y H:i') : null,
+                        ]
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Transaksi tidak ditemukan'
+            ], 404);
+
+        } catch (\Exception $e) {
+            Log::error('Get Transaction Detail Error', [
+                'trxid' => $trxid,
+                'type' => $type,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memuat detail transaksi'
+            ], 500);
         }
     }
 }

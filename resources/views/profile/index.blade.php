@@ -324,6 +324,11 @@
                                                         {{ app()->getLocale() === 'en' ? 'Pay' : 'Bayar' }}
                                                     </a>
                                                 @endif
+                                                <button type="button" 
+                                                    onclick="showTransactionDetail('{{ $transaction->invoice }}', '{{ $transaction->type }}')"
+                                                    class="rounded-lg bg-blue-500/20 border border-blue-500/30 px-3 py-1.5 text-xs font-semibold text-blue-400 hover:bg-blue-500/30 transition-colors ml-1">
+                                                    <i class="ri-eye-line"></i> {{ app()->getLocale() === 'en' ? 'Detail' : 'Detail' }}
+                                                </button>
                                             </td>
                                         </tr>
                                     @empty
@@ -378,11 +383,18 @@
                                             <p class="text-xs text-gray-500">{{ app()->getLocale() === 'en' ? 'Price' : 'Harga' }}</p>
                                             <p class="text-base font-bold text-rose-400">Rp {{ number_format($transaction->price, 0, ',', '.') }}</p>
                                         </div>
-                                        @if($transaction->status === 'waiting' && !empty($transaction->payment_url))
-                                            <a href="{{ $transaction->payment_url }}" target="_blank" class="rounded-lg bg-yellow-500 px-3 py-1.5 text-xs font-semibold text-black hover:bg-yellow-400 transition-colors">
-                                                {{ app()->getLocale() === 'en' ? 'Pay' : 'Bayar' }}
-                                            </a>
-                                        @endif
+                                        <div class="flex gap-2">
+                                            @if($transaction->status === 'waiting' && !empty($transaction->payment_url))
+                                                <a href="{{ $transaction->payment_url }}" target="_blank" class="rounded-lg bg-yellow-500 px-3 py-1.5 text-xs font-semibold text-black hover:bg-yellow-400 transition-colors">
+                                                    {{ app()->getLocale() === 'en' ? 'Pay' : 'Bayar' }}
+                                                </a>
+                                            @endif
+                                            <button type="button" 
+                                                onclick="showTransactionDetail('{{ $transaction->invoice }}', '{{ $transaction->type }}')"
+                                                class="rounded-lg bg-blue-500/20 border border-blue-500/30 px-3 py-1.5 text-xs font-semibold text-blue-400 hover:bg-blue-500/30 transition-colors">
+                                                <i class="ri-eye-line"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             @empty
@@ -786,6 +798,70 @@
         </div>
     </div>
 </div>
+
+<!-- Transaction Detail Modal -->
+<div id="transactionDetailModal" class="fixed inset-0 z-9999 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
+    <div id="transactionDetailModalContent" class="bg-[#111114] rounded-2xl border border-white/10 w-full max-w-lg max-h-[90vh] overflow-hidden shadow-2xl transform scale-95 transition-all duration-300">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between p-4 border-b border-white/10">
+            <h3 class="text-lg font-semibold text-white">
+                <i class="ri-file-list-3-line mr-2"></i>
+                {{ app()->getLocale() === 'en' ? 'Transaction Detail' : 'Detail Transaksi' }}
+            </h3>
+            <button onclick="closeTransactionDetailModal()" class="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
+                <i class="ri-close-line text-xl"></i>
+            </button>
+        </div>
+        
+        <!-- Modal Content -->
+        <div class="p-4 overflow-y-auto max-h-[calc(90vh-80px)]">
+            <!-- Loading State with Skeleton -->
+            <div id="transactionDetailLoading" class="space-y-4">
+                <!-- Skeleton Header -->
+                <div class="flex items-center justify-between pb-4 border-b border-white/10">
+                    <div class="space-y-2">
+                        <div class="h-3 w-20 bg-white/10 rounded animate-pulse"></div>
+                        <div class="h-5 w-48 bg-white/10 rounded animate-pulse"></div>
+                    </div>
+                    <div class="h-6 w-20 bg-white/10 rounded-full animate-pulse"></div>
+                </div>
+                
+                <!-- Skeleton Product Info -->
+                <div class="bg-white/5 rounded-xl p-4 space-y-3">
+                    <div class="h-3 w-28 bg-white/10 rounded animate-pulse"></div>
+                    <div class="flex items-center gap-3">
+                        <div class="h-12 w-12 bg-white/10 rounded-lg animate-pulse"></div>
+                        <div class="space-y-2 flex-1">
+                            <div class="h-4 w-32 bg-white/10 rounded animate-pulse"></div>
+                            <div class="h-3 w-24 bg-white/10 rounded animate-pulse"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Skeleton Details -->
+                <div class="space-y-3">
+                    @for($i = 0; $i < 5; $i++)
+                    <div class="flex justify-between py-2 border-b border-white/5">
+                        <div class="h-4 w-24 bg-white/10 rounded animate-pulse"></div>
+                        <div class="h-4 w-32 bg-white/10 rounded animate-pulse"></div>
+                    </div>
+                    @endfor
+                </div>
+                
+                <!-- Loading Spinner -->
+                <div class="text-center py-4">
+                    <div class="inline-block animate-spin rounded-full h-6 w-6 border-3 border-rose-500 border-t-transparent"></div>
+                    <p class="mt-2 text-sm text-gray-400">{{ app()->getLocale() === 'en' ? 'Loading transaction data...' : 'Memuat data transaksi...' }}</p>
+                </div>
+            </div>
+            
+            <!-- Detail Content -->
+            <div id="transactionDetailContent" class="hidden">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -969,6 +1045,269 @@ document.addEventListener('DOMContentLoaded', function () {
                 submitBtn.textContent = originalText;
             }
         });
+    }
+});
+
+// Transaction Detail Modal Functions
+let activeDetailButton = null;
+
+function showTransactionDetail(trxid, type, buttonElement) {
+    const modal = document.getElementById('transactionDetailModal');
+    const modalContent = document.getElementById('transactionDetailModalContent');
+    const content = document.getElementById('transactionDetailContent');
+    const loading = document.getElementById('transactionDetailLoading');
+    
+    // Get button element if clicked via onclick
+    if (!buttonElement) {
+        buttonElement = event.currentTarget;
+    }
+    activeDetailButton = buttonElement;
+    
+    // Add loading state to button
+    if (activeDetailButton) {
+        activeDetailButton.disabled = true;
+        activeDetailButton.innerHTML = '<i class="ri-loader-4-line animate-spin"></i>';
+    }
+    
+    // Show modal with animation
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    loading.classList.remove('hidden');
+    content.classList.add('hidden');
+    
+    // Trigger animation after a small delay (for CSS transition)
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            modal.classList.remove('opacity-0');
+            modal.classList.add('opacity-100');
+            modalContent.classList.remove('scale-95');
+            modalContent.classList.add('scale-100');
+        });
+    });
+    
+    // Fetch transaction detail
+    fetch(`/api/transaction-detail/${trxid}?type=${type}`, {
+        headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Restore button state
+        restoreDetailButton();
+        
+        // Small delay before showing content for smoother transition
+        setTimeout(() => {
+            loading.classList.add('hidden');
+            content.classList.remove('hidden');
+            
+            if (data.success) {
+                renderTransactionDetail(data.data);
+            } else {
+                content.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="ri-error-warning-line text-4xl text-red-500"></i>
+                        <p class="mt-2 text-gray-400">${data.message || 'Gagal memuat detail transaksi'}</p>
+                    </div>
+                `;
+            }
+        }, 300);
+    })
+    .catch(error => {
+        // Restore button state
+        restoreDetailButton();
+        
+        loading.classList.add('hidden');
+        content.classList.remove('hidden');
+        content.innerHTML = `
+            <div class="text-center py-8">
+                <i class="ri-error-warning-line text-4xl text-red-500"></i>
+                <p class="mt-2 text-gray-400">Terjadi kesalahan saat memuat detail</p>
+            </div>
+        `;
+    });
+}
+
+function restoreDetailButton() {
+    if (activeDetailButton) {
+        activeDetailButton.disabled = false;
+        // Check if it's mobile button (without text) or desktop button (with text)
+        const isMobile = activeDetailButton.closest('.md\\:hidden') !== null;
+        if (isMobile) {
+            activeDetailButton.innerHTML = '<i class="ri-eye-line"></i>';
+        } else {
+            activeDetailButton.innerHTML = '<i class="ri-eye-line"></i> {{ app()->getLocale() === 'en' ? 'Detail' : 'Detail' }}';
+        }
+        activeDetailButton = null;
+    }
+}
+
+function closeTransactionDetailModal() {
+    const modal = document.getElementById('transactionDetailModal');
+    const modalContent = document.getElementById('transactionDetailModalContent');
+    
+    // Animate out
+    modal.classList.remove('opacity-100');
+    modal.classList.add('opacity-0');
+    modalContent.classList.remove('scale-100');
+    modalContent.classList.add('scale-95');
+    
+    // Hide after animation completes
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        restoreDetailButton();
+    }, 300);
+}
+
+function renderTransactionDetail(transaction) {
+    const content = document.getElementById('transactionDetailContent');
+    const isEn = '{{ app()->getLocale() }}' === 'en';
+    
+    // Status color
+    const statusColors = {
+        'waiting': 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+        'processing': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+        'success': 'bg-green-500/20 text-green-400 border-green-500/30',
+        'failed': 'bg-red-500/20 text-red-400 border-red-500/30',
+        'expired': 'bg-red-500/20 text-red-400 border-red-500/30',
+    };
+    const statusColor = statusColors[transaction.status] || 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+    
+    // Build detail rows
+    let detailHtml = `
+        <div class="space-y-4">
+            <!-- Header -->
+            <div class="flex items-center justify-between pb-4 border-b border-white/10">
+                <div>
+                    <p class="text-xs text-gray-500">${isEn ? 'Invoice Number' : 'Nomor Invoice'}</p>
+                    <p class="text-lg font-bold text-white">${transaction.trxid}</p>
+                </div>
+                <span class="px-3 py-1 text-xs font-semibold rounded-full border ${statusColor}">
+                    ${transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
+                </span>
+            </div>
+            
+            <!-- Product Info -->
+            <div class="bg-white/5 rounded-xl p-4">
+                <p class="text-xs text-gray-500 mb-2">${isEn ? 'Product Information' : 'Informasi Produk'}</p>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <p class="text-gray-400">${transaction.type === 'game' ? 'Game' : 'Brand'}</p>
+                        <p class="text-white font-medium">${transaction.game || transaction.brand || '-'}</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-400">${isEn ? 'Product' : 'Produk'}</p>
+                        <p class="text-white font-medium">${transaction.service_name}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Target Info -->
+            <div class="bg-white/5 rounded-xl p-4">
+                <p class="text-xs text-gray-500 mb-2">${isEn ? 'Target Information' : 'Informasi Tujuan'}</p>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <p class="text-gray-400">${transaction.type === 'game' ? 'User ID' : (isEn ? 'Phone Number' : 'Nomor HP')}</p>
+                        <p class="text-white font-medium">${transaction.data_no}</p>
+                    </div>
+                    ${transaction.data_zone ? `
+                    <div>
+                        <p class="text-gray-400">Zone/Server</p>
+                        <p class="text-white font-medium">${transaction.data_zone}</p>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+            
+            <!-- Price Info -->
+            <div class="bg-white/5 rounded-xl p-4">
+                <p class="text-xs text-gray-500 mb-2">${isEn ? 'Price Information' : 'Informasi Harga'}</p>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <p class="text-gray-400">${isEn ? 'Price' : 'Harga'}</p>
+                        <p class="text-white font-bold">Rp ${Number(transaction.price).toLocaleString('id-ID')}</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-400">${isEn ? 'Payment Method' : 'Metode Pembayaran'}</p>
+                        <p class="text-white font-medium">${transaction.payment_method_code || '-'}</p>
+                    </div>
+                </div>
+            </div>
+    `;
+    
+    // Provider Info (if has provider_note - like Token PLN, SN, etc)
+    if (transaction.provider_note || transaction.provider_trxid) {
+        detailHtml += `
+            <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4">
+                <p class="text-xs text-emerald-400 mb-2 flex items-center gap-2">
+                    <i class="ri-checkbox-circle-line"></i>
+                    ${isEn ? 'Provider Information' : 'Informasi Provider'}
+                </p>
+                <div class="space-y-2 text-sm">
+                    ${transaction.provider_trxid ? `
+                    <div>
+                        <p class="text-gray-400">Provider TRX ID</p>
+                        <p class="text-white font-mono text-xs">${transaction.provider_trxid}</p>
+                    </div>
+                    ` : ''}
+                    ${transaction.provider_note ? `
+                    <div>
+                        <p class="text-gray-400">${isEn ? 'Token/SN/Note' : 'Token/SN/Catatan'}</p>
+                        <div class="flex items-center gap-2 mt-1">
+                            <p class="text-emerald-400 font-bold text-lg font-mono bg-emerald-500/10 px-3 py-2 rounded-lg flex-1 break-all" id="providerNoteText">${transaction.provider_note}</p>
+                            <button onclick="copyToClipboard('${transaction.provider_note}')" class="shrink-0 p-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 transition-colors" title="Copy">
+                                <i class="ri-file-copy-line text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }
+    
+    // Date Info
+    detailHtml += `
+            <div class="bg-white/5 rounded-xl p-4">
+                <p class="text-xs text-gray-500 mb-2">${isEn ? 'Date Information' : 'Informasi Tanggal'}</p>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <p class="text-gray-400">${isEn ? 'Created At' : 'Tanggal Transaksi'}</p>
+                        <p class="text-white font-medium">${transaction.created_at}</p>
+                    </div>
+                    ${transaction.paid_at ? `
+                    <div>
+                        <p class="text-gray-400">${isEn ? 'Paid At' : 'Tanggal Bayar'}</p>
+                        <p class="text-white font-medium">${transaction.paid_at}</p>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    content.innerHTML = detailHtml;
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        // Show toast or alert
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-[9999] animate-fade-in';
+        toast.textContent = '{{ app()->getLocale() === "en" ? "Copied to clipboard!" : "Berhasil disalin!" }}';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+    });
+}
+
+// Close modal on backdrop click
+document.getElementById('transactionDetailModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeTransactionDetailModal();
     }
 });
     </script>

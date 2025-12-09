@@ -50,6 +50,11 @@ Route::post('/webhook/vipresel', [App\Http\Controllers\VipResellerWebhookControl
     ->middleware('vipresel.ip')
     ->name('vipresel.webhook');
 
+// Transaction Detail API (outside locale group for direct access)
+Route::get('/api/transaction-detail/{trxid}', [App\Http\Controllers\ProfileController::class, 'getTransactionDetail'])
+    ->middleware('auth')
+    ->name('transaction.detail.api');
+
 // Duitku Redirect - User Return URL (GET)
 Route::get('/payment/duitku/redirect', [App\Http\Controllers\TopUpController::class, 'redirect'])
     ->name('topup.redirect');
