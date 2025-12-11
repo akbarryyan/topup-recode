@@ -42,13 +42,12 @@
                         </a>
                     </nav>
     
-                    <form method="POST" action="{{ route('logout') }}" class="pt-4 border-t border-white/5">
-                        @csrf
-                        <button type="submit" class="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-red-500 hover:bg-red-500/10">
+                    <div class="pt-4 border-t border-white/5">
+                        <button type="button" onclick="confirmProfileLogout()" class="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-red-500 hover:bg-red-500/10">
                             <i class="ri-logout-circle-r-line text-lg"></i>
                             {{ app()->getLocale() === 'en' ? 'Logout' : 'Keluar' }}
                         </button>
-                    </form>
+                    </div>
                 </aside>
     
                 <section class="space-y-4 lg:space-y-6 flex-1 hidden" data-tab-content="dashboard">
@@ -253,17 +252,17 @@
                         <div class="flex items-center justify-between">
                             <h2 class="text-lg font-semibold">{{ app()->getLocale() === 'en' ? 'Transaction History' : 'Riwayat Transaksi' }}</h2>
                         </div>
-                        <form action="{{ route('profile') }}" method="GET" class="mt-4 grid gap-3 md:grid-cols-[1fr,200px,200px]">
+                        <form id="transactionFilterForm" action="{{ route('profile') }}" method="GET" class="mt-4 grid gap-3 md:grid-cols-[1fr,200px,200px]">
                             <!-- Preserve active tab -->
                             <input type="hidden" name="tab" value="transactions">
                             
                             <label class="flex flex-col text-xs uppercase tracking-wide text-gray-400">
                                 <span class="mb-1 text-gray-500 normal-case">{{ app()->getLocale() === 'en' ? 'Search Transactions' : 'Cari Transaksi' }}</span>
-                                <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ app()->getLocale() === 'en' ? 'Search ID, Product, or Phone Number...' : 'Cari ID, Produk, atau No. HP...' }}" class="rounded-2xl border border-white/10 bg-transparent px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
+                                <input type="text" id="transactionSearch" name="search" value="{{ request('search') }}" placeholder="{{ app()->getLocale() === 'en' ? 'Search Invoice, Product, or Game...' : 'Cari Invoice, Produk, atau Game...' }}" class="rounded-2xl border border-white/10 bg-transparent px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
                             </label>
                             <label class="flex flex-col text-xs uppercase tracking-wide text-gray-400">
                                 <span class="mb-1 text-gray-500 normal-case">{{ app()->getLocale() === 'en' ? 'Date' : 'Tanggal' }}</span>
-                                <select name="date" onchange="this.form.submit()" class="rounded-2xl border border-white/10 bg-[#050505] px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
+                                <select id="transactionDate" name="date" class="rounded-2xl border border-white/10 bg-[#050505] px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
                                     <option value="all" {{ request('date') == 'all' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">{{ app()->getLocale() === 'en' ? 'All' : 'Semua' }}</option>
                                     <option value="today" {{ request('date') == 'today' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">{{ app()->getLocale() === 'en' ? 'Today' : 'Hari Ini' }}</option>
                                     <option value="week" {{ request('date') == 'week' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">7 Hari Terakhir</option>
@@ -272,7 +271,7 @@
                             </label>
                             <label class="flex flex-col text-xs uppercase tracking-wide text-gray-400">
                                 <span class="mb-1 text-gray-500 normal-case">{{ app()->getLocale() === 'en' ? 'Status' : 'Status' }}</span>
-                                <select name="status" onchange="this.form.submit()" class="rounded-2xl border border-white/10 bg-[#050505] px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
+                                <select id="transactionStatus" name="status" class="rounded-2xl border border-white/10 bg-[#050505] px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
                                     <option value="all" {{ request('status') == 'all' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">{{ app()->getLocale() === 'en' ? 'All' : 'Semua' }}</option>
                                     <option value="waiting" {{ request('status') == 'waiting' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">{{ app()->getLocale() === 'en' ? 'Waiting' : 'Menunggu' }}</option>
                                     <option value="processing" {{ request('status') == 'processing' ? 'selected' : '' }} class="bg-[#050505] text-gray-900">{{ app()->getLocale() === 'en' ? 'Processing' : 'Dalam Proses' }}</option>
@@ -283,7 +282,7 @@
                         </form>
     
                         <!-- Desktop Table -->
-                        <div class="hidden md:block mt-6 rounded-2xl border border-white/5 overflow-hidden">
+                        <div id="transactionTableContainer" class="hidden md:block mt-6 rounded-2xl border border-white/5 overflow-hidden">
                             <table class="min-w-full text-left text-sm text-gray-300">
                                 <thead class="bg-white/5 text-xs uppercase tracking-wide text-gray-400">
                                     <tr>
@@ -345,7 +344,7 @@
                         </div>
 
                         <!-- Mobile Cards -->
-                        <div class="md:hidden mt-4 space-y-3">
+                        <div id="transactionCardsContainer" class="md:hidden mt-4 space-y-3">
                             @forelse($latestTransactions as $transaction)
                                 <div class="rounded-xl border border-white/5 bg-[#1a1a1e] p-3">
                                     <div class="flex items-start justify-between gap-2 mb-2">
@@ -410,6 +409,7 @@
                         </div>
     
                         <!-- Pagination -->
+                        <div id="transactionPaginationContainer">
                         @if(method_exists($latestTransactions, 'total') && $latestTransactions->total() > 5)
                             <div class="mt-4 flex flex-col gap-3 text-sm text-gray-400 md:flex-row md:items-center md:justify-between">
                                 <p>{{ app()->getLocale() === 'en' ? 'Showing' : 'Menampilkan' }} {{ $latestTransactions->firstItem() }} - {{ $latestTransactions->lastItem() }} {{ app()->getLocale() === 'en' ? 'of' : 'dari' }} {{ $latestTransactions->total() }} {{ app()->getLocale() === 'en' ? 'transactions' : 'transaksi' }}</p>
@@ -430,6 +430,7 @@
                                 </div>
                             </div>
                         @endif
+                        </div>
 
                     </div>
                 </section>
@@ -451,6 +452,7 @@
                                     <div class="relative">
                                         <i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
                                         <input 
+                                            id="mutationSearch"
                                             type="text" 
                                             name="search" 
                                             value="{{ request('search') }}"
@@ -461,6 +463,7 @@
                                 <label class="flex flex-col space-y-1 text-xs text-gray-500">
                                     <span class="normal-case">{{ app()->getLocale() === 'en' ? 'Type' : 'Tipe' }}</span>
                                     <select 
+                                        id="mutationType"
                                         name="type" 
                                         class="rounded-2xl border border-white/10 bg-[#050505] px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
                                         <option value="">{{ app()->getLocale() === 'en' ? 'All' : 'Semua' }}</option>
@@ -471,6 +474,7 @@
                                 <label class="flex flex-col space-y-1 text-xs text-gray-500">
                                     <span class="normal-case">{{ app()->getLocale() === 'en' ? 'From Date' : 'Dari Tanggal' }}</span>
                                     <input 
+                                        id="mutationDateFrom"
                                         type="date" 
                                         name="date_from" 
                                         value="{{ request('date_from') }}"
@@ -479,24 +483,17 @@
                                 <label class="flex flex-col space-y-1 text-xs text-gray-500">
                                     <span class="normal-case">{{ app()->getLocale() === 'en' ? 'To Date' : 'Sampai Tanggal' }}</span>
                                     <input 
+                                        id="mutationDateTo"
                                         type="date" 
                                         name="date_to" 
                                         value="{{ request('date_to') }}"
                                         class="rounded-2xl border border-white/10 bg-transparent px-4 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none">
                                 </label>
                             </form>
-                            <div class="flex gap-2">
-                                <button type="submit" form="mutation-filter-form" class="rounded-2xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500">
-                                    <i class="ri-search-line"></i> {{ app()->getLocale() === 'en' ? 'Filter' : 'Filter' }}
-                                </button>
-                                <a href="{{ route('profile') }}?tab=mutations" class="rounded-2xl border border-white/10 px-4 py-2 text-sm font-semibold text-gray-400 hover:bg-white/5 hover:text-white">
-                                    <i class="ri-refresh-line"></i> {{ app()->getLocale() === 'en' ? 'Reset' : 'Reset' }}
-                                </a>
-                            </div>
                         </div>
     
                         <!-- Desktop Table -->
-                        <div class="hidden md:block mt-6 rounded-2xl border border-white/5 overflow-hidden">
+                        <div id="mutationTableContainer" class="hidden md:block mt-6 rounded-2xl border border-white/5 overflow-hidden">
                             <table class="min-w-full text-left text-sm text-gray-300">
                                 <thead class="bg-white/5 text-xs uppercase tracking-wide text-gray-400">
                                     <tr>
@@ -564,7 +561,7 @@
                         </div>
 
                         <!-- Mobile Cards -->
-                        <div class="md:hidden mt-4 space-y-3">
+                        <div id="mutationCardsContainer" class="md:hidden mt-4 space-y-3">
                             @forelse($mutations as $mutation)
                                 <div class="rounded-xl border border-white/5 bg-[#1a1a1e] p-3">
                                     <div class="flex items-start justify-between gap-2 mb-2">
@@ -622,6 +619,7 @@
                             @endforelse
                         </div>
     
+                        <div id="mutationPaginationContainer">
                         @if($mutations->total() > 5)
                             <div class="mt-4 flex flex-col gap-3 text-sm text-gray-400 md:flex-row md:items-center md:justify-between">
                                 <p>{{ app()->getLocale() === 'en' ? 'Showing' : 'Menampilkan' }} {{ $mutations->firstItem() }} - {{ $mutations->lastItem() }} {{ app()->getLocale() === 'en' ? 'of' : 'dari' }} {{ $mutations->total() }} data</p>
@@ -642,6 +640,7 @@
                                 </div>
                             </div>
                         @endif
+                        </div>
                     </div>
                 </section>
     
@@ -803,6 +802,57 @@
     </div>
 </div>
 
+<!-- Logout Modal Backdrop -->
+<div id="profileModalBackdrop" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998] opacity-0 transition-opacity duration-300"></div>
+
+<!-- Logout Confirmation Modal -->
+<div id="profileLogoutModal" class="hidden fixed inset-0 z-[9999] items-center justify-center p-4 opacity-0 scale-95 transition-all duration-300">
+    <div class="bg-[#1F1F23] rounded-2xl border border-white/10 shadow-2xl max-w-md w-full p-6 relative">
+        <!-- Close Button -->
+        <button onclick="closeProfileLogoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+            <i class="ri-close-line text-2xl"></i>
+        </button>
+        
+        <!-- Icon -->
+        <div class="flex justify-center mb-4">
+            <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center">
+                <i class="ri-logout-circle-r-line text-4xl text-red-500"></i>
+            </div>
+        </div>
+        
+        <!-- Title -->
+        <h3 class="text-xl font-bold text-white text-center mb-2">
+            {{ app()->getLocale() === 'en' ? 'Logout Confirmation' : 'Konfirmasi Keluar' }}
+        </h3>
+        
+        <!-- Message -->
+        <p class="text-gray-400 text-center mb-6">
+            {{ app()->getLocale() === 'en' ? 'Are you sure you want to logout from your account?' : 'Apakah Anda yakin ingin keluar dari akun Anda?' }}
+        </p>
+        
+        <!-- Buttons -->
+        <div class="flex gap-3">
+            <button id="profileCancelBtn" onclick="closeProfileLogoutModal()" class="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-medium transition-colors border border-white/10">
+                {{ app()->getLocale() === 'en' ? 'Cancel' : 'Batal' }}
+            </button>
+            <button id="profileLogoutBtn" onclick="proceedProfileLogout()" class="flex-1 px-4 py-3 bg-linear-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-medium transition-all shadow-lg shadow-red-500/30">
+                <span class="flex items-center justify-center gap-2">
+                    <svg id="profileLogoutSpinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span id="profileLogoutBtnText">{{ app()->getLocale() === 'en' ? 'Yes, Logout' : 'Ya, Keluar' }}</span>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden Logout Form -->
+<form id="profileLogoutForm" method="POST" action="{{ localized_url('/auth/logout') }}" style="display: none;">
+    @csrf
+</form>
+
 <!-- Transaction Detail Modal -->
 <div id="transactionDetailModal" class="fixed inset-0 z-9999 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
     <div id="transactionDetailModalContent" class="bg-[#111114] rounded-2xl border border-white/10 w-full max-w-lg max-h-[90vh] overflow-hidden shadow-2xl transform scale-95 transition-all duration-300">
@@ -875,7 +925,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const tabContents = document.querySelectorAll('[data-tab-content]');
     const activeClasses = ['bg-linear-to-r', 'from-rose-600', 'to-red-700', 'text-white', 'shadow-lg'];
 
-    function activateTab(targetName) {
+    function activateTab(targetName, updateUrl = true) {
         tabTriggers.forEach((trigger) => {
             if (!trigger.dataset.tabTarget) {
                 return;
@@ -894,6 +944,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const matches = content.dataset.tabContent === targetName;
             content.classList.toggle('hidden', !matches);
         });
+
+        // Update URL with tab parameter to persist on refresh
+        if (updateUrl && targetName) {
+            const url = new URL(window.location);
+            url.searchParams.set('tab', targetName);
+            window.history.pushState({}, '', url);
+        }
     }
 
     tabTriggers.forEach((trigger) => {
@@ -903,7 +960,19 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             event.preventDefault();
-            activateTab(trigger.dataset.tabTarget);
+            const targetTab = trigger.dataset.tabTarget;
+            
+            // Check if already on this tab
+            const currentTab = document.querySelector('[data-tab-content]:not(.hidden)');
+            const isCurrentTab = currentTab && currentTab.dataset.tabContent === targetTab;
+            
+            if (isCurrentTab) {
+                // Already on this tab, no need to show loading
+                return;
+            }
+            
+            // Show loading animation before switching
+            showTabSwitchLoading(trigger, targetTab);
         });
     });
 
@@ -912,10 +981,77 @@ document.addEventListener('DOMContentLoaded', function () {
             event.preventDefault();
             const target = switcher.dataset.switchTab;
             if (target) {
-                activateTab(target);
+                // Show loading animation before switching tab
+                showTabSwitchLoading(switcher, target);
             }
         });
     });
+
+    // Function to show loading animation when switching tabs
+    function showTabSwitchLoading(button, targetTab) {
+        // Disable button and show loading state
+        const originalContent = button.innerHTML;
+        button.disabled = true;
+        button.style.opacity = '0.7';
+        button.style.pointerEvents = 'none';
+        
+        // Add spinner to button
+        const hasIcon = button.querySelector('i');
+        if (hasIcon) {
+            button.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> ' + button.textContent.trim();
+        } else {
+            button.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> ' + button.textContent;
+        }
+        
+        // Show loading overlay on current tab content
+        const currentTab = document.querySelector('[data-tab-content]:not(.hidden)');
+        if (currentTab) {
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300';
+            loadingOverlay.innerHTML = `
+                <div class="bg-[#111114] rounded-2xl border border-white/10 p-6 shadow-2xl">
+                    <div class="flex flex-col items-center gap-3">
+                        <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-rose-500 border-t-transparent"></div>
+                        <p class="text-sm text-gray-300">{{ app()->getLocale() === 'en' ? 'Loading...' : 'Memuat...' }}</p>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(loadingOverlay);
+            
+            // Fade in overlay
+            requestAnimationFrame(() => {
+                loadingOverlay.style.opacity = '0';
+                requestAnimationFrame(() => {
+                    loadingOverlay.style.opacity = '1';
+                });
+            });
+            
+            // Wait for animation then switch tab
+            setTimeout(() => {
+                // Remove overlay
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.remove();
+                }, 300);
+                
+                // Switch to target tab
+                activateTab(targetTab);
+                
+                // Restore button state
+                button.disabled = false;
+                button.style.opacity = '1';
+                button.style.pointerEvents = 'auto';
+                button.innerHTML = originalContent;
+            }, 800); // 800ms loading delay
+        } else {
+            // If no current tab found, just switch immediately
+            activateTab(targetTab);
+            button.disabled = false;
+            button.style.opacity = '1';
+            button.style.pointerEvents = 'auto';
+            button.innerHTML = originalContent;
+        }
+    }
 
     // Check URL for tab parameter or hash
     const urlParams = new URLSearchParams(window.location.search);
@@ -923,13 +1059,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const hashParam = window.location.hash.substring(1); // Remove the # symbol
     
     if (tabParam) {
-        // Activate tab from URL parameter
-        activateTab(tabParam);
+        // Activate tab from URL parameter (don't update URL again)
+        activateTab(tabParam, false);
     } else if (hashParam) {
         // Activate tab from URL hash (e.g., #transaksi)
         activateTab(hashParam);
     } else {
-        // Use default tab
+        // Use default tab (update URL with default tab)
         const defaultTrigger = document.querySelector('.tab-trigger[data-tab-default="true"]');
         if (defaultTrigger) {
             activateTab(defaultTrigger.dataset.tabTarget);
@@ -1314,5 +1450,353 @@ document.getElementById('transactionDetailModal')?.addEventListener('click', fun
         closeTransactionDetailModal();
     }
 });
+
+// jQuery AJAX Live Filtering - Initialize both Transaction and Mutation filtering
+if (typeof jQuery === 'undefined') {
+    // Load jQuery if not already loaded
+    const jqueryScript = document.createElement('script');
+    jqueryScript.src = 'https://code.jquery.com/jquery-3.7.1.min.js';
+    jqueryScript.onload = function() {
+        initTransactionFiltering();
+        initMutationFiltering();
+    };
+    document.head.appendChild(jqueryScript);
+} else {
+    initTransactionFiltering();
+    initMutationFiltering();
+}
+
+function initTransactionFiltering() {
+    let filterTimeout;
+    const isEn = '{{ app()->getLocale() }}' === 'en';
+    
+    // Loading overlay HTML
+    const loadingOverlay = `
+        <div class="absolute inset-0 bg-[#0f0f12]/80 backdrop-blur-sm flex items-center justify-center z-10 rounded-2xl">
+            <div class="text-center">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-3 border-rose-500 border-t-transparent"></div>
+                <p class="mt-2 text-sm text-gray-400">${isEn ? 'Loading...' : 'Memuat...'}</p>
+            </div>
+        </div>
+    `;
+    
+    function filterTransactions() {
+        const search = $('#transactionSearch').val();
+        const date = $('#transactionDate').val();
+        const status = $('#transactionStatus').val();
+        
+        // Add loading state
+        const container = $('.rounded-2xl.bg-\\[\\#0f0f12\\].border.border-white\\/5.p-4.lg\\:p-6.text-white').first();
+        container.css('position', 'relative');
+        container.append(loadingOverlay);
+        
+        $.ajax({
+            url: window.location.pathname,
+            type: 'GET',
+            data: {
+                tab: 'transactions',
+                search: search,
+                date: date,
+                status: status
+            },
+            success: function(response) {
+                // Parse the response HTML
+                const $response = $(response);
+                
+                // Extract desktop table
+                const desktopTable = $response.find('#transactionTableContainer').html();
+                if (desktopTable) {
+                    $('#transactionTableContainer').html(desktopTable);
+                }
+                
+                // Extract mobile cards
+                const mobileCards = $response.find('#transactionCardsContainer').html();
+                if (mobileCards) {
+                    $('#transactionCardsContainer').html(mobileCards);
+                }
+                
+                // Extract pagination
+                const pagination = $response.find('#transactionPaginationContainer').html();
+                if (pagination) {
+                    $('#transactionPaginationContainer').html(pagination);
+                }
+                
+                // Remove loading overlay
+                container.find('.absolute.inset-0').remove();
+            },
+            error: function(xhr, status, error) {
+                console.error('Filter error:', error);
+                container.find('.absolute.inset-0').remove();
+                
+                // Show error message
+                const errorMsg = `
+                    <div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm">
+                        <i class="ri-error-warning-line mr-2"></i>
+                        ${isEn ? 'Failed to load transactions. Please try again.' : 'Gagal memuat transaksi. Silakan coba lagi.'}
+                    </div>
+                `;
+                $('#transactionTableContainer').html(errorMsg);
+                $('#transactionCardsContainer').html(errorMsg);
+            }
+        });
+    }
+    
+    // Search input with debounce (wait 500ms after typing stops)
+    $('#transactionSearch').on('input', function() {
+        clearTimeout(filterTimeout);
+        filterTimeout = setTimeout(filterTransactions, 500);
+    });
+    
+    // Dropdown changes - instant filter
+    $('#transactionDate, #transactionStatus').on('change', function() {
+        clearTimeout(filterTimeout);
+        filterTransactions();
+    });
+    
+    // Pagination link handling
+    $(document).on('click', '#transactionPaginationContainer a', function(e) {
+        e.preventDefault();
+        const url = $(this).attr('href');
+        if (url) {
+            const urlParams = new URLSearchParams(url.split('?')[1]);
+            const page = urlParams.get('page');
+            
+            const container = $('.rounded-2xl.bg-\\[\\#0f0f12\\].border.border-white\\/5.p-4.lg\\:p-6.text-white').first();
+            container.css('position', 'relative');
+            container.append(loadingOverlay);
+            
+            $.ajax({
+                url: window.location.pathname,
+                type: 'GET',
+                data: {
+                    tab: 'transactions',
+                    search: $('#transactionSearch').val(),
+                    date: $('#transactionDate').val(),
+                    status: $('#transactionStatus').val(),
+                    page: page
+                },
+                success: function(response) {
+                    const $response = $(response);
+                    
+                    const desktopTable = $response.find('#transactionTableContainer').html();
+                    if (desktopTable) $('#transactionTableContainer').html(desktopTable);
+                    
+                    const mobileCards = $response.find('#transactionCardsContainer').html();
+                    if (mobileCards) $('#transactionCardsContainer').html(mobileCards);
+                    
+                    const pagination = $response.find('#transactionPaginationContainer').html();
+                    if (pagination) $('#transactionPaginationContainer').html(pagination);
+                    
+                    container.find('.absolute.inset-0').remove();
+                    
+                    // Scroll to top of transactions section
+                    $('[data-tab-content="transactions"]').get(0)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                },
+                error: function() {
+                    container.find('.absolute.inset-0').remove();
+                }
+            });
+        }
+    });
+}
+
+// jQuery AJAX Live Filtering for Mutations
+function initMutationFiltering() {
+    let mutationFilterTimeout;
+    const isEn = '{{ app()->getLocale() }}' === 'en';
+    
+    // Loading overlay HTML
+    const loadingOverlay = `
+        <div class="absolute inset-0 bg-[#0f0f12]/80 backdrop-blur-sm flex items-center justify-center z-10 rounded-2xl">
+            <div class="text-center">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-3 border-rose-500 border-t-transparent"></div>
+                <p class="mt-2 text-sm text-gray-400">${isEn ? 'Loading...' : 'Memuat...'}</p>
+            </div>
+        </div>
+    `;
+    
+    function filterMutations() {
+        const search = $('#mutationSearch').val();
+        const type = $('#mutationType').val();
+        const dateFrom = $('#mutationDateFrom').val();
+        const dateTo = $('#mutationDateTo').val();
+        
+        // Find mutations container
+        const container = $('[data-tab-content="mutations"] .rounded-2xl.bg-\\[\\#0f0f12\\]').first();
+        container.css('position', 'relative');
+        container.append(loadingOverlay);
+        
+        $.ajax({
+            url: window.location.pathname,
+            type: 'GET',
+            data: {
+                tab: 'mutations',
+                search: search,
+                type: type,
+                date_from: dateFrom,
+                date_to: dateTo
+            },
+            success: function(response) {
+                // Parse the response HTML
+                const $response = $(response);
+                
+                // Extract desktop table
+                const desktopTable = $response.find('#mutationTableContainer').html();
+                if (desktopTable) {
+                    $('#mutationTableContainer').html(desktopTable);
+                }
+                
+                // Extract mobile cards
+                const mobileCards = $response.find('#mutationCardsContainer').html();
+                if (mobileCards) {
+                    $('#mutationCardsContainer').html(mobileCards);
+                }
+                
+                // Extract pagination
+                const pagination = $response.find('#mutationPaginationContainer').html();
+                if (pagination) {
+                    $('#mutationPaginationContainer').html(pagination);
+                }
+                
+                // Remove loading overlay
+                container.find('.absolute.inset-0').remove();
+            },
+            error: function(xhr, status, error) {
+                console.error('Mutation filter error:', error);
+                container.find('.absolute.inset-0').remove();
+                
+                // Show error message
+                const errorMsg = `
+                    <div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm">
+                        <i class="ri-error-warning-line mr-2"></i>
+                        ${isEn ? 'Failed to load mutations. Please try again.' : 'Gagal memuat mutasi. Silakan coba lagi.'}
+                    </div>
+                `;
+                $('#mutationTableContainer').html(errorMsg);
+                $('#mutationCardsContainer').html(errorMsg);
+            }
+        });
+    }
+    
+    // Search input with debounce (wait 500ms after typing stops)
+    $('#mutationSearch').on('input', function() {
+        clearTimeout(mutationFilterTimeout);
+        mutationFilterTimeout = setTimeout(filterMutations, 500);
+    });
+    
+    // Dropdown and date changes - instant filter
+    $('#mutationType, #mutationDateFrom, #mutationDateTo').on('change', function() {
+        clearTimeout(mutationFilterTimeout);
+        filterMutations();
+    });
+    
+    // Pagination link handling
+    $(document).on('click', '#mutationPaginationContainer a', function(e) {
+        e.preventDefault();
+        const url = $(this).attr('href');
+        if (url) {
+            const urlParams = new URLSearchParams(url.split('?')[1]);
+            const page = urlParams.get('page');
+            
+            const container = $('[data-tab-content="mutations"] .rounded-2xl.bg-\\[\\#0f0f12\\]').first();
+            container.css('position', 'relative');
+            container.append(loadingOverlay);
+            
+            $.ajax({
+                url: window.location.pathname,
+                type: 'GET',
+                data: {
+                    tab: 'mutations',
+                    search: $('#mutationSearch').val(),
+                    type: $('#mutationType').val(),
+                    date_from: $('#mutationDateFrom').val(),
+                    date_to: $('#mutationDateTo').val(),
+                    page: page
+                },
+                success: function(response) {
+                    const $response = $(response);
+                    
+                    const desktopTable = $response.find('#mutationTableContainer').html();
+                    if (desktopTable) $('#mutationTableContainer').html(desktopTable);
+                    
+                    const mobileCards = $response.find('#mutationCardsContainer').html();
+                    if (mobileCards) $('#mutationCardsContainer').html(mobileCards);
+                    
+                    const pagination = $response.find('#mutationPaginationContainer').html();
+                    if (pagination) $('#mutationPaginationContainer').html(pagination);
+                    
+                    container.find('.absolute.inset-0').remove();
+                    
+                    // Scroll to top of mutations section
+                    $('[data-tab-content="mutations"]').get(0)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                },
+                error: function() {
+                    container.find('.absolute.inset-0').remove();
+                }
+            });
+        }
+    });
+}
+
+// Profile Logout Modal Functions
+function confirmProfileLogout() {
+    const modal = document.getElementById('profileLogoutModal');
+    const modalBackdrop = document.getElementById('profileModalBackdrop');
+    
+    // Show modal with animation
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    modalBackdrop.classList.remove('hidden');
+    
+    setTimeout(() => {
+        modal.classList.remove('opacity-0', 'scale-95');
+        modal.classList.add('opacity-100', 'scale-100');
+        modalBackdrop.classList.remove('opacity-0');
+        modalBackdrop.classList.add('opacity-100');
+    }, 10);
+    
+    document.body.style.overflow = 'hidden';
+}
+
+function closeProfileLogoutModal() {
+    const modal = document.getElementById('profileLogoutModal');
+    const modalBackdrop = document.getElementById('profileModalBackdrop');
+    
+    modal.classList.remove('opacity-100', 'scale-100');
+    modal.classList.add('opacity-0', 'scale-95');
+    modalBackdrop.classList.remove('opacity-0');
+    modalBackdrop.classList.add('opacity-0');
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        modalBackdrop.classList.add('hidden');
+        document.body.style.overflow = '';
+    }, 300);
+}
+
+function proceedProfileLogout() {
+    const logoutBtn = document.getElementById('profileLogoutBtn');
+    const cancelBtn = document.getElementById('profileCancelBtn');
+    const spinner = document.getElementById('profileLogoutSpinner');
+    const btnText = document.getElementById('profileLogoutBtnText');
+    
+    // Disable buttons
+    logoutBtn.disabled = true;
+    cancelBtn.disabled = true;
+    
+    // Show loading state
+    spinner.classList.remove('hidden');
+    btnText.textContent = '{{ app()->getLocale() === 'en' ? 'Logging out...' : 'Memproses...' }}';
+    
+    // Add loading classes
+    logoutBtn.classList.add('opacity-75', 'cursor-not-allowed');
+    cancelBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    
+    // Submit after delay
+    setTimeout(() => {
+        document.getElementById('profileLogoutForm').submit();
+    }, 1500); // 1.5 second delay
+}
     </script>
     @endpush

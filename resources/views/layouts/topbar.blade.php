@@ -144,7 +144,7 @@
                             </div>
                             <span class="font-semibold">Rp {{ number_format($currentUser->balance ?? 0, 0, ',', '.') }}</span>
                         </div>
-                        <a href="{{ url('/profile') }}" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
+                        <a href="{{ localized_url('/profile') }}" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
                             <i class="ri-user-line"></i>
                             <span>{{ app()->getLocale() === 'en' ? 'Profile' : 'Profil' }}</span>
                         </a>
@@ -675,7 +675,27 @@
     
     // Confirm logout
     function proceedLogout() {
-        document.getElementById('logoutForm').submit();
+        const logoutBtn = document.getElementById('logoutBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const spinner = document.getElementById('logoutSpinner');
+        const btnText = document.getElementById('logoutBtnText');
+        
+        // Disable buttons
+        logoutBtn.disabled = true;
+        cancelBtn.disabled = true;
+        
+        // Show loading state
+        spinner.classList.remove('hidden');
+        btnText.textContent = '{{ app()->getLocale() === 'en' ? 'Logging out...' : 'Memproses...' }}';
+        
+        // Add loading classes
+        logoutBtn.classList.add('opacity-75', 'cursor-not-allowed');
+        cancelBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        
+        // Submit after delay
+        setTimeout(() => {
+            document.getElementById('logoutForm').submit();
+        }, 1500); // 1.5 second delay
     }
 </script>
 
@@ -709,11 +729,17 @@
         
         <!-- Buttons -->
         <div class="flex gap-3">
-            <button onclick="closeLogoutModal()" class="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-medium transition-colors border border-white/10">
+            <button id="cancelBtn" onclick="closeLogoutModal()" class="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-medium transition-colors border border-white/10">
                 {{ app()->getLocale() === 'en' ? 'Cancel' : 'Batal' }}
             </button>
-            <button onclick="proceedLogout()" class="flex-1 px-4 py-3 bg-linear-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-medium transition-all shadow-lg shadow-red-500/30">
-                {{ app()->getLocale() === 'en' ? 'Yes, Logout' : 'Ya, Keluar' }}
+            <button id="logoutBtn" onclick="proceedLogout()" class="flex-1 px-4 py-3 bg-linear-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-medium transition-all shadow-lg shadow-red-500/30">
+                <span class="flex items-center justify-center gap-2">
+                    <svg id="logoutSpinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span id="logoutBtnText">{{ app()->getLocale() === 'en' ? 'Yes, Logout' : 'Ya, Keluar' }}</span>
+                </span>
             </button>
         </div>
     </div>

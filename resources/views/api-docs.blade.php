@@ -413,7 +413,7 @@
             </div>
     
             <!-- Support -->
-            <div class="mt-12 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-2xl p-8 text-center">
+            <div class="mt-12 bg-linear-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-2xl p-8 text-center">
                 <i class="ri-customer-service-2-line text-5xl text-yellow-500 mb-4"></i>
                 <h3 class="text-xl font-bold text-white mb-2">
                     {{ app()->getLocale() === 'en' ? 'Need Help?' : 'Butuh Bantuan?' }}

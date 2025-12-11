@@ -10,7 +10,7 @@
             <!-- Input Search -->
             <div class="bg-[#080808] px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-6 rounded-lg">
                 <div class="flex justify-center items-center">
-                    <form action="{{ route('check-invoice') }}" method="GET" class="w-full max-w-xl">
+                    <form action="{{ localized_url('/check-invoice') }}" method="GET" class="w-full max-w-xl">
                         <input type="text" name="invoice_number" value="{{ request('invoice_number') }}" placeholder="{{ app()->getLocale() === 'en' ? 'Enter invoice number' : 'Masukkan nomor invoice' }}" 
                             class="w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-[#0E0E10] border border-gray-600 text-white placeholder-gray-400 text-xs sm:text-sm focus:border-gray-400 focus:outline-none transition" 
                             required>
@@ -53,9 +53,11 @@
                                     {{ $transaction->created_at->format('d M Y, H:i') }}
                                 </td>
                                 <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm font-medium">
-                                    @auth
+                                    @if(request('invoice_number'))
+                                        {{-- Show full invoice if user searched for it --}}
                                         {{ $transaction->trxid }}
                                     @else
+                                        {{-- Mask invoice for real-time transactions --}}
                                         @php
                                             $trxid = $transaction->trxid;
                                             $length = strlen($trxid);
@@ -67,13 +69,8 @@
                                                 $masked = substr($trxid, 0, 2) . str_repeat('*', $length - 2);
                                             }
                                         @endphp
-                                        <span class="inline-flex items-center gap-2">
-                                            {{ $masked }}
-                                            <a href="{{ route('login') }}" class="text-amber-500 hover:text-amber-400 text-[10px] sm:text-xs whitespace-nowrap" title="Login untuk melihat nomor lengkap">
-                                                <i class="ri-lock-line"></i> Login
-                                            </a>
-                                        </span>
-                                    @endauth
+                                        {{ $masked }}
+                                    @endif
                                 </td>
                                 <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm">
                                     Rp {{ number_format($transaction->price, 0, ',', '.') }}

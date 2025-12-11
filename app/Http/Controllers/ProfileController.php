@@ -56,28 +56,37 @@ class ProfileController extends Controller
             $gameQuery->where(function($q) use ($search) {
                 $q->where('trxid', 'like', "%{$search}%")
                   ->orWhere('service_name', 'like', "%{$search}%")
-                  ->orWhere('data_no', 'like', "%{$search}%");
+                  ->orWhere('data_no', 'like', "%{$search}%")
+                  ->orWhere('note', 'like', "%{$search}%")
+                  ->orWhereHas('gameService', function($query) use ($search) {
+                      $query->where('game', 'like', "%{$search}%");
+                  });
             });
             $prepaidQuery->where(function($q) use ($search) {
                 $q->where('trxid', 'like', "%{$search}%")
                   ->orWhere('service_name', 'like', "%{$search}%")
-                  ->orWhere('data_no', 'like', "%{$search}%");
+                  ->orWhere('data_no', 'like', "%{$search}%")
+                  ->orWhere('note', 'like', "%{$search}%")
+                  ->orWhereHas('prepaidService', function($query) use ($search) {
+                      $query->where('brand', 'like', "%{$search}%");
+                  });
             });
         }
 
         if ($request->filled('date')) {
             $dateFilter = $request->date;
-            $now = now();
             
             if ($dateFilter === 'today') {
-                $gameQuery->whereDate('created_at', $now->today());
-                $prepaidQuery->whereDate('created_at', $now->today());
+                $gameQuery->whereDate('created_at', now()->today());
+                $prepaidQuery->whereDate('created_at', now()->today());
             } elseif ($dateFilter === 'week') {
-                $gameQuery->where('created_at', '>=', $now->subDays(7));
-                $prepaidQuery->where('created_at', '>=', $now->subDays(7));
+                $startOfWeek = now()->subDays(7)->startOfDay();
+                $gameQuery->where('created_at', '>=', $startOfWeek);
+                $prepaidQuery->where('created_at', '>=', $startOfWeek);
             } elseif ($dateFilter === 'month') {
-                $gameQuery->where('created_at', '>=', $now->subDays(30));
-                $prepaidQuery->where('created_at', '>=', $now->subDays(30));
+                $startOfMonth = now()->subDays(30)->startOfDay();
+                $gameQuery->where('created_at', '>=', $startOfMonth);
+                $prepaidQuery->where('created_at', '>=', $startOfMonth);
             } elseif ($dateFilter !== 'all') {
                 // Fallback for specific date if needed, or ignore
                 $gameQuery->whereDate('created_at', $dateFilter);

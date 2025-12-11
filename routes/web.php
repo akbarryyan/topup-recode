@@ -137,11 +137,66 @@ Route::get('/', function () {
         ->orderBy('brand')
         ->get();
     
-    // Group by normalized brand name
-    $prepaidServices = $allPrepaidServices->groupBy(function ($item) {
+    // Group by normalized brand name (for Pulsa & Data)
+    $pulsaDataTypes = ['pulsa-reguler', 'pulsa-internasional', 'paket-internet', 'paket-telepon', 'paket-lainnya'];
+    $prepaidServices = $allPrepaidServices->filter(function ($item) use ($pulsaDataTypes) {
+        return in_array($item->type, $pulsaDataTypes);
+    })->groupBy(function ($item) {
         return strtolower(trim($item->brand));
     })->mapWithKeys(function ($group, $key) {
         $originalName = $group->first()->brand;
+        return [$originalName => $group];
+    });
+    
+    // Get streaming services (streaming-tv type)
+    $streamingServices = $allPrepaidServices->filter(function ($item) {
+        return $item->type === 'streaming-tv';
+    })->groupBy(function ($item) {
+        return strtolower(trim($item->brand));
+    })->mapWithKeys(function ($group, $key) {
+        $originalName = $group->first()->brand;
+        return [$originalName => $group];
+    });
+    
+    // Get e-wallet services (saldo-emoney type)
+    $ewalletServices = $allPrepaidServices->filter(function ($item) {
+        return $item->type === 'saldo-emoney';
+    })->groupBy(function ($item) {
+        return strtolower(trim($item->brand));
+    })->mapWithKeys(function ($group, $key) {
+        $originalName = $group->first()->brand;
+        return [$originalName => $group];
+    });
+    
+    // Get PLN services (token-pln type)
+    $plnServices = $allPrepaidServices->filter(function ($item) {
+        return $item->type === 'token-pln';
+    })->groupBy(function ($item) {
+        return strtolower(trim($item->brand));
+    })->mapWithKeys(function ($group, $key) {
+        $originalName = $group->first()->brand;
+        return [$originalName => $group];
+    });
+    
+    // Get voucher games
+    $voucherGameNames = [
+        'Steam Wallet Code', 
+        'Voucher Fortnite V Bucks', 
+        'Voucher Garena Shell', 
+        'Voucher Megaxus', 
+        'Voucher PB Zepetto', 
+        'Voucher PSN', 
+        'Voucher Razer Gold', 
+        'Voucher Roblox', 
+        'Voucher Valorant', 
+        'Warp Plus'
+    ];
+    $voucherServices = $allGameServices->filter(function ($item) use ($voucherGameNames) {
+        return in_array($item->game, $voucherGameNames);
+    })->groupBy(function ($item) {
+        return strtolower(trim($item->game));
+    })->mapWithKeys(function ($group, $key) {
+        $originalName = $group->first()->game;
         return [$originalName => $group];
     });
     
@@ -170,7 +225,19 @@ Route::get('/', function () {
         ->limit(3)
         ->get();
     
-    return view('welcome', compact('gameServices', 'gameImages', 'prepaidServices', 'brandImages', 'banners', 'popularGameData', 'news'));
+    return view('welcome', compact(
+        'gameServices', 
+        'gameImages', 
+        'prepaidServices', 
+        'streamingServices',
+        'ewalletServices',
+        'plnServices',
+        'voucherServices',
+        'brandImages', 
+        'banners', 
+        'popularGameData', 
+        'news'
+    ));
 });
 Route::middleware('guest')->group(function () {
     Route::get('/auth/login', [AuthenticatedSessionController::class, 'showLoginForm'])->name('login');

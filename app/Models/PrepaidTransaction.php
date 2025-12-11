@@ -98,6 +98,14 @@ class PrepaidTransaction extends Model
     }
 
     /**
+     * Get the prepaid service
+     */
+    public function prepaidService()
+    {
+        return $this->belongsTo(PrepaidService::class, 'service_code', 'code');
+    }
+
+    /**
      * Get status badge color
      */
     public function getStatusBadgeAttribute()

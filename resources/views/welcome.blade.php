@@ -68,6 +68,19 @@
         <div id="products-container" class="mt-4 lg:mt-6 max-w-7xl mx-auto">
             <!-- Topup Game Products -->
             <div id="topup-game-products" class="products-content">
+                <!-- Loading Skeleton -->
+                <div class="loading-skeleton hidden">
+                    <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 lg:gap-4">
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item hidden lg:block"></div>
+                        <div class="skeleton-loader skeleton-item hidden lg:block"></div>
+                    </div>
+                </div>
                 <div class="products-grid grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 lg:gap-4">
                     @foreach($gameServices as $index => $gameData)
                         @php
@@ -78,10 +91,12 @@
                             @if(isset($gameImages[$gameName]))
                                 <img src="{{ asset('storage/game-images/' . $gameImages[$gameName]->image) }}" 
                                      alt="{{ $gameName }}" 
+                                     loading="lazy"
                                      class="w-full h-full object-cover rounded-lg lg:rounded-xl hover:scale-105 transition-transform duration-300">
                             @else
                                 <img src="{{ asset('storage/game-images/game-placeholder.svg') }}" 
                                      alt="{{ $gameName }}" 
+                                     loading="lazy"
                                      class="w-full h-full object-cover rounded-lg lg:rounded-xl hover:scale-105 transition-transform duration-300">
                             @endif
                             <div class="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2 lg:p-3">
@@ -105,6 +120,19 @@
 
             <!-- Pulsa & Data Products -->
             <div id="pulsa-data-products" class="products-content hidden">
+                <!-- Loading Skeleton -->
+                <div class="loading-skeleton hidden">
+                    <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 lg:gap-4">
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item hidden lg:block"></div>
+                        <div class="skeleton-loader skeleton-item hidden lg:block"></div>
+                    </div>
+                </div>
                 <div class="products-grid grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 lg:gap-4">
                     @foreach($prepaidServices as $index => $brandData)
                         @php
@@ -115,10 +143,12 @@
                             @if(isset($brandImages[$brandName]))
                                 <img src="{{ asset('storage/brand-images/' . $brandImages[$brandName]->image) }}" 
                                      alt="{{ $brandName }}" 
+                                     loading="lazy"
                                      class="w-full h-full object-cover rounded-lg lg:rounded-xl hover:scale-105 transition-transform duration-300">
                             @else
                                 <img src="{{ asset('storage/brand-images/brand-placeholder.svg') }}" 
                                      alt="{{ $brandName }}" 
+                                     loading="lazy"
                                      class="w-full h-full object-cover rounded-lg lg:rounded-xl hover:scale-105 transition-transform duration-300">
                             @endif
                             <div class="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2 lg:p-3">
@@ -129,6 +159,214 @@
                 </div>
 
                 @if($prepaidServices->count() > 6)
+                    <div class="mt-4 lg:mt-6 text-center">
+                        <button class="show-more-btn bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 lg:px-8 py-2 lg:py-3 rounded-lg lg:rounded-xl transition-colors duration-300 text-sm lg:text-base">
+                            {{ app()->getLocale() === 'en' ? 'Show More' : 'Tampilkan Lebih Banyak' }}
+                        </button>
+                        <button class="show-less-btn hidden bg-gray-700 hover:bg-gray-600 text-white font-semibold px-6 lg:px-8 py-2 lg:py-3 rounded-lg lg:rounded-xl transition-colors duration-300 text-sm lg:text-base">
+                            {{ app()->getLocale() === 'en' ? 'Show Less' : 'Tampilkan Lebih Sedikit' }}
+                        </button>
+                    </div>
+                @endif
+            </div>
+
+            <!-- Voucher Products -->
+            <div id="voucher-products" class="products-content hidden">
+                <!-- Loading Skeleton -->
+                <div class="loading-skeleton hidden">
+                    <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 lg:gap-4">
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item hidden lg:block"></div>
+                        <div class="skeleton-loader skeleton-item hidden lg:block"></div>
+                    </div>
+                </div>
+                <div class="products-grid grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 lg:gap-4">
+                    @foreach($voucherServices as $index => $gameData)
+                        @php
+                            $gameName = $index;
+                            $services = $gameData;
+                        @endphp
+                        <button class="product-item relative overflow-hidden rounded-lg lg:rounded-xl {{ $loop->index >= 6 ? 'hidden lg:block' : '' }} {{ $loop->index >= 16 ? 'lg:hidden' : '' }}" data-name="{{ $gameName }}">
+                            @if(isset($gameImages[$gameName]))
+                                <img src="{{ asset('storage/game-images/' . $gameImages[$gameName]->image) }}" 
+                                     alt="{{ $gameName }}" 
+                                     loading="lazy"
+                                     class="w-full h-full object-cover rounded-lg lg:rounded-xl hover:scale-105 transition-transform duration-300">
+                            @else
+                                <img src="{{ asset('storage/game-images/game-placeholder.svg') }}" 
+                                     alt="{{ $gameName }}" 
+                                     loading="lazy"
+                                     class="w-full h-full object-cover rounded-lg lg:rounded-xl hover:scale-105 transition-transform duration-300">
+                            @endif
+                            <div class="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2 lg:p-3">
+                                <p class="text-white text-xs lg:text-sm font-semibold truncate">{{ $gameName }}</p>
+                            </div>
+                        </button>
+                    @endforeach
+                </div>
+
+                @if($voucherServices->count() > 6)
+                    <div class="mt-4 lg:mt-6 text-center">
+                        <button class="show-more-btn bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 lg:px-8 py-2 lg:py-3 rounded-lg lg:rounded-xl transition-colors duration-300 text-sm lg:text-base">
+                            {{ app()->getLocale() === 'en' ? 'Show More' : 'Tampilkan Lebih Banyak' }}
+                        </button>
+                        <button class="show-less-btn hidden bg-gray-700 hover:bg-gray-600 text-white font-semibold px-6 lg:px-8 py-2 lg:py-3 rounded-lg lg:rounded-xl transition-colors duration-300 text-sm lg:text-base">
+                            {{ app()->getLocale() === 'en' ? 'Show Less' : 'Tampilkan Lebih Sedikit' }}
+                        </button>
+                    </div>
+                @endif
+            </div>
+
+            <!-- PLN Products -->
+            <div id="pln-products" class="products-content hidden">
+                <!-- Loading Skeleton -->
+                <div class="loading-skeleton hidden">
+                    <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 lg:gap-4">
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item hidden lg:block"></div>
+                        <div class="skeleton-loader skeleton-item hidden lg:block"></div>
+                    </div>
+                </div>
+                <div class="products-grid grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 lg:gap-4">
+                    @foreach($plnServices as $index => $brandData)
+                        @php
+                            $brandName = $index;
+                            $services = $brandData;
+                        @endphp
+                        <button class="product-item relative overflow-hidden rounded-lg lg:rounded-xl {{ $loop->index >= 6 ? 'hidden lg:block' : '' }} {{ $loop->index >= 16 ? 'lg:hidden' : '' }}" data-name="{{ $brandName }}">
+                            @if(isset($brandImages[$brandName]))
+                                <img src="{{ asset('storage/brand-images/' . $brandImages[$brandName]->image) }}" 
+                                     alt="{{ $brandName }}" 
+                                     loading="lazy"
+                                     class="w-full h-full object-cover rounded-lg lg:rounded-xl hover:scale-105 transition-transform duration-300">
+                            @else
+                                <img src="{{ asset('storage/brand-images/brand-placeholder.svg') }}" 
+                                     alt="{{ $brandName }}" 
+                                     loading="lazy"
+                                     class="w-full h-full object-cover rounded-lg lg:rounded-xl hover:scale-105 transition-transform duration-300">
+                            @endif
+                            <div class="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2 lg:p-3">
+                                <p class="text-white text-xs lg:text-sm font-semibold truncate">{{ $brandName }}</p>
+                            </div>
+                        </button>
+                    @endforeach
+                </div>
+
+                @if($plnServices->count() > 6)
+                    <div class="mt-4 lg:mt-6 text-center">
+                        <button class="show-more-btn bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 lg:px-8 py-2 lg:py-3 rounded-lg lg:rounded-xl transition-colors duration-300 text-sm lg:text-base">
+                            {{ app()->getLocale() === 'en' ? 'Show More' : 'Tampilkan Lebih Banyak' }}
+                        </button>
+                        <button class="show-less-btn hidden bg-gray-700 hover:bg-gray-600 text-white font-semibold px-6 lg:px-8 py-2 lg:py-3 rounded-lg lg:rounded-xl transition-colors duration-300 text-sm lg:text-base">
+                            {{ app()->getLocale() === 'en' ? 'Show Less' : 'Tampilkan Lebih Sedikit' }}
+                        </button>
+                    </div>
+                @endif
+            </div>
+
+            <!-- E-Wallet Products -->
+            <div id="ewallet-products" class="products-content hidden">
+                <!-- Loading Skeleton -->
+                <div class="loading-skeleton hidden">
+                    <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 lg:gap-4">
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item hidden lg:block"></div>
+                        <div class="skeleton-loader skeleton-item hidden lg:block"></div>
+                    </div>
+                </div>
+                <div class="products-grid grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 lg:gap-4">
+                    @foreach($ewalletServices as $index => $brandData)
+                        @php
+                            $brandName = $index;
+                            $services = $brandData;
+                        @endphp
+                        <button class="product-item relative overflow-hidden rounded-lg lg:rounded-xl {{ $loop->index >= 6 ? 'hidden lg:block' : '' }} {{ $loop->index >= 16 ? 'lg:hidden' : '' }}" data-name="{{ $brandName }}">
+                            @if(isset($brandImages[$brandName]))
+                                <img src="{{ asset('storage/brand-images/' . $brandImages[$brandName]->image) }}" 
+                                     alt="{{ $brandName }}" 
+                                     loading="lazy"
+                                     class="w-full h-full object-cover rounded-lg lg:rounded-xl hover:scale-105 transition-transform duration-300">
+                            @else
+                                <img src="{{ asset('storage/brand-images/brand-placeholder.svg') }}" 
+                                     alt="{{ $brandName }}" 
+                                     loading="lazy"
+                                     class="w-full h-full object-cover rounded-lg lg:rounded-xl hover:scale-105 transition-transform duration-300">
+                            @endif
+                            <div class="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2 lg:p-3">
+                                <p class="text-white text-xs lg:text-sm font-semibold truncate">{{ $brandName }}</p>
+                            </div>
+                        </button>
+                    @endforeach
+                </div>
+
+                @if($ewalletServices->count() > 6)
+                    <div class="mt-4 lg:mt-6 text-center">
+                        <button class="show-more-btn bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 lg:px-8 py-2 lg:py-3 rounded-lg lg:rounded-xl transition-colors duration-300 text-sm lg:text-base">
+                            {{ app()->getLocale() === 'en' ? 'Show More' : 'Tampilkan Lebih Banyak' }}
+                        </button>
+                        <button class="show-less-btn hidden bg-gray-700 hover:bg-gray-600 text-white font-semibold px-6 lg:px-8 py-2 lg:py-3 rounded-lg lg:rounded-xl transition-colors duration-300 text-sm lg:text-base">
+                            {{ app()->getLocale() === 'en' ? 'Show Less' : 'Tampilkan Lebih Sedikit' }}
+                        </button>
+                    </div>
+                @endif
+            </div>
+
+            <!-- Streaming Products -->
+            <div id="streaming-products" class="products-content hidden">
+                <!-- Loading Skeleton -->
+                <div class="loading-skeleton hidden">
+                    <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 lg:gap-4">
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item"></div>
+                        <div class="skeleton-loader skeleton-item hidden lg:block"></div>
+                        <div class="skeleton-loader skeleton-item hidden lg:block"></div>
+                    </div>
+                </div>
+                <div class="products-grid grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 lg:gap-4">
+                    @foreach($streamingServices as $index => $brandData)
+                        @php
+                            $brandName = $index;
+                            $services = $brandData;
+                        @endphp
+                        <button class="product-item relative overflow-hidden rounded-lg lg:rounded-xl {{ $loop->index >= 6 ? 'hidden lg:block' : '' }} {{ $loop->index >= 16 ? 'lg:hidden' : '' }}" data-name="{{ $brandName }}">
+                            @if(isset($brandImages[$brandName]))
+                                <img src="{{ asset('storage/brand-images/' . $brandImages[$brandName]->image) }}" 
+                                     alt="{{ $brandName }}" 
+                                     loading="lazy"
+                                     class="w-full h-full object-cover rounded-lg lg:rounded-xl hover:scale-105 transition-transform duration-300">
+                            @else
+                                <img src="{{ asset('storage/brand-images/brand-placeholder.svg') }}" 
+                                     alt="{{ $brandName }}" 
+                                     loading="lazy"
+                                     class="w-full h-full object-cover rounded-lg lg:rounded-xl hover:scale-105 transition-transform duration-300">
+                            @endif
+                            <div class="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2 lg:p-3">
+                                <p class="text-white text-xs lg:text-sm font-semibold truncate">{{ $brandName }}</p>
+                            </div>
+                        </button>
+                    @endforeach
+                </div>
+
+                @if($streamingServices->count() > 6)
                     <div class="mt-4 lg:mt-6 text-center">
                         <button class="show-more-btn bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 lg:px-8 py-2 lg:py-3 rounded-lg lg:rounded-xl transition-colors duration-300 text-sm lg:text-base">
                             {{ app()->getLocale() === 'en' ? 'Show More' : 'Tampilkan Lebih Banyak' }}
@@ -183,6 +421,33 @@
             }
             .banner-credit {
                 position: absolute;
+            }
+        }
+
+        /* Loading Skeleton Animation */
+        .skeleton-loader {
+            background: linear-gradient(90deg, #27272A 25%, #3f3f46 50%, #27272A 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .skeleton-item {
+            aspect-ratio: 3/4;
+            border-radius: 0.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .skeleton-item {
+                border-radius: 0.75rem;
             }
         }
     </style>
@@ -272,10 +537,18 @@
             const locale = '{{ app()->getLocale() }}';
             const tabContentMap = locale === 'en' ? {
                 'Game Topup': 'topup-game-products',
-                'Credit & Data': 'pulsa-data-products'
+                'Credit & Data': 'pulsa-data-products',
+                'Voucher': 'voucher-products',
+                'Electricity': 'pln-products',
+                'E-Wallet': 'ewallet-products',
+                'Streaming': 'streaming-products'
             } : {
                 'Topup Game': 'topup-game-products',
-                'Pulsa & Data': 'pulsa-data-products'
+                'Pulsa & Data': 'pulsa-data-products',
+                'Voucher': 'voucher-products',
+                'PLN': 'pln-products',
+                'E-Wallet': 'ewallet-products',
+                'Streaming': 'streaming-products'
             };
             
             // Tab switching
@@ -298,12 +571,30 @@
                         content.classList.add('hidden');
                     });
                     
-                    // Show selected content
+                    // Show selected content with loading animation
                     const contentId = tabContentMap[tabText];
                     if (contentId) {
                         const selectedContent = document.getElementById(contentId);
                         if (selectedContent) {
                             selectedContent.classList.remove('hidden');
+                            
+                            // Show loading skeleton
+                            const skeleton = selectedContent.querySelector('.loading-skeleton');
+                            const productsGrid = selectedContent.querySelector('.products-grid');
+                            const showMoreSection = selectedContent.querySelector('.mt-4');
+                            
+                            if (skeleton && productsGrid) {
+                                skeleton.classList.remove('hidden');
+                                productsGrid.classList.add('hidden');
+                                if (showMoreSection) showMoreSection.classList.add('hidden');
+                                
+                                // Simulate loading delay
+                                setTimeout(() => {
+                                    skeleton.classList.add('hidden');
+                                    productsGrid.classList.remove('hidden');
+                                    if (showMoreSection) showMoreSection.classList.remove('hidden');
+                                }, 400);
+                            }
                         }
                     }
                 });
@@ -321,12 +612,56 @@
                 });
             });
 
+            // Handle voucher product click to go to order page (game services)
+            document.querySelectorAll('#voucher-products .product-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const gameName = this.getAttribute('data-name');
+                    if (gameName) {
+                        const gameSlug = gameName.toLowerCase().replace(/\s+/g, '-');
+                        window.location.href = `/{{ app()->getLocale() }}/order/${gameSlug}`;
+                    }
+                });
+            });
+
             // Handle prepaid product click to go to prepaid order page
             document.querySelectorAll('#pulsa-data-products .product-item').forEach(item => {
                 item.addEventListener('click', function() {
                     const brandName = this.getAttribute('data-name');
                     if (brandName) {
                         // Convert brand name to URL-friendly format (lowercase, replace spaces with hyphens)
+                        const brandSlug = brandName.toLowerCase().replace(/\s+/g, '-');
+                        window.location.href = `/{{ app()->getLocale() }}/order/prepaid/${brandSlug}`;
+                    }
+                });
+            });
+
+            // Handle PLN product click
+            document.querySelectorAll('#pln-products .product-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const brandName = this.getAttribute('data-name');
+                    if (brandName) {
+                        const brandSlug = brandName.toLowerCase().replace(/\s+/g, '-');
+                        window.location.href = `/{{ app()->getLocale() }}/order/prepaid/${brandSlug}`;
+                    }
+                });
+            });
+
+            // Handle E-Wallet product click
+            document.querySelectorAll('#ewallet-products .product-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const brandName = this.getAttribute('data-name');
+                    if (brandName) {
+                        const brandSlug = brandName.toLowerCase().replace(/\s+/g, '-');
+                        window.location.href = `/{{ app()->getLocale() }}/order/prepaid/${brandSlug}`;
+                    }
+                });
+            });
+
+            // Handle Streaming product click
+            document.querySelectorAll('#streaming-products .product-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const brandName = this.getAttribute('data-name');
+                    if (brandName) {
                         const brandSlug = brandName.toLowerCase().replace(/\s+/g, '-');
                         window.location.href = `/{{ app()->getLocale() }}/order/prepaid/${brandSlug}`;
                     }
