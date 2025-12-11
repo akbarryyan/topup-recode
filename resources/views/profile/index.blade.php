@@ -803,10 +803,10 @@
 </div>
 
 <!-- Logout Modal Backdrop -->
-<div id="profileModalBackdrop" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998] opacity-0 transition-opacity duration-300"></div>
+<div id="profileModalBackdrop" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-9998 opacity-0 transition-opacity duration-300"></div>
 
 <!-- Logout Confirmation Modal -->
-<div id="profileLogoutModal" class="hidden fixed inset-0 z-[9999] items-center justify-center p-4 opacity-0 scale-95 transition-all duration-300">
+<div id="profileLogoutModal" class="hidden fixed inset-0 z-9999 items-center justify-center p-4 opacity-0 scale-95 transition-all duration-300">
     <div class="bg-[#1F1F23] rounded-2xl border border-white/10 shadow-2xl max-w-md w-full p-6 relative">
         <!-- Close Button -->
         <button onclick="closeProfileLogoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">

@@ -125,9 +125,9 @@
 
         <!-- CTA Button -->
         <div class="mt-8 text-center">
-            <button id="toggleAbout" class="group inline-flex items-center gap-2 bg-linear-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold px-8 py-2 rounded-xl transition-all duration-300 hover:scale-105">
+            <button id="toggleAbout" class="group inline-flex items-center gap-2 bg-linear-to-b from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black font-bold px-8 py-3 rounded-xl transition-all duration-300 shadow-[0_5px_0_rgba(161,98,7,0.8),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_2px_0_rgba(161,98,7,0.8),inset_0_1px_0_rgba(255,255,255,0.3)] hover:translate-y-[3px] active:translate-y-[5px] active:shadow-[0_0px_0_rgba(161,98,7,0.8)]">
                 <span id="toggleText">{{ app()->getLocale() === 'en' ? 'Read More' : 'Baca Selengkapnya' }}</span>
-                <i id="toggleIcon" class="ri-arrow-down-s-line text-xl group-hover:translate-y-0.5 transition-transform"></i>
+                <i id="toggleIcon" class="ri-arrow-down-s-line text-xl transition-transform"></i>
             </button>
         </div>
     </div>

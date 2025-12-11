@@ -71,8 +71,8 @@
 
             <!-- Sign In / Account Button (Desktop only) -->
             @guest
-            <a href="{{ localized_url('/auth/login') }}" class="hidden lg:flex items-center gap-2 px-6 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-2xl transition-all">
-                <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Sign In' : 'Masuk' }}</span>
+            <a href="{{ localized_url('/auth/login') }}" class="hidden lg:flex items-center gap-2 px-6 py-2.5 bg-linear-to-b from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white rounded-2xl transition-all font-medium shadow-[0_5px_0_rgba(29,78,216,0.9),inset_0_1px_0_rgba(255,255,255,0.3),0_8px_20px_rgba(59,130,246,0.4)] hover:shadow-[0_2px_0_rgba(29,78,216,0.9),inset_0_1px_0_rgba(255,255,255,0.3),0_4px_12px_rgba(59,130,246,0.3)] hover:translate-y-[3px] active:translate-y-[5px] active:shadow-[0_0px_0_rgba(29,78,216,0.9),inset_0_1px_0_rgba(255,255,255,0.3)]">
+                <span>{{ app()->getLocale() === 'en' ? 'Sign In' : 'Masuk' }}</span>
             </a>
             @else
             <div class="hidden lg:block relative">
@@ -316,7 +316,7 @@
         <!-- Sign In Button -->
         @guest
         <div class="mt-8 pt-6 border-t border-gray-800">
-            <a href="{{ localized_url('/auth/login') }}" class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-transparent border border-gray-700 text-white hover:bg-[#27272A] hover:border-gray-500 rounded-lg transition-all">
+            <a href="{{ localized_url('/auth/login') }}" class="flex items-center justify-center gap-2 w-full px-4 py-1 bg-linear-to-b from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white rounded-lg transition-all shadow-[0_5px_0_rgba(29,78,216,0.9),inset_0_1px_0_rgba(255,255,255,0.3),0_8px_20px_rgba(59,130,246,0.4)] hover:shadow-[0_2px_0_rgba(29,78,216,0.9),inset_0_1px_0_rgba(255,255,255,0.3),0_4px_12px_rgba(59,130,246,0.3)] hover:translate-y-[3px] active:translate-y-[5px] active:shadow-[0_0px_0_rgba(29,78,216,0.9),inset_0_1px_0_rgba(255,255,255,0.3)]">
                 <i class="ri-login-box-line text-[18px]"></i>
                 <span class="font-medium">{{ app()->getLocale() === 'en' ? 'Sign In' : 'Masuk' }}</span>
             </a>

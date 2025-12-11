@@ -5,10 +5,11 @@
     <!-- Banner Section -->
     <div class="mt-14 lg:mt-[124px]">
         <div class="relative bg-[#27272A] px-3 lg:px-8 pt-4 lg:pt-6 pb-8 lg:pb-12">
-            <div class="mx-auto">
+            <div class="mx-auto max-w-7xl lg:flex lg:items-start lg:gap-6">
                 <!-- Banner Carousel -->
-                <div class="overflow-hidden rounded-xl lg:rounded-2xl">
-                    <div id="banner-carousel" class="flex transition-transform duration-500 ease-in-out">
+                <div class="relative lg:flex-1">
+                    <div class="overflow-hidden rounded-xl lg:rounded-2xl">
+                        <div id="banner-carousel" class="flex transition-transform duration-500 ease-in-out">
                         @forelse($banners as $banner)
                         <div class="banner-slide w-full shrink-0">
                             @if($banner->link)
@@ -42,25 +43,83 @@
                         @endforeach
                     </div>
                     @endif
+                    </div>
+                </div>
+
+                <!-- Popular Games List (Desktop Only) -->
+                <div class="hidden lg:block lg:w-[380px] lg:shrink-0">
+                    <div class="flex flex-col gap-1">
+                        @php
+                            // Get popular games from game_services
+                            $popularGameNames = ['Mobile Legends A', 'Mobile Legends', 'Free Fire', 'Free Fire Max', 'PUBG Mobile (GLOBAL)'];
+                            $popularGames = [];
+                            
+                            foreach($popularGameNames as $gameName) {
+                                if(isset($gameServices[$gameName])) {
+                                    $gameImage = $gameImages->get($gameName);
+                                    $popularGames[] = [
+                                        'name' => $gameName,
+                                        'image' => $gameImage ? asset('storage/game-images/' . $gameImage->image) : asset('storage/game-images/game-placeholder.svg'),
+                                        'publisher' => $gameName == 'Mobile Legends' || $gameName == 'Mobile Legends A' ? 'Moonton' : 
+                                                      ($gameName == 'Free Fire' || $gameName == 'Free Fire Max' ? 'Garena' : 'Tencent Games')
+                                    ];
+                                }
+                            }
+                        @endphp
+                        
+                        @foreach($popularGames as $game)
+                            <!-- Individual Game Card with Layered Background -->
+                            <div class="relative">
+                                <!-- Background Layer (visible at top) -->
+                                <div class="absolute -top-1 left-2 right-2 h-3 bg-linear-to-br from-yellow-500/20 to-yellow-600/20 rounded-t-2xl blur-sm"></div>
+                                
+                                <!-- Main Card -->
+                                <div class="relative bg-linear-to-br from-[#1a1a1e] via-[#111114] to-[#0a0a0c] rounded-2xl border border-white/10 overflow-visible shadow-lg hover:shadow-xl transition-shadow">
+                                    <!-- Best Badge - Wrapping around top right corner -->
+                                    <div class="absolute -right-1 -top-1 z-20">
+                                        <div class="relative">
+                                            <div class="bg-linear-to-br from-yellow-400 via-yellow-500 to-yellow-600 text-black text-[9px] font-black px-3 py-1.5 rounded-full shadow-lg border-2 border-yellow-300">
+                                                BEST SELLER
+                                            </div>
+                                            <!-- Glow effect -->
+                                            <div class="absolute inset-0 bg-yellow-400/30 rounded-full blur-md -z-10"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <button onclick="window.location.href='{{ localized_url('/order/' . Str::slug($game['name'])) }}'" class="w-full flex items-center gap-3 p-4 hover:bg-white/5 transition-all group relative">
+                                        <div class="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-[#1a1a1e] ring-2 ring-white/5 group-hover:ring-yellow-500/30 transition-all">
+                                            <img src="{{ $game['image'] }}" alt="{{ $game['name'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                        </div>
+                                        <div class="flex-1 text-left">
+                                            <h3 class="font-semibold text-white group-hover:text-yellow-500 transition-colors text-sm">{{ $game['name'] }}</h3>
+                                            <p class="text-xs text-gray-400 mt-0.5 group-hover:text-gray-300 transition-colors">{{ $game['publisher'] }}</p>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Popular Section -->
-    @include('components.popular-section')
+    <!-- Popular Section (Mobile Only) -->
+    <div class="lg:hidden">
+        @include('components.popular-section')
+    </div>
 
     <!-- Categories Section -->
     <div class="bg-[#000000] px-3 lg:px-8 py-6 lg:py-8">
         <!-- Categories Tab -->
         <div class="overflow-x-auto scrollbar-hide max-w-7xl mx-auto">
             <div class="flex items-center justify-center lg:justify-center gap-2 lg:gap-4 min-w-max">
-                <button class="category-tab bg-[#141214] active text-white text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-yellow-500 transition-all rounded-t-lg">{{ app()->getLocale() === 'en' ? 'Game Topup' : 'Topup Game' }}</button>
-                <button class="category-tab bg-[#141214] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg">{{ app()->getLocale() === 'en' ? 'Credit & Data' : 'Pulsa & Data' }}</button>
-                <button class="category-tab bg-[#141214] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg">{{ app()->getLocale() === 'en' ? 'Voucher' : 'Voucher' }}</button>
-                <button class="category-tab bg-[#141214] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg">{{ app()->getLocale() === 'en' ? 'Electricity' : 'PLN' }}</button>
-                <button class="category-tab bg-[#141214] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg">{{ app()->getLocale() === 'en' ? 'E-Wallet' : 'E-Wallet' }}</button>
-                <button class="category-tab bg-[#141214] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg">{{ app()->getLocale() === 'en' ? 'Streaming' : 'Streaming' }}</button>
+                <button class="category-tab bg-linear-to-b from-[#1c1c1e] to-[#0a0a0c] active text-white text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-yellow-500 transition-all rounded-t-lg shadow-[0_4px_0_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_2px_0_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] hover:translate-y-[2px]">{{ app()->getLocale() === 'en' ? 'Game Topup' : 'Topup Game' }}</button>
+                <button class="category-tab bg-linear-to-b from-[#1c1c1e] to-[#0a0a0c] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg shadow-[0_4px_0_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_2px_0_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] hover:translate-y-[2px]">{{ app()->getLocale() === 'en' ? 'Credit & Data' : 'Pulsa & Data' }}</button>
+                <button class="category-tab bg-linear-to-b from-[#1c1c1e] to-[#0a0a0c] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg shadow-[0_4px_0_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_2px_0_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] hover:translate-y-[2px]">{{ app()->getLocale() === 'en' ? 'Voucher' : 'Voucher' }}</button>
+                <button class="category-tab bg-linear-to-b from-[#1c1c1e] to-[#0a0a0c] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg shadow-[0_4px_0_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_2px_0_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] hover:translate-y-[2px]">{{ app()->getLocale() === 'en' ? 'Electricity' : 'PLN' }}</button>
+                <button class="category-tab bg-linear-to-b from-[#1c1c1e] to-[#0a0a0c] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg shadow-[0_4px_0_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_2px_0_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] hover:translate-y-[2px]">{{ app()->getLocale() === 'en' ? 'E-Wallet' : 'E-Wallet' }}</button>
+                <button class="category-tab bg-linear-to-b from-[#1c1c1e] to-[#0a0a0c] text-gray-400 text-sm lg:text-base font-semibold px-4 lg:px-6 py-2 lg:py-3 whitespace-nowrap border-b-2 border-transparent hover:text-white transition-all rounded-t-lg shadow-[0_4px_0_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_2px_0_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] hover:translate-y-[2px]">{{ app()->getLocale() === 'en' ? 'Streaming' : 'Streaming' }}</button>
             </div>
         </div>
 
@@ -108,10 +167,10 @@
 
                 @if($gameServices->count() > 6)
                     <div class="mt-4 lg:mt-6 text-center">
-                        <button class="show-more-btn bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 lg:px-8 py-2 lg:py-3 rounded-lg lg:rounded-xl transition-colors duration-300 text-sm lg:text-base">
+                        <button class="show-more-btn bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black font-semibold px-6 lg:px-8 py-2 lg:py-3 rounded-lg lg:rounded-xl transition-all duration-300 text-sm lg:text-base shadow-[0_4px_0_rgba(161,98,7,0.8),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_2px_0_rgba(161,98,7,0.8),inset_0_1px_0_rgba(255,255,255,0.3)] hover:translate-y-[2px] active:translate-y-[4px] active:shadow-[0_0px_0_rgba(161,98,7,0.8)]">
                             {{ app()->getLocale() === 'en' ? 'Show More' : 'Tampilkan Lebih Banyak' }}
                         </button>
-                        <button class="show-less-btn hidden bg-gray-700 hover:bg-gray-600 text-white font-semibold px-6 lg:px-8 py-2 lg:py-3 rounded-lg lg:rounded-xl transition-colors duration-300 text-sm lg:text-base">
+                        <button class="show-less-btn hidden bg-gradient-to-b from-gray-600 to-gray-800 hover:from-gray-500 hover:to-gray-700 text-white font-semibold px-6 lg:px-8 py-2 lg:py-3 rounded-lg lg:rounded-xl transition-all duration-300 text-sm lg:text-base shadow-[0_4px_0_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.1)] hover:shadow-[0_2px_0_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.1)] hover:translate-y-[2px] active:translate-y-[4px] active:shadow-[0_0px_0_rgba(0,0,0,0.5)]">
                             {{ app()->getLocale() === 'en' ? 'Show Less' : 'Tampilkan Lebih Sedikit' }}
                         </button>
                     </div>
@@ -450,6 +509,22 @@
                 border-radius: 0.75rem;
             }
         }
+
+        /* Products Grid Fade In Animation */
+        .products-grid {
+            animation: fadeIn 0.9s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 
     <script>
@@ -585,13 +660,19 @@
                             
                             if (skeleton && productsGrid) {
                                 skeleton.classList.remove('hidden');
-                                productsGrid.classList.add('hidden');
+                                productsGrid.classList.add('hidden', 'opacity-0');
                                 if (showMoreSection) showMoreSection.classList.add('hidden');
                                 
                                 // Simulate loading delay
                                 setTimeout(() => {
                                     skeleton.classList.add('hidden');
                                     productsGrid.classList.remove('hidden');
+                                    
+                                    // Trigger animation
+                                    requestAnimationFrame(() => {
+                                        productsGrid.classList.remove('opacity-0');
+                                    });
+                                    
                                     if (showMoreSection) showMoreSection.classList.remove('hidden');
                                 }, 400);
                             }

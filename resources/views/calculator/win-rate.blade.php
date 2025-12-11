@@ -64,7 +64,7 @@
                     <div>
                         <button 
                             type="submit" 
-                            class="w-full bg-linear-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold py-3 px-6 rounded-3xl transition-all shadow-lg shadow-yellow-500/30"
+                            class="w-full bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black font-bold py-3 px-6 rounded-3xl transition-all shadow-[0_5px_0_rgba(161,98,7,0.8),inset_0_1px_0_rgba(255,255,255,0.3),0_10px_30px_rgba(234,179,8,0.3)] hover:shadow-[0_2px_0_rgba(161,98,7,0.8),inset_0_1px_0_rgba(255,255,255,0.3),0_5px_20px_rgba(234,179,8,0.2)] hover:translate-y-[3px] active:translate-y-[5px] active:shadow-[0_0px_0_rgba(161,98,7,0.8),inset_0_1px_0_rgba(255,255,255,0.3)]"
                         >
                             Hitung
                         </button>
